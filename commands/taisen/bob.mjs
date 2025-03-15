@@ -1,13 +1,30 @@
 import { SlashCommandBuilder } from 'discord.js';
+import fs from 'fs/promises';
 
 export const data = new SlashCommandBuilder()
   .setName('bob')
   .setDescription('BOBが返信してくれます');
 
-export async function execute(interaction){
-  const arr = ["赤色", "青色", "緑色", "黄色", "水色"]
-  const random = Math.floor( Math.random() * arr.length);
-  const color = arr[random];
+export async function execute(interaction) {
+  try {
+    // ファイルを読み込む（非同期処理）
+    const textData = await fs.readFile('Normal_bob.txt', 'utf-8');
 
-	await interaction.reply(`ラッキーカラーは${color}だよ～`);
+    // 改行で分割して配列arrにする
+    const arr = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    if (arr.length === 0) {
+      await interaction.reply('エラー: データがありません');
+      return;
+    }
+
+    // ランダムに選ぶ
+    const random = Math.floor(Math.random() * arr.length);
+    const comment = arr[random];
+
+    await interaction.reply(`${comment}`);
+  } catch (error) {
+    console.error('ファイル読み込みエラー:', error);
+    await interaction.reply('エラー: ファイルを読み込めませんでした');
+  }
 }
