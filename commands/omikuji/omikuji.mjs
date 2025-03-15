@@ -36,15 +36,15 @@ export async function execute(interaction) {
   // 1322583560938590238 = negi
   // 1322582345445937203 = sambow
   const mao = "<:custom_emoji:1322580002491072653>"; // 魔王
-  const gunshin = "<:custom_emoji:1322580002491072653>"; //軍神 
-  const yurigami = "<:custom_emoji:1322580002491072653>"; //百合神
-  const otsupai = "<:custom_emoji:1322580002491072653>"; // 乙牌
-  const lucky = "<:custom_emoji:1322580002491072653>"; // 大吉、撃破王、吉
-  const negi = "<:custom_emoji:1322580002491072653>"; // ネギ吉
-  const sambow = "<:custom_emoji:1322580002491072653>"; // もみ吉
-  const matcha = "<:custom_emoji:1322580002491072653>"; // 抹吉
-  const unlucky = "<:custom_emoji:1322580002491072653>"; // 凶、大凶
-  const senpan = "<:custom_emoji:1322580002491072653>"; // 大戦犯
+  const gunshin = "<:custom_emoji:1322826267187478549>"; //軍神 
+  const yurigami = "<:custom_emoji:1350383778643841065>"; //百合神
+  const otsupai = "<:custom_emoji:1322843082399547483>"; // 乙牌
+  const lucky = "<:custom_emoji:1329812204475777066>"; // 大吉、撃破王、吉
+  const negi = "<:custom_emoji:1322583560938590238>"; // ネギ吉
+  const sambow = "<:custom_emoji:1322582345445937203>"; // もみ吉
+  const matcha = "<:custom_emoji:1322580258125516953>"; // 抹吉
+  const unlucky = "<:custom_emoji:1322730562145882122>"; // 凶、大凶
+  const senpan = "<:custom_emoji:1322844796091367477>"; // 大戦犯
 
   
   await interaction.reply(`運　勢 ： ${result} ！\n`);
