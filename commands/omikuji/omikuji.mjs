@@ -28,7 +28,7 @@ const filePath_worst3 = `${__dirname}/comment3_worst.txt`;
 const filePath_yurigami1 = `${__dirname}/comment1_yurigami.txt`;
 const filePath_yurigami2 = `${__dirname}/comment2_yurigami.txt`;
 const filePath_yurigami3 = `${__dirname}/comment3_yurigami.txt`;
-const filePath_otsupai3 = `${__dirname}/comment3_otsupai.txt`;
+const filePath_otsupai = `${__dirname}/comment3_otsupai.txt`;
 
 export const data = new SlashCommandBuilder()
   .setName("omikuji")
@@ -177,11 +177,11 @@ export async function execute(interaction) {
       // ファイルが存在するかチェック
       await fs.access(filePath_lucky1);
       await fs.access(filePath_lucky2);
-      await fs.access(filePath_otsupai3);
+      await fs.access(filePath_otsupai);
       // ファイルを読み込む（非同期処理）
       const textData = await fs.readFile(filePath_lucky1, 'utf-8');
       const textData2 = await fs.readFile(filePath_lucky2, 'utf-8');
-      const textData3 = await fs.readFile(filePath_otsupai3, 'utf-8'); 
+      const textData3 = await fs.readFile(filePath_otsupai, 'utf-8'); 
     　// 改行で分割して配列arrにする
       const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
       const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
