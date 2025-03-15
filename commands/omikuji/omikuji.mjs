@@ -47,5 +47,5 @@ export async function execute(interaction) {
   const senpan = "<:custom_emoji:1322844796091367477>"; // 大戦犯
 
   
-  await interaction.reply(`おみくじを引いた！」\n**運　勢 ： ${result} ！**\n\n待ち人：来ず\旅行運：スられる`);
+  await interaction.reply(`おみくじを引いた！」\n## 運　勢 ： ${result} ！**\n─────────────────────\n待ち人：来ず\n旅行運：スられる`);
 }
