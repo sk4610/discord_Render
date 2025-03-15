@@ -35,6 +35,64 @@ export async function execute(interaction) {
     }
   }
 
+    // comment1処理
+    // ファイルが存在するかチェック
+    await fs.access(filePath_gunshin1);
+    
+    // ファイルを読み込む（非同期処理）
+    const textData = await fs.readFile(filePath_gunshin1, 'utf-8');
+
+    // 改行で分割して配列arrにする
+    const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    if (arr1.length === 0) {
+      await interaction.reply('エラー: データがありません');
+      return;
+    }
+
+    // ランダムに選ぶ
+    const random1 = Math.floor(Math.random() * arr.length);
+    const comment1 = arr1[random1];
+
+    // comment2処理
+    // ファイルが存在するかチェック
+    await fs.access(filePath_gunshin2);
+    
+    // ファイルを読み込む（非同期処理）
+    const textData2 = await fs.readFile(filePath_gunshin2, 'utf-8');
+
+    // 改行で分割して配列arrにする
+    const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    if (arr2.length === 0) {
+      await interaction.reply('エラー: データがありません');
+      return;
+    }
+
+    // ランダムに選ぶ
+    const random2 = Math.floor(Math.random() * arr.length);
+    const comment2 = arr2[random2];
+
+      // comment3処理
+    // ファイルが存在するかチェック
+    await fs.access(filePath_gunshin3);
+    
+    // ファイルを読み込む（非同期処理）
+    const textData3 = await fs.readFile(filePath_gunshin3, 'utf-8');
+
+    // 改行で分割して配列arrにする
+    const arr3 = textData3.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    if (arr3.length === 0) {
+      await interaction.reply('エラー: データがありません');
+      return;
+    }
+
+    // ランダムに選ぶ
+    const random3 = Math.floor(Math.random() * arr.length);
+    const comment3 = arr3[random3];
+
+  
   // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
   // 1322580002491072653 = mao791
   // 1322580258125516953 = matcha
@@ -58,5 +116,5 @@ export async function execute(interaction) {
   const senpan = "<:custom_emoji:1322844796091367477>"; // 大戦犯
 
   
-  await interaction.reply(`───────────────────────────\n## 運　勢 ： ${gunshin}${result} ！**\n─────────────────────\n\n`);
+  await interaction.reply(`おみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${gunshin}${result} ！\n───────────────────────────\n*一言アドバイス*\n${comment2}\n${comment3}`);
 }
