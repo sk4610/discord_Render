@@ -1,4 +1,15 @@
 import { SlashCommandBuilder } from "discord.js";
+import fs from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// スクリプトのディレクトリを取得
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const filePath_gunshin1 = `${__dirname}/comment1_gunshin.txt`;
+const filePath_gunshin2 = `${__dirname}/comment2_gunshin.txt`;
+const filePath_gunshin3 = `${__dirname}/comment3_gunshin.txt`;
+
 
 export const data = new SlashCommandBuilder()
   .setName("omikuji")
@@ -47,5 +58,5 @@ export async function execute(interaction) {
   const senpan = "<:custom_emoji:1322844796091367477>"; // 大戦犯
 
   
-  await interaction.reply(`───────────────────────────\n## 運　勢 ： ${result} ！**\n─────────────────────\n待ち人：来ず\n旅行運：スられる`);
+  await interaction.reply(`───────────────────────────\n## 運　勢 ： ${gunshin}${result} ！**\n─────────────────────\n\n`);
 }
