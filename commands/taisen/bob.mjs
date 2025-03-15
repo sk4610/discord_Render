@@ -34,7 +34,7 @@ export async function execute(interaction) {
     const random = Math.floor(Math.random() * arr.length);
     const comment = arr[random];
 
-    await interaction.reply(`:factory_worker:${comment}`);
+    await interaction.reply(`:tejas:${comment}`);
   } catch (error) {
     console.error('ファイル読み込みエラー:', error);
     await interaction.reply('エラー: ファイルを読み込めませんでした');
