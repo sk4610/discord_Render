@@ -33,7 +33,7 @@ export async function execute(interaction) {
     // ランダムに選ぶ
     const random = Math.floor(Math.random() * arr.length);
     const comment = arr[random];
-    // 絵文字を追加する（カスタム絵文字IDは Discord中で<:emoji_name:emoji_id>と打ち込めば返る
+    // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
     // 1350367513271341088 = 盾専
     const emoji = "<:custom_emoji:1350367513271341088>";
     await interaction.reply(`${emoji}${comment}`);
