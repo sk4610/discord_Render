@@ -6,10 +6,29 @@ import { dirname } from 'path';
 // スクリプトのディレクトリを取得
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+// commentファイルの宣言
 const filePath_gunshin1 = `${__dirname}/comment1_gunshin.txt`;
 const filePath_gunshin2 = `${__dirname}/comment2_gunshin.txt`;
 const filePath_gunshin3 = `${__dirname}/comment3_gunshin.txt`;
-
+const filePath_mao1 = `${__dirname}/comment1_mao.txt`;
+const filePath_mao2 = `${__dirname}/comment2_mao.txt`;
+const filePath_mao3 = `${__dirname}/comment3_mao.txt`;
+const filePath_lucky1 = `${__dirname}/comment1_lucky.txt`;
+const filePath_lucky2 = `${__dirname}/comment2_lucky.txt`;
+const filePath_lucky3 = `${__dirname}/comment3_lucky.txt`;
+const filePath_normal1 = `${__dirname}/comment1_normal.txt`;
+const filePath_normal2 = `${__dirname}/comment2_normal.txt`;
+const filePath_normal3 = `${__dirname}/comment3_normal.txt`;
+const filePath_unlucky1 = `${__dirname}/comment1_unlucky.txt`;
+const filePath_unlucky2 = `${__dirname}/comment2_unlucky.txt`;
+const filePath_unlucky3 = `${__dirname}/comment3_unlucky.txt`;
+const filePath_worst1 = `${__dirname}/comment1_worst.txt`;
+const filePath_worst2 = `${__dirname}/comment2_worst.txt`;
+const filePath_worst3 = `${__dirname}/comment3_worst.txt`;
+const filePath_yurigami1 = `${__dirname}/comment1_yurigami.txt`;
+const filePath_yurigami2 = `${__dirname}/comment2_yurigami.txt`;
+const filePath_yurigami3 = `${__dirname}/comment3_yurigami.txt`;
+const filePath_otsupai3 = `${__dirname}/comment3_otsupai.txt`;
 
 export const data = new SlashCommandBuilder()
   .setName("omikuji")
@@ -39,6 +58,36 @@ export async function execute(interaction) {
     // これよりおみくじのコメント分け　comment1 = 待人、旅行運　comment2=撃破運　comment3=雀運
     if (result === "魔　王") {
       // ファイルが存在するかチェック
+      await fs.access(filePath_mao1);
+      await fs.access(filePath_mao2);
+      await fs.access(filePath_mao3);
+      // ファイルを読み込む（非同期処理）
+      const textData = await fs.readFile(filePath_mao1, 'utf-8');
+      const textData2 = await fs.readFile(filePath_mao2, 'utf-8');
+      const textData3 = await fs.readFile(filePath_mao3, 'utf-8'); 
+    　// 改行で分割して配列arrにする
+      const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr3 = textData3.split('\n').map(line => line.trim()).filter(line => line !== '');
+        if (arr1.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      } else if (arr2.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }else if (arr3.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }
+      // ランダムに選ぶ
+      const random1 = Math.floor(Math.random() * arr.length);
+      const comment1 = arr1[random1];
+      const random2 = Math.floor(Math.random() * arr.length);
+      const comment2 = arr2[random2];
+      const random3 = Math.floor(Math.random() * arr.length);
+      const comment3 = arr3[random3];
+    }else if (result === "軍　神") {
+      // ファイルが存在するかチェック
       await fs.access(filePath_gunshin1);
       await fs.access(filePath_gunshin2);
       await fs.access(filePath_gunshin3);
@@ -67,8 +116,99 @@ export async function execute(interaction) {
       const comment2 = arr2[random2];
       const random3 = Math.floor(Math.random() * arr.length);
       const comment3 = arr3[random3];
-
-  
+    }else if (result === "百　合　神") {
+      // ファイルが存在するかチェック
+      await fs.access(filePath_yurigami1);
+      await fs.access(filePath_yurigami2);
+      await fs.access(filePath_yurigami3);
+      // ファイルを読み込む（非同期処理）
+      const textData = await fs.readFile(filePath_yurigami1, 'utf-8');
+      const textData2 = await fs.readFile(filePath_yurigami2, 'utf-8');
+      const textData3 = await fs.readFile(filePath_yurigami3, 'utf-8'); 
+    　// 改行で分割して配列arrにする
+      const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr3 = textData3.split('\n').map(line => line.trim()).filter(line => line !== '');
+        if (arr1.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      } else if (arr2.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }else if (arr3.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }
+      // ランダムに選ぶ
+      const random1 = Math.floor(Math.random() * arr.length);
+      const comment1 = arr1[random1];
+      const random2 = Math.floor(Math.random() * arr.length);
+      const comment2 = arr2[random2];
+      const random3 = Math.floor(Math.random() * arr.length);
+      const comment3 = arr3[random3];
+    }else if (result === "乙　牌") {
+      // ファイルが存在するかチェック
+      await fs.access(filePath_lucky1);
+      await fs.access(filePath_lucky2);
+      await fs.access(filePath_otsupai3);
+      // ファイルを読み込む（非同期処理）
+      const textData = await fs.readFile(filePath_lucky1, 'utf-8');
+      const textData2 = await fs.readFile(filePath_lucky2, 'utf-8');
+      const textData3 = await fs.readFile(filePath_otsupai3, 'utf-8'); 
+    　// 改行で分割して配列arrにする
+      const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr3 = textData3.split('\n').map(line => line.trim()).filter(line => line !== '');
+        if (arr1.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      } else if (arr2.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }else if (arr3.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }
+      // ランダムに選ぶ
+      const random1 = Math.floor(Math.random() * arr.length);
+      const comment1 = arr1[random1];
+      const random2 = Math.floor(Math.random() * arr.length);
+      const comment2 = arr2[random2];
+      const random3 = Math.floor(Math.random() * arr.length);
+      const comment3 = arr3[random3];
+    }else if (result === "撃　破　王") {
+      // ファイルが存在するかチェック
+      await fs.access(filePath_lucky1);
+      await fs.access(filePath_lucky2);
+      await fs.access(filePath_lucky3);
+      // ファイルを読み込む（非同期処理）
+      const textData = await fs.readFile(filePath_lucky1, 'utf-8');
+      const textData2 = await fs.readFile(filePath_lucky2, 'utf-8');
+      const textData3 = await fs.readFile(filePath_lucky3, 'utf-8'); 
+    　// 改行で分割して配列arrにする
+      const arr1 = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr2 = textData2.split('\n').map(line => line.trim()).filter(line => line !== '');
+      const arr3 = textData3.split('\n').map(line => line.trim()).filter(line => line !== '');
+        if (arr1.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      } else if (arr2.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }else if (arr3.length === 0) {
+        await interaction.reply('エラー: データがありません');
+        return;
+      }
+      // ランダムに選ぶ
+      const random1 = Math.floor(Math.random() * arr.length);
+      const comment1 = arr1[random1];
+      const random2 = Math.floor(Math.random() * arr.length);
+      const comment2 = arr2[random2];
+      const random3 = Math.floor(Math.random() * arr.length);
+      const comment3 = arr3[random3];
+     
+     
+     
   // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
   // 1322580002491072653 = mao791
   // 1322580258125516953 = matcha
