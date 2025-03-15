@@ -5,8 +5,8 @@ export const data = new SlashCommandBuilder()
   .setDescription("おみくじを引きます");
 
 export async function execute(interaction) {
-  const arr = ["魔王", "SR 銀のじゃがいも", "R 銅のじゃがいも", "N ただのじゃがいも"];
-  const weight = [2, 4, 8, 16];
+  const arr = ["魔王", "軍神", "百合神", "乙牌", "撃破王", "大吉", "吉", "中吉", "小吉", "もみ吉", "抹吉", "凶", "大凶", "大戦犯"];
+  const weight = [7.91, 2.09, 2, 3, 3, 4, 5, 10, 10, 10, 15, ];
   let result = "";
 
   let totalWeight = 0;
