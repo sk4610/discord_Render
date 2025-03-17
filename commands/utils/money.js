@@ -1,19 +1,53 @@
-import db from "../utils/database.js";
+import { DataTypes } from "sequelize";
+import sequelize from "../command/utils/database.js"; // データベース接続をインポート
 
-const ADD_AMOUNT = 100; // 追加する金額
+// ユーザーの所持金を管理するテーブル
+const Money = sequelize.define("Money", {
+  userId: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+  },
+  balance: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+});
 
-// **所持金を追加**
-export function addMoney(userId) {
-  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+// データベースを同期（テーブルがなければ作成）
+sequelize.sync();
+
+/**
+ * 指定したユーザーの所持金を取得
+ */
+export async function getBalance(userId) {
+  const user = await Money.findByPk(userId);
+  return user ? user.balance : 0;
+}
+
+/**
+ * 所持金を追加
+ */
+export async function addMoney(userId, amount) {
+  const user = await Money.findByPk(userId);
   if (user) {
-    db.prepare("UPDATE users SET balance = balance + ? WHERE id = ?").run(ADD_AMOUNT, userId);
+    user.balance += amount;
+    await user.save();
   } else {
-    db.prepare("INSERT INTO users (id, balance) VALUES (?, ?)").run(userId, ADD_AMOUNT);
+    await Money.create({ userId, balance: amount });
   }
 }
 
-// **所持金を取得**
-export function getBalance(userId) {
-  const user = db.prepare("SELECT balance FROM users WHERE id = ?").get(userId);
-  return user ? user.balance : 0;
+/**
+ * 所持金を減らす（不足時は何もしない）
+ */
+export async function subtractMoney(userId, amount) {
+  const user = await Money.findByPk(userId);
+  if (user && user.balance >= amount) {
+    user.balance -= amount;
+    await user.save();
+    return true;
+  }
+  return false; // 所持金が足りない場合
 }
+
+export default Money;
