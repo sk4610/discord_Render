@@ -1,4 +1,4 @@
-import db from "./utils/database.js";
+import db from "../utils/database.js";
 
 const ADD_AMOUNT = 100; // 追加する金額
 
