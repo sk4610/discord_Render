@@ -2,8 +2,8 @@ import { SlashCommandBuilder } from "discord.js";
 import money from "../utils/money.js";  // default import を使う
 
 export const data = new SlashCommandBuilder()
-  .setName("money")
-  .setDescription("所持金を確認または追加します")
+  .setName("cent")
+  .setDescription("所持金を確認/追加します")
   .addBooleanOption(option =>
     option.setName("add")
       .setDescription("100G追加します")

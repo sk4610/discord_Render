@@ -36,7 +36,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   const arr = ["魔　王", "軍　神", "百　合　神", "乙　牌", "撃　破　王", "大　吉", "吉", "ネ　ギ　吉", "も　み　吉", "抹　吉", "凶", "大　凶", "大　戦　犯"];
-  const weight = [7.91, 2.09, 2, 3, 3, 4, 7, 16, 17, 17, 8, 7, 6 ]; // 100%換算　魔王が7.91%で出やすくなるように
+  const weight = [7.91, 2.09, 3, 3, 3, 4, 7, 16, 16, 17, 8, 7, 6 ]; // 100%換算　魔王が7.91%で出やすくなるように
   let result = "";
 
   let totalWeight = 0;
