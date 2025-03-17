@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../command/utils/database.js"; // データベース接続をインポート
+import sequelize from "../utils/database.js"; // データベース接続をインポート
 
 // ユーザーの所持金を管理するテーブル
 const Money = sequelize.define("Money", {
@@ -19,7 +19,7 @@ sequelize.sync();
 /**
  * 指定したユーザーの所持金を取得
  */
-export async function getBalance(userId) {
+async function getBalance(userId) {
   const user = await Money.findByPk(userId);
   return user ? user.balance : 0;
 }
@@ -27,7 +27,7 @@ export async function getBalance(userId) {
 /**
  * 所持金を追加
  */
-export async function addMoney(userId, amount) {
+async function addMoney(userId, amount) {
   const user = await Money.findByPk(userId);
   if (user) {
     user.balance += amount;
@@ -40,7 +40,7 @@ export async function addMoney(userId, amount) {
 /**
  * 所持金を減らす（不足時は何もしない）
  */
-export async function subtractMoney(userId, amount) {
+async function subtractMoney(userId, amount) {
   const user = await Money.findByPk(userId);
   if (user && user.balance >= amount) {
     user.balance -= amount;
@@ -50,4 +50,5 @@ export async function subtractMoney(userId, amount) {
   return false; // 所持金が足りない場合
 }
 
-export default Money;
+// CommonJS エクスポートではなく、ES モジュールでデフォルトエクスポート
+export default { getBalance, addMoney, subtractMoney };

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { getBalance, addMoney } from "../command/utils/money.js";
+import money from "../utils/money.js";  // default import を使う
 
 export const data = new SlashCommandBuilder()
   .setName("money")
@@ -15,9 +15,9 @@ export async function execute(interaction) {
   const add = interaction.options.getBoolean("add") || false;
 
   if (add) {
-    await addMoney(userId, 100);
+    await money.addMoney(userId, 100);  // money からメソッドを呼び出す
   }
 
-  const balance = await getBalance(userId);
+  const balance = await money.getBalance(userId);  // 同じく
   await interaction.reply(`${interaction.user.username} さんの所持金は ${balance}G です！`);
 }
