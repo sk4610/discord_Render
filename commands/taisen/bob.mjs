@@ -10,16 +10,24 @@ const filePath = `${__dirname}/Normal_bob.txt`;
 
 export const data = new SlashCommandBuilder()
   .setName('bob')
-  .setDescription('BOBが返信してくれます');
+  .setDescription('BOBが返信してくれます')
   .addStringOption(option =>
     option.setName('message')
-      .setDescription('BOBに言わせたいメッセージ')
+      .setDescription('参加者のコメント')
       .setRequired(false) // 任意
   );
 
 
 export async function execute(interaction) {
   try {
+        const userMessage = interaction.options.getString("message");
+
+        if (userMessage) {
+          // ユーザーが入力したメッセージをそのまま返す
+          await interaction.reply(userMessage);
+          return;
+        }
+    
     console.log(`Reading file from: ${filePath}`); // デバッグ用
 
     // ファイルが存在するかチェック
