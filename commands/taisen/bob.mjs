@@ -11,6 +11,12 @@ const filePath = `${__dirname}/Normal_bob.txt`;
 export const data = new SlashCommandBuilder()
   .setName('bob')
   .setDescription('BOBが返信してくれます');
+  .addStringOption(option =>
+    option.setName('message')
+      .setDescription('BOBに言わせたいメッセージ')
+      .setRequired(false) // 任意
+  );
+
 
 export async function execute(interaction) {
   try {
