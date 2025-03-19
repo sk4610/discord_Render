@@ -13,30 +13,20 @@ export const data = new SlashCommandBuilder()
   .setDescription('BOBが返信してくれます')
   .addStringOption(option =>
     option.setName('message')
-      .setDescription('参加者のコメント')
+      .setDescription('BOBに言わせたいメッセージ')
       .setRequired(false) // 任意
   );
 
-
 export async function execute(interaction) {
   try {
-        const userMessage = interaction.options.getString("message");
+    const userMessage = interaction.options.getString("message");
 
-        if (userMessage) {
-          // ユーザーが入力したメッセージをそのまま返す
-          await interaction.reply(userMessage);
-          return;
-        }
-    
+    // Normal_bob.txt の内容を取得
     console.log(`Reading file from: ${filePath}`); // デバッグ用
-
-    // ファイルが存在するかチェック
     await fs.access(filePath);
-    
-    // ファイルを読み込む（非同期処理）
     const textData = await fs.readFile(filePath, 'utf-8');
 
-    // 改行で分割して配列arrにする
+    // 改行で分割して配列にする
     const arr = textData.split('\n').map(line => line.trim()).filter(line => line !== '');
 
     if (arr.length === 0) {
@@ -46,11 +36,19 @@ export async function execute(interaction) {
 
     // ランダムに選ぶ
     const random = Math.floor(Math.random() * arr.length);
-    const comment = arr[random];
+    const randomComment = arr[random];
+
     // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
     // 1350367513271341088 = 盾専
     const emoji = "<:custom_emoji:1350367513271341088>";
-    await interaction.reply(`${emoji}${comment}`);
+
+    // ユーザーがメッセージを入力した場合、それ＋ランダムメッセージ
+    if (userMessage) {
+      await interaction.reply(`${userMessage}\n${emoji}${randomComment}`);
+    } else {
+      await interaction.reply(`${emoji}${randomComment}`);
+    }
+
   } catch (error) {
     console.error('ファイル読み込みエラー:', error);
     await interaction.reply('エラー: ファイルを読み込めませんでした');
