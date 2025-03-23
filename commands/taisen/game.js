@@ -1,11 +1,13 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import path from 'path';
+import sequelize from '../utils/database.js';
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(process.cwd(), 'game.db'),
-  logging: false
-});
+//const sequelize = new Sequelize({
+//  dialect: 'sqlite',
+//  storage: path.join(process.cwd(), 'game.db'),
+//  logging: false
+//});
+
+
 
 // 参加者情報
 const User = sequelize.define('User', {
@@ -41,5 +43,14 @@ const GameState = sequelize.define('GameState', {
     defaultValue: 0
   }
 });
+
+// テーブルの同期（テーブルが存在しない場合は作成されます）
+sequelize.sync({ force: false }) // force: false にすると、テーブルが存在していれば再作成されません
+  .then(() => {
+    console.log('✅ Models synced successfully.');
+  })
+  .catch((error) => {
+    console.error('❌ Failed to sync models:', error);
+  });
 
 export { sequelize, User, GameState };
