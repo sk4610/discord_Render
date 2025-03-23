@@ -52,12 +52,24 @@ for (const folder of commandFolders) {
   const commandsPath = path.join(categoryFoldersPath, folder);
   const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".mjs"));
   
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    import(filePath).then((module) => {
-      client.commands.set(module.data.name, module);
-    });
-  }
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  
+  import(filePath).then((module) => {
+    console.log(`✅ 読み込んだコマンド: ${file}`);
+    console.log(module); // モジュールの内容を確認
+
+    if (!module.data || !module.data.name) {
+      console.error(`❌ コマンド ${file} に 'data.name' が定義されていません！`);
+      return; // エラーがあったらスキップ
+    }
+
+    client.commands.set(module.data.name, module);
+  }).catch(error => {
+    console.error(`❌ コマンド ${file} の読み込み中にエラーが発生:`, error);
+  });
+}
+
 }
 
 const handlers = new Map();

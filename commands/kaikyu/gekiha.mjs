@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { GameState, Player } from '../taisen/game.mjs';
+import { GameState, User } from '../taisen/game.mjs';
 
 const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
 
@@ -13,7 +13,7 @@ export async function execute(interaction) {
 
   try {
     // プレイヤーが登録済みか確認
-    const player = await Player.findOne({ where: { user_id: userId } });
+    const player = await User.findOne({ where: { user_id: userId } });
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }
@@ -36,8 +36,8 @@ export async function execute(interaction) {
     await player.save();
 
     // A軍とB軍の総撃破数を計算
-    const totalKillsA = await Player.sum('total_kills', { where: { army: 'A' } }) || 0;
-    const totalKillsB = await Player.sum('total_kills', { where: { army: 'B' } }) || 0;
+    const totalKillsA = await User.sum('total_kills', { where: { army: 'A' } }) || 0;
+    const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
 
     // メッセージ作成
     let message = `🎖 **${username}**（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;

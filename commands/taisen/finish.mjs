@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { Player } from '../taisen/game.mjs';
+import { User } from '../taisen/game.mjs';
 
 export const data = new SlashCommandBuilder()
   .setName('finish')
@@ -8,8 +8,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   try {
     // A軍とB軍の総撃破数を取得
-    const totalKillsA = await Player.sum('total_kills', { where: { army: 'A' } }) || 0;
-    const totalKillsB = await Player.sum('total_kills', { where: { army: 'B' } }) || 0;
+    const totalKillsA = await User.sum('total_kills', { where: { army: 'A' } }) || 0;
+    const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
 
     // 勝敗判定
     let resultMessage = '🏆 **勝敗結果:** ';
