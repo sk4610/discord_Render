@@ -2,7 +2,25 @@ import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 
 const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
-const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ];
+const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の確率順を基に100％になるように微調整
+let result = "";
+
+//ランダム生成
+  let totalWeight = 0;
+  for (let i = 0; i < weight.length; i++) {
+    totalWeight += weight[i];
+  }
+  let random = Math.floor(Math.random() * totalWeight);
+  
+  for (let i = 0; i < weight.length; i++) {
+    if (random < weight[i]) {
+      result = ranks[i];
+      break;
+    } else {
+      random -= weight[i];
+    }
+  }
+
 
 // 軍名設定　変更はここから
 const nameA = 'きのこ軍';
@@ -49,7 +67,8 @@ export async function execute(interaction) {
     }
 
     // ランダムな階級を決定
-    const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
+//    const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
+    
 
     // データベースにプレイヤーを追加
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
