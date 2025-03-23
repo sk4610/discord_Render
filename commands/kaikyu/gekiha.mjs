@@ -6,12 +6,19 @@ const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉�
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
-  .setDescription('撃破数を決定します');
+  .setDescription('撃破数を決定します')
+  .addStringOption(option =>
+      option.setName("message")
+      .setDescription("送信するメッセージ")
+      .setRequired(true)
+  );
 
 export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.user.username;
+  const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
 
+  
   try {
     // プレイヤーが登録済みか確認
     const player = await User.findOne({ where: { id: userId } });
@@ -48,7 +55,12 @@ export async function execute(interaction) {
     let message = `🎖 **${username}**（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
     if (rankUp) message += `🔥 **大量撃破発生！階級昇格: ${player.rank}** 🎉\n`;
     message += `📊 **現在の撃破数:**\n${armyNameA}: **${totalKillsA}** 撃破\n${armyNameB}: **${totalKillsB}** 撃破`;
-
+    
+    // 追加メッセージ（ユーザーが入力したもの）
+    if (customMessage) {
+      message += `📝 ${customMessage}`;
+    }
+    
     await interaction.reply(message);
   } catch (error) {
     console.error('撃破処理エラー:', error);
