@@ -101,11 +101,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${mao}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
 
@@ -133,11 +133,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${gunshin}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
 
@@ -165,11 +165,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${yurigami}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
 
@@ -197,11 +197,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${otsupai}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
 
@@ -229,11 +229,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${lucky}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -261,11 +261,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3]; 
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${lucky}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -293,11 +293,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3]; 
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${lucky}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
 
@@ -326,11 +326,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${negi}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -358,11 +358,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];  
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${sambow}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -390,11 +390,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];  
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${matcha}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -422,11 +422,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];   
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${unlucky}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -454,11 +454,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3];  
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${unlucky}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
@@ -486,11 +486,11 @@ export async function execute(interaction) {
         return;
       }
       // ランダムに選ぶ
-      const random1 = Math.floor(Math.random() * arr.length);
+      const random1 = Math.floor(Math.random() * arr1.length);
       const comment1 = arr1[random1];
-      const random2 = Math.floor(Math.random() * arr.length);
+      const random2 = Math.floor(Math.random() * arr2.length);
       const comment2 = arr2[random2];
-      const random3 = Math.floor(Math.random() * arr.length);
+      const random3 = Math.floor(Math.random() * arr3.length);
       const comment3 = arr3[random3]; 
       await interaction.reply(`${interaction.member.displayName}はおみくじを引いた！\n\n───────────────────────────\n## 運　勢 ： ${senpan}${result} ！\n───────────────────────────\n\n◯${comment1}\n◯${comment2}\n◯${comment3}`);
       
