@@ -15,6 +15,11 @@ export const data = new SlashCommandBuilder()
         { name: 'たけのこ軍', value: 'B' }
       ));
 
+  // gekiha.mjsで表示するためのグローバル関数の設定　軍命の変更をkaikyu.
+export const armyName_global = {A:'きのこ軍',B:'たけのこ軍'};
+export function getArmyName(army) {
+  return armyName_global[army] || '不明';
+}
 export async function execute(interaction) {
   const army = interaction.options.getString('army');
   const userId = interaction.user.id;

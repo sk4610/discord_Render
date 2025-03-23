@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
+import { getArmyName } from './kaikyu.mjs';
 
 const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
 
@@ -39,10 +40,14 @@ export async function execute(interaction) {
     const totalKillsA = await User.sum('total_kills', { where: { army: 'A' } }) || 0;
     const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
 
+    // A軍とB軍の名前を取得
+    const armyNameA = getArmyName('A');
+    const armyNameB = getArmyName('B');
+    
     // メッセージ作成
     let message = `🎖 **${username}**（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
     if (rankUp) message += `🔥 **大量撃破発生！階級昇格: ${player.rank}** 🎉\n`;
-    message += `📊 **現在の撃破数:**\nA軍: **${totalKillsA}** 撃破\nB軍: **${totalKillsB}** 撃破`;
+    message += `📊 **現在の撃破数:**\n${armyNameA}: **${totalKillsA}** 撃破\n${armyNameB}: **${totalKillsB}** 撃破`;
 
     await interaction.reply(message);
   } catch (error) {
