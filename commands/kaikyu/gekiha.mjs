@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from './kaikyu.mjs';
 
-const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
+const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')

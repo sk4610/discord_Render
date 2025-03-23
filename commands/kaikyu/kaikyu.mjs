@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 
-const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
+const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
+const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ];
 
 // 軍名設定　変更はここから
 const nameA = 'きのこ軍';
