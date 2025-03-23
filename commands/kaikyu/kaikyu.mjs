@@ -11,8 +11,8 @@ export const data = new SlashCommandBuilder()
       .setDescription('所属する軍を選択')
       .setRequired(true)
       .addChoices(
-        { name: 'きのこ軍', value: 'きのこ' },
-        { name: 'たけのこ軍', value: 'たけのこ' }
+        { name: 'きのこ軍', value: 'A' },
+        { name: 'たけのこ軍', value: 'B' }
       ));
 
 export async function execute(interaction) {
@@ -20,6 +20,9 @@ export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.user.username;
 
+    // army の値に対応する軍名を取得
+  const armyName = army === 'A' ? 'きのこ軍' : 'たけのこ軍';
+  
   try {
     // ルールが設定されているか確認
     const gameState = await GameState.findByPk(1);
@@ -30,7 +33,8 @@ export async function execute(interaction) {
     // すでに登録済みか確認
     const existingPlayer = await User.findOne({ where: { id: userId } });
     if (existingPlayer) {
-      return await interaction.reply(`エラー: あなたはすでに **${existingPlayer.army}軍** の **${existingPlayer.rank}** です！`);
+      const existingArmyName = existingPlayer.army === 'A' ? 'きのこ軍' : 'たけのこ軍';
+      return await interaction.reply(`エラー: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
     }
 
     // ランダムな階級を決定
@@ -39,7 +43,7 @@ export async function execute(interaction) {
     // データベースにプレイヤーを追加
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
 
-    await interaction.reply(`${username} さんが **${army}軍** に配属され、**${randomRank}** になりました！`);
+    await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);
   } catch (error) {
     console.error('軍配属エラー:', error);
     await interaction.reply('エラー: 軍の選択に失敗しました');
