@@ -11,8 +11,8 @@ export const data = new SlashCommandBuilder()
       .setDescription('所属する軍を選択')
       .setRequired(true)
       .addChoices(
-        { name: 'きのこ軍', value: 'A' },
-        { name: 'たけのこ軍', value: 'B' }
+        { name: 'きのこ軍', value: 'きのこ' },
+        { name: 'たけのこ軍', value: 'たけのこ' }
       ));
 
 export async function execute(interaction) {
