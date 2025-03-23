@@ -3,7 +3,7 @@ import { User, GameState  } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('reset')
-  .setDescription('戦闘データをリセットします');
+  .setDescription('大戦データをリセットします');
 
 export async function execute(interaction) {
   try {
@@ -13,7 +13,7 @@ export async function execute(interaction) {
     // ルールデータ削除
     await GameState.destroy({ where: {} });
 
-    await interaction.reply('🔄 **戦闘データをリセットしました！**\n新しい戦いを始める準備ができました。');
+    await interaction.reply('🔄 **大戦データをリセットしました！**\n新しい戦いを始める準備ができました。');
   } catch (error) {
     console.error('リセット処理エラー:', error);
     await interaction.reply('エラー: リセットに失敗しました');
