@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { GameState, User } from '../taisen/game.mjs';
+import { GameState, User } from '../taisen/game.js';
 
 const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
 
@@ -13,7 +13,7 @@ export async function execute(interaction) {
 
   try {
     // プレイヤーが登録済みか確認
-    const player = await User.findOne({ where: { id: userId } });
+    const player = await User.findOne({ where: { user_id: userId } });
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }

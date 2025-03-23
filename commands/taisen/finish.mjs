@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { User } from '../taisen/game.mjs';
+import { User } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('finish')

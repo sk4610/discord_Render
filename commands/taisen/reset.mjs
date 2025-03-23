@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { User, GameState  } from '../taisen/game.mjs';
+import { User, GameState  } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('reset')

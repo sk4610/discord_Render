@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { GameState } from '../taisen/game.mjs';
+import { GameState } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('rule')

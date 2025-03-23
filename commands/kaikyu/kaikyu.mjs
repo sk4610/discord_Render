@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { GameState, User } from '../taisen/game.mjs';
+import { GameState, User } from '../taisen/game.js';
 
 const ranks = ['二等兵', '一等兵', '軍曹', '曹長', '大尉', '大佐', '准将', '大将', '元帥'];
 
