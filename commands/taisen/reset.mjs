@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { User, Rule } from '../taisen/game.mjs';
+import { User, GameState  } from '../taisen/game.mjs';
 
 export const data = new SlashCommandBuilder()
   .setName('reset')
@@ -11,7 +11,7 @@ export async function execute(interaction) {
     await User.destroy({ where: {} });
 
     // ルールデータ削除
-    await Rule.destroy({ where: {} });
+    await GameState.destroy({ where: {} });
 
     await interaction.reply('🔄 **戦闘データをリセットしました！**\n新しい戦いを始める準備ができました。');
   } catch (error) {
