@@ -28,6 +28,10 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  rule_type: {  // ルールの種類を保存
+    type: DataTypes.STRING,
+    defaultValue: 'none'
+  },
   a_team_kills: {
     type: DataTypes.INTEGER,
     defaultValue: 0
