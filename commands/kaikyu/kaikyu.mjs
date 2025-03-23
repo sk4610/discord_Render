@@ -5,21 +5,24 @@ const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉�
 const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の確率順を基に100％になるように微調整
 let result = "";
 
-//ランダム生成
-  let totalWeight = 0;
-  for (let i = 0; i < weight.length; i++) {
-    totalWeight += weight[i];
+// 小数を避けるために100倍
+const weightInt = weight.map(w => w * 100); 
+
+// ① 合計を計算
+let totalWeight = weightInt.reduce((sum, w) => sum + w, 0);
+
+// ② 乱数生成
+let random = Math.floor(Math.random() * totalWeight);
+
+// ③ 重みに基づく選択
+for (let i = 0; i < weightInt.length; i++) {
+  if (random < weightInt[i]) {
+    result = ranks[i]; // 当たったランクを決定
+    break;
+  } else {
+    random -= weightInt[i]; // 乱数を更新
   }
-  let random = Math.floor(Math.random() * totalWeight);
-  
-  for (let i = 0; i < weight.length; i++) {
-    if (random < weight[i]) {
-      result = ranks[i];
-      break;
-    } else {
-      random -= weight[i];
-    }
-  }
+}
 
 
 // 軍名設定　変更はここから
@@ -68,7 +71,7 @@ export async function execute(interaction) {
 
     // ランダムな階級を決定
 //    const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
-    
+    const randomRank = result;
 
     // データベースにプレイヤーを追加
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
