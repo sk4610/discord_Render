@@ -63,7 +63,7 @@ export async function execute(interaction) {
     }
 
     // すでに登録済みか確認
-    const existingPlayer = await User.findOne({ where: { id: userId } });
+    const existingPlayer = await User.findOne({ where: { id: userId }, raw: true});
     if (existingPlayer) {
       const existingArmyName = existingPlayer.army === 'A' ? `${nameA}` : `${nameB}`;
       return await interaction.reply(`エラー: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
