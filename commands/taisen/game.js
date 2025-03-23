@@ -16,7 +16,7 @@ const User = sequelize.define('User', {
     primaryKey: true
   },
   name: DataTypes.STRING,
-  team: DataTypes.STRING,
+  army: DataTypes.STRING,
   rank: DataTypes.STRING,
   total_kills: {
     type: DataTypes.INTEGER,
