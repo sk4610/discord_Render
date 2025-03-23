@@ -45,7 +45,7 @@ const GameState = sequelize.define('GameState', {
 });
 
 // テーブルの同期（テーブルが存在しない場合は作成されます）
-sequelize.sync({ force: false }) // force: false にすると、テーブルが存在していれば再作成されません
+sequelize.sync({ force: false  }) // force: false にすると、テーブルが存在していれば再作成されません
   .then(() => {
     console.log('✅ Models synced successfully.');
   })

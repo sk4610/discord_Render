@@ -28,7 +28,7 @@ export async function execute(interaction) {
     }
 
     // すでに登録済みか確認
-    const existingPlayer = await User.findOne({ where: { user_id: userId } });
+    const existingPlayer = await User.findOne({ where: { id: userId } });
     if (existingPlayer) {
       return await interaction.reply(`エラー: あなたはすでに **${existingPlayer.army}軍** の **${existingPlayer.rank}** です！`);
     }
@@ -37,7 +37,7 @@ export async function execute(interaction) {
     const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
 
     // データベースにプレイヤーを追加
-    await User.create({ user_id: userId, username, army, rank: randomRank, total_kills: 0 });
+    await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
 
     await interaction.reply(`${username} さんが **${army}軍** に配属され、**${randomRank}** になりました！`);
   } catch (error) {
