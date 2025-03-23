@@ -24,6 +24,10 @@ export async function execute(interaction) {
     });
 
 
+
+const gameState = await GameState.findByPk(1); // 保存した後にデータを確認
+console.log(gameState); // ここでgameStateの内容をログに出力
+    
     await interaction.reply(`ルールを「${mode}」に設定しました！ 参加者は /kaikyu コマンドで軍に参加してください。`);
   } catch (error) {
     console.error('ルール設定エラー:', error);
