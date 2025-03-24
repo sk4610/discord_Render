@@ -14,6 +14,57 @@ const largeKillCounts = {
 // 超・大量撃破の撃破数（軍神のみ特別）
 const superMassiveKillCount = 32;
 
+// 確率設定
+function isNormalKill() {
+  return Math.random() < 1 / 10; // 10% の確率で通常撃破
+}
+
+function isLargeKill() {
+  return Math.random() < 1 / 100; // 1% の確率で大量撃破
+}
+
+function isSuperMassiveKill() {
+  return Math.random() < 1 / 1000; // 0.1% の確率で超・大量撃破
+}
+
+// 撃破処理と昇格判定
+async function processKill(currentRank) {
+  let kills = 0; // 初期撃破数は0
+  let rankUp = false;
+
+  if (currentRank === specialRank) {
+    // 軍神Åの処理
+    if (isSuperMassiveKill()) {
+      kills = superMassiveKillCount; // 軍神Åの超・大量撃破は32撃破
+    }
+    return { newRank: specialRank, kills, rankUp };
+  }
+
+  if (isSuperMassiveKill()) {
+    // 軍神Åに昇格
+    return { newRank: specialRank, kills: largeKillCounts[specialRank], rankUp: true };
+  }
+
+  if (isLargeKill()) {
+    // 通常の大量撃破
+    kills = largeKillCounts[currentRank] || 1; // 各階級の大量撃破数
+    rankUp = true;
+  } else if (isNormalKill()) {
+    // 通常撃破（1撃破）
+    kills = 1;
+  }
+
+  // 通常昇格（軍神Åにはならない）
+  const currentIndex = ranks.indexOf(currentRank);
+  let newRank = currentRank;
+  if (rankUp && currentIndex !== -1 && currentIndex < ranks.length - 1) {
+    newRank = ranks[currentIndex + 1]; // 次の階級に昇格
+  }
+
+  return { newRank, kills, rankUp };
+}
+
+
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
   .setDescription('撃破数を決定します')
@@ -28,6 +79,7 @@ export async function execute(interaction) {
   const username = interaction.member.displayName;
   const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
 
+  
   
   try {
     // プレイヤーが登録済みか確認
