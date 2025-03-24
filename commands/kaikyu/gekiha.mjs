@@ -115,9 +115,10 @@ export async function execute(interaction) {
 //      }
 //    }
 
-    // 撃破数を更新
+    // 兵士データを更新
     player.rank = newRank;
     player.total_kills += kills;
+    player.gekiha_counts += 1;
     await player.save();
 
     // A軍とB軍の総撃破数を計算
@@ -134,14 +135,14 @@ export async function execute(interaction) {
     // メッセージ作成
     message += `-#  :military_helmet: ${username} の攻撃！\n`;
     if(kills === 0){
-      message += `## 残念、${kills} 撃破…\n.\n`; //0撃破の場合
+      message += `## 残念、${kills} 撃破\n.\n`; //0撃破の場合
     }else{
       message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
     }
     
-    if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **${player.rank}**へ昇格！ \n\n`;
+    if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
     //自分の撃破数
-    message += `-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
+    message += `-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     //軍の総撃破数を表示
     message += `-# >>> 📊 現在の戦況:\n-# >>> ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> ${armyNameB}: 総${totalKillsB} 撃破\n`;
     

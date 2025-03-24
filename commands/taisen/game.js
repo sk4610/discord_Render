@@ -20,10 +20,15 @@ const User = sequelize.define('User', {
   name: DataTypes.STRING,
   army: DataTypes.STRING,
   rank: DataTypes.STRING,
+  gekiha_counts: { // /gekihaを書き込む度にカウント　書き込み回数カウント
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   total_kills: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   }
+
 });
 
 // ゲームの状態
