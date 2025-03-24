@@ -36,6 +36,16 @@ export async function execute(interaction) {
       }
     }
 
+    //アクティブ兵士数のカウント
+    const uniquePlayersA = await User.count({ where: { army: 'A' } });
+    const uniquePlayersB = await User.count({ where: { army: 'B' } });
+    const totalUniquePlayers = uniquePlayersA + uniquePlayersB;
+    
+    // **レス（行動回数）の取得**
+    const totalActionsA = await User.sum('gekiha_count', { where: { army: 'A' } }) || 0;
+    const totalActionsB = await User.sum('gekiha_count', { where: { army: 'B' } }) || 0;
+    const totalActions = totalActionsA + totalActionsB;
+    
     // A軍とB軍の名前を取得
     const armyNameA = getArmyName('A');
     const armyNameB = getArmyName('B');
@@ -49,7 +59,7 @@ export async function execute(interaction) {
       message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
     }
     // B軍（たけのこ）表示
-    message += '\n:green_circle:  **${armyNameB}軍:**\n';
+    message += '\n:green_circle:  **${armyNameB}:**\n';
     for (const player of topB) {
       const username = await getUsername(guild, player.id);
       message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
@@ -57,8 +67,8 @@ export async function execute(interaction) {
     
     // **追加情報**
     message += `\n📊 **戦況データ:**\n`;
-    message += `総ID数: **${totalUniquePlayers}**　:yellow_circle:  **${armyNameA} : 🔵B軍 = **${uniquePlayersA}** : **${uniquePlayersB}**\n`;
-    message += `合計 **${totalActions}** レス（行動回数）　🔴A軍 : 🔵B軍 = **${totalActionsA}** : **${totalActionsB}**`;
+    message += `総ID数: **${totalUniquePlayers}**　:yellow_circle:  **${armyNameA} : :green_circle:  **${armyNameB} = **${uniquePlayersA}** : **${uniquePlayersB}**\n`;
+    message += `合計 **${totalActions}** レス（行動回数）　:yellow_circle:  **${armyNameA} : :green_circle:  **${armyNameB} = **${totalActionsA}** : **${totalActionsB}**`;
 
     
     // ランキングを送信
