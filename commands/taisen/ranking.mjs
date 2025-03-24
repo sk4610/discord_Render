@@ -9,6 +9,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   try {
+    const { guild } = interaction; // サーバー情報を取得
     
     // A軍の上位3名を取得
     const topA = await User.findAll({
@@ -25,10 +26,10 @@ export async function execute(interaction) {
     });
 
      // ユーザーIDからサーバーニックネームを取得
-    async function getUsername(userId) {
+    async function getUsername(guild, userId) {
       try {
-        const user = await interaction.guild.members.fetch(userId);
-        return user.nickname || user.user.username; // ニックネームがあれば使用、なければ通常のユーザー名
+        const member = await guild.members.fetch(userId);
+        return member.displayName; // サーバーニックネームを取得
       } catch (error) {
         console.error(`ユーザー取得エラー: ${userId}`, error);
         return '不明なユーザー'; // 取得に失敗した場合のデフォルト
@@ -39,14 +40,17 @@ export async function execute(interaction) {
     let message = '🏆 **ランキング - 上位3名** 🏆\n\n';
 
     message += '🔴 **A軍:**\n';
-    topA.forEach((player, index) => {
-      message += `${index + 1}. **${player.username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
-    });
+    for (const player of topA) {
+      const username = await getUsername(guild, player.id);
+      message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
+    }
+    
 
     message += '\n🔵 **B軍:**\n';
-    topB.forEach((player, index) => {
-      message += `${index + 1}. **${player.username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
-    });
+    for (const player of topB) {
+      const username = await getUsername(guild, player.id);
+      message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
+    }
 
     // ランキングを送信
     await interaction.reply(message);
