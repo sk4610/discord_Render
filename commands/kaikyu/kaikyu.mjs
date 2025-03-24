@@ -29,7 +29,7 @@ export function getArmyName(army) {
 export async function execute(interaction) {
   const army = interaction.options.getString('army');
   const userId = interaction.user.id;
-  const username = interaction.user.username;
+  const username = interaction.member.displayName;
 
     // army の値に対応する軍名を取得
   const armyName = army === 'A' ? `${nameA}` : `${nameB}`;

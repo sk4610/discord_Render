@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   const userId = interaction.user.id;
-  const username = interaction.user.username;
+  const username = interaction.member.displayName;
   const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
 
   
@@ -55,10 +55,10 @@ export async function execute(interaction) {
     let message = "";
    
     // メッセージ作成
-    message += `-#  :military_helmet: ${username} の戦闘！\n## ${kills} 撃破！\n`;
+    message += `-#  :military_helmet: ${username} の戦闘！\n## ${kills} 撃破！\n.\n`;
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **${player.rank}**へ昇格！ \n\n`;
     //自分の撃破数
-    message += `\n\n-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 撃破数: **${player.total_kills}** 撃破\n`
+    message += `-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     //軍の総撃破数を表示
     message += `-# >>> 📊 現在の戦況:\n-# >>> ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> ${armyNameB}: 総${totalKillsB} 撃破\n`;
     
