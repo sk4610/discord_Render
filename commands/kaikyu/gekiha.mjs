@@ -55,8 +55,8 @@ export async function execute(interaction) {
     let message = "";
    
     // メッセージ作成
-    message += ` :military_helmet: ${username}（${player.rank}）の戦闘！\n## ${kills} 撃破！\n`;
-    if (rankUp) message += `## 🔥大量撃破だ！！🔥 階級昇格: ${player.rank}** \n`;
+    message += `-#  :military_helmet: ${username} の戦闘！\n## ${kills} 撃破！\n`;
+    if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **${player.rank}**へ昇格！ \n\n`;
     //自分の撃破数
     message += `\n\n-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 撃破数: **${player.total_kills}** 撃破\n`
     //軍の総撃破数を表示
