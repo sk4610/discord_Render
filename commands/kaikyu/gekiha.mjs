@@ -60,12 +60,12 @@ export async function execute(interaction) {
     }
     
     // メッセージ作成
-    message += ` ${username}（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
-    if (rankUp) message += `🔥 **大量撃破発生！階級昇格: ${player.rank}** 🎉\n`;
+    message += ` :military_helmet: ${username}（${player.rank}）の戦闘！\n## ${kills} 撃破！\n`;
+    if (rankUp) message += `## 🔥大量撃破だ！！🔥 階級昇格: ${player.rank}** \n`;
     //自分の撃破数
-    message += `\n🏅戦歴\n Name:${username} 階級:${player.rank} \n撃破数: **${player.total_kills}** 撃破\n\n`
+    message += `\n\n-# 🏅戦歴\n-# ${username} 階級:${player.rank} \n-# 撃破数: **${player.total_kills}** 撃破\n`
     //軍の総撃破数を表示
-    message += `\n-# >>> 📊 現在の戦況:\n-# ${armyNameA}: 　総${totalKillsA} 撃破\n-# ${armyNameB}: 総${totalKillsB} 撃破`;
+    message += `\n-# >>> 📊 現在の戦況:\n-# >>> ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> ${armyNameB}: 総${totalKillsB} 撃破`;
     
 
     
