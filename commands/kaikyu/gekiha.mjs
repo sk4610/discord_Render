@@ -9,8 +9,8 @@ export const data = new SlashCommandBuilder()
   .setDescription('撃破数を決定します')
   .addStringOption(option =>
       option.setName("message")
-      .setDescription("送信するメッセージ")
-      .setRequired(true)
+      .setDescription("一言レスを表示")
+      .setRequired(false) // trueにすると必須、falseにすると任意 
   );
 
 export async function execute(interaction) {
@@ -60,12 +60,12 @@ export async function execute(interaction) {
     }
     
     // メッセージ作成
-    message = ` ${username}（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
+    message += ` ${username}（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
     if (rankUp) message += `🔥 **大量撃破発生！階級昇格: ${player.rank}** 🎉\n`;
     //自分の撃破数
     message += `\n🏅 ${username} 階級:${player.rank} の総撃破数: **${player.total_kills}** 撃破\n\n`
     //軍の総撃破数を表示
-    message += `📊 \n───────────────────────────\n\n現在の戦況:\n${armyNameA}: 合計${totalKillsA} 撃破\n${armyNameB}: 合計${totalKillsB} 撃破`;
+    message += `\n───────────────────────────\n📊 ```現在の戦況:\n${armyNameA}: 合計${totalKillsA} 撃破\n${armyNameB}: 合計${totalKillsB} 撃破`;
     
 
     
