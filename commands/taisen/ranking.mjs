@@ -67,8 +67,8 @@ export async function execute(interaction) {
     
     // **追加情報**
     message += `\n\n 📊 **戦況データ:**\n`;
-    message += `総ID数: **${totalUniquePlayers}**　　　　　　　　${armyNameA} : ${armyNameB} = ${uniquePlayersA} : ${uniquePlayersB}\n`;
-    message += `合計 **${totalActions}** レス（攻撃回数）　${armyNameA} : ${armyNameB} = ${totalActionsA} : ${totalActionsB}`;
+    message += `・総ID数: **${totalUniquePlayers}**\n　${armyNameA} : ${armyNameB} = ${uniquePlayersA} : ${uniquePlayersB}\n`;
+    message += `・総合計 **${totalActions}** レス（攻撃回数）\n　${armyNameA} : ${armyNameB} = ${totalActionsA} : ${totalActionsB}`;
 
     
     // ランキングを送信
