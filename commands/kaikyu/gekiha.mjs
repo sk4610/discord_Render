@@ -28,7 +28,7 @@ function isSuperMassiveKill() {
 }
 
 // 撃破処理と昇格判定
-async function processKill(currentRank) {
+function processKill(currentRank) {
   let kills = 0; // 初期撃破数は0
   let rankUp = false;
 
@@ -64,7 +64,6 @@ async function processKill(currentRank) {
   return { newRank, kills, rankUp };
 }
 
-
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
   .setDescription('撃破数を決定します')
@@ -82,26 +81,42 @@ export async function execute(interaction) {
   
   
   try {
+    
     // プレイヤーが登録済みか確認
     const player = await User.findOne({ where: { id: userId } });
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }
+    
+    // 撃破数の処理（ランダム、昇格処理など）
+//    let kills = 0;
+//    let rankUp = false;
+//    let newRank = currentRank;
+      const currentRank = player.rank;
+    
+     // 通常撃破処理
+//    if (Math.random() < 0.1) { // 10%で通常撃破（1撃破）
+//      kills = 1;
+//    }   
+//    // 撃破数をランダム決定
+//    let kills = Math.random() < 0.01 ? 5 : Math.floor(Math.random() * 2); // 1%で5撃破, それ以外は0 or 1
 
-    // 撃破数をランダム決定
-    let kills = Math.random() < 0.01 ? 5 : Math.floor(Math.random() * 2); // 1%で5撃破, それ以外は0 or 1
+    // 撃破処理
+    const { newRank, kills, rankUp } = processKill(currentRank);
+
 
     // 階級昇格判定
-    let rankUp = false;
-    if (kills === 5) {
-      const currentRankIndex = ranks.indexOf(player.rank);
-      if (currentRankIndex < ranks.length - 1) {
-        player.rank = ranks[currentRankIndex + 1]; // 階級を1つ昇格
-        rankUp = true;
-      }
-    }
+//    let rankUp = false;
+//    if (kills === 5) {
+//      const currentRankIndex = ranks.indexOf(player.rank);
+//      if (currentRankIndex < ranks.length - 1) {
+//        player.rank = ranks[currentRankIndex + 1]; // 階級を1つ昇格
+//        rankUp = true;
+//      }
+//    }
 
     // 撃破数を更新
+    player.rank = newRank;
     player.total_kills += kills;
     await player.save();
 
@@ -117,7 +132,13 @@ export async function execute(interaction) {
     let message = "";
    
     // メッセージ作成
-    message += `-#  :military_helmet: ${username} の戦闘！\n## ${kills} 撃破！\n.\n`;
+    message += `-#  :military_helmet: ${username} の攻撃！\n`;
+    if(kills == 0){
+      message += `## 残念、${kills} 撃破…\n.\n`;
+    }else{
+      message += `## 命中！${kills} 撃破！\n.\n`;
+    }
+    
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **${player.rank}**へ昇格！ \n\n`;
     //自分の撃破数
     message += `-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
