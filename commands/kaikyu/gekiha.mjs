@@ -5,6 +5,15 @@ import { getArmyName } from './kaikyu.mjs';
 const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
 const specialRank = '軍神Å';
 
+// 各階級ごとの大量撃破時の撃破数
+const largeKillCounts = {
+  '二等兵＝': 4, '一等兵〓': 5, '軍曹¶': 6, '曹長†': 7, '大尉‡': 8,
+  '大佐▽': 9, '准将◇': 10, '大将Θ': 11, '元帥☆': 12, '軍神Å': 16
+};
+
+// 超・大量撃破の撃破数（軍神のみ特別）
+const superMassiveKillCount = 32;
+
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
   .setDescription('撃破数を決定します')
