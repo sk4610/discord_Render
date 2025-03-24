@@ -50,16 +50,18 @@ export async function execute(interaction) {
     // A軍とB軍の名前を取得
     const armyNameA = getArmyName('A');
     const armyNameB = getArmyName('B');
+
+    // メッセージ（ユーザーが入力したもの）
+    if (customMessage) {
+      message += ` ${customMessage}\n───────────────────────────\n\n`;
+    }
     
     // メッセージ作成
-    let message = `🎖 **${username}**（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
+    let message = ` ${username}（${player.rank}）の撃破結果: **${kills}** 撃破！\n`;
     if (rankUp) message += `🔥 **大量撃破発生！階級昇格: ${player.rank}** 🎉\n`;
     message += `📊 **現在の撃破数:**\n${armyNameA}: **${totalKillsA}** 撃破\n${armyNameB}: **${totalKillsB}** 撃破`;
     
-    // 追加メッセージ（ユーザーが入力したもの）
-    if (customMessage) {
-      message += `📝 ${customMessage}`;
-    }
+
     
     await interaction.reply(message);
   } catch (error) {
