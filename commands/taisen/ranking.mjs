@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { User } from '../taisen/game.js';
-import { getArmyName } from './kaikyu.mjs';
+import { getArmyName } from '../kaikyu/kaikyu.mjs';
 
 
 export const data = new SlashCommandBuilder()
@@ -42,8 +42,8 @@ export async function execute(interaction) {
     const totalUniquePlayers = uniquePlayersA + uniquePlayersB;
     
     // **レス（行動回数）の取得**
-    const totalActionsA = await User.sum('gekiha_count', { where: { army: 'A' } }) || 0;
-    const totalActionsB = await User.sum('gekiha_count', { where: { army: 'B' } }) || 0;
+    const totalActionsA = await User.sum('gekiha_counts', { where: { army: 'A' } }) || 0;
+    const totalActionsB = await User.sum('gekiha_counts', { where: { army: 'B' } }) || 0;
     const totalActions = totalActionsA + totalActionsB;
     
     // A軍とB軍の名前を取得
@@ -51,24 +51,24 @@ export async function execute(interaction) {
     const armyNameB = getArmyName('B');
     
     // ランキング表示用のメッセージを作成
-    let message = '🏆 **ランキング - 上位3名** 🏆\n\n';
+    let message = '🏆 **戦績ランキング (上位3名)** 🏆\n\n';
     // A軍（きのこ）表示
-    message += ':yellow_circle:  **${armyNameA}:**\n';
+    message += `:yellow_circle:  **${armyNameA}:**\n`;
     for (const player of topA) {
       const username = await getUsername(guild, player.id);
       message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
     }
     // B軍（たけのこ）表示
-    message += '\n:green_circle:  **${armyNameB}:**\n';
+    message += `\n:green_circle:  **${armyNameB}:**\n`;
     for (const player of topB) {
       const username = await getUsername(guild, player.id);
       message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
     }
     
     // **追加情報**
-    message += `\n📊 **戦況データ:**\n`;
-    message += `総ID数: **${totalUniquePlayers}**　:yellow_circle:  **${armyNameA} : :green_circle:  **${armyNameB} = **${uniquePlayersA}** : **${uniquePlayersB}**\n`;
-    message += `合計 **${totalActions}** レス（行動回数）　:yellow_circle:  **${armyNameA} : :green_circle:  **${armyNameB} = **${totalActionsA}** : **${totalActionsB}**`;
+    message += `\n\n 📊 **戦況データ:**\n`;
+    message += `総ID数: **${totalUniquePlayers}**　　　　　　　　${armyNameA} : ${armyNameB} = ${uniquePlayersA} : ${uniquePlayersB}\n`;
+    message += `合計 **${totalActions}** レス（攻撃回数）　${armyNameA} : ${armyNameB} = ${totalActionsA} : ${totalActionsB}`;
 
     
     // ランキングを送信

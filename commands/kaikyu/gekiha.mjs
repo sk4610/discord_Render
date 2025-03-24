@@ -142,9 +142,9 @@ export async function execute(interaction) {
     
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
     //自分の撃破数
-    message += `-# >>> 🏅戦歴\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
+    message += `-# >>> 🏅戦績\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     //軍の総撃破数を表示
-    message += `-# >>> 📊 現在の戦況:\n-# >>> ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> ${armyNameB}: 総${totalKillsB} 撃破\n`;
+    message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> ${armyNameB}: 総${totalKillsB} 撃破\n`;
     
      // メッセージ（ユーザーが入力したもの）
     if (customMessage) {
