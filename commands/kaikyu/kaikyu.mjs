@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
+import { armyNames } from '../armyname/armyname.js';
 
 const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
 const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の確率順を基に100％になるように微調整
@@ -11,10 +12,6 @@ const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の�
 // gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
 
 
-// 軍名設定　変更はここから
-const nameA = 'きのこ軍';
-const nameB = 'たけのこ軍';
-
 export const data = new SlashCommandBuilder()
   .setName('kaikyu')
   .setDescription('軍を選択し、ランダムな階級を割り当てます')
@@ -23,12 +20,13 @@ export const data = new SlashCommandBuilder()
       .setDescription('所属する軍を選択')
       .setRequired(true)
       .addChoices(
-        { name: `${nameA}`, value: 'A' },
-        { name: `${nameB}`, value: 'B' }
+        { name: armyNames.A, value: 'A' },
+        { name: armyNames.B, value: 'B' }
       ));
 
   // gekiha.mjsで表示するためのグローバル関数の設定　軍命の変更をkaikyu.mjsだけで留める
-export const armyName_global = {A:`${nameA}`,B:`${nameB}`};
+  // 正直なところarmy
+export const armyName_global = {A:armyNames.A,B:armyNames.B};
 export function getArmyName(army) {
   return armyName_global[army] || '不明';
 }
@@ -39,7 +37,7 @@ export async function execute(interaction) {
   const username = interaction.member.displayName;
 
     // army の値に対応する軍名を取得
-  const armyName = army === 'A' ? `${nameA}` : `${nameB}`;
+  const armyName = army === 'A' ? armyNames.A : armyNames.B;
   
   try {
     // ルールが設定されているか確認
@@ -51,7 +49,7 @@ export async function execute(interaction) {
     // すでに登録済みか確認
     const existingPlayer = await User.findOne({ where: { id: userId }, raw: true});
     if (existingPlayer) {
-      const existingArmyName = existingPlayer.army === 'A' ? `${nameA}` : `${nameB}`;
+      const existingArmyName = existingPlayer.army === 'A' ? armyNames.A : armyNames.B;
       return await interaction.reply(`エラー: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
     }
 
