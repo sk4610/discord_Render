@@ -2,22 +2,28 @@ import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../utils/database.js';
 
 //大戦の源となるデータベースファイル
-//sequelizeのデータベースを呼び出しUser,GameStateを始めとした関数に情報を格納している
+//sequelizeのデータベースを呼び出しUser,GameStateを始めとした値に情報を格納している
 //各大戦ルールについてはそれぞれのフォルダを参照のこと
 
-// 参加者情報
+// 参加者情報 User
 const User = sequelize.define('User', {
+  // ユーザIDを保存 ここではDiscordのユーザID
   id: {
     type: DataTypes.STRING,
     primaryKey: true
   },
+  // ユーザネームを保存
   name: DataTypes.STRING,
+  // ユーザ所属軍を保存
   army: DataTypes.STRING,
+  // ユーザ階級を保存（階級制で使用）
   rank: DataTypes.STRING,
-  gekiha_counts: { // /gekihaを書き込む度にカウント　書き込み回数カウント
+  // /gekihaを書き込む度にカウント　書き込み回数カウント
+  gekiha_counts: { 
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
+  // ユーザの合計撃破数をカウント
   total_kills: {
     type: DataTypes.INTEGER,
     defaultValue: 0
@@ -25,21 +31,25 @@ const User = sequelize.define('User', {
 
 });
 
-// ゲームの状態
+// ゲームの状態を格納する GamaState
 const GameState = sequelize.define('GameState', {
-  rule_set: {　// ruleがsetされたかどうかの状態を保存
+  // ruleがsetされたかどうかの状態を保存 trueならset,falseならnot set
+  rule_set: {   
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
-  rule_type: {  // ルールの種類を保存
+  // ruleの名称を保存
+  rule_type: {  
     type: DataTypes.STRING,
     defaultValue: 'none'
   },
-  a_team_kills: { //
+  // A軍の撃破数
+  a_team_kills: { 
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  b_team_kills: {
+  // B軍の撃破数
+  b_team_kills: {  
     type: DataTypes.INTEGER,
     defaultValue: 0
   }

@@ -9,6 +9,8 @@ export const data = new SlashCommandBuilder()
       .setDescription('ルールの種類')
       .setRequired(true)
       .addChoices(
+        // ルール選択　nameがDiscord上に表示される文字、valueが内部処理で使用する変数
+        // 階級制の選択処理 
         { name: '階級制', value: 'ranked' }
       ));
 

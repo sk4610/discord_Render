@@ -3,7 +3,7 @@ import { User } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('finish')
-  .setDescription('現在の戦闘結果を発表します');
+  .setDescription('終戦させることとして結果発表します');
 
 export async function execute(interaction) {
   try {
