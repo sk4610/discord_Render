@@ -74,66 +74,34 @@ export const data = new SlashCommandBuilder()
       .setRequired(false) // trueにすると必須、falseにすると任意 
   );
 
+// 現在のルールを取得する関数
+async function getGameRule() {
+  const gameState = await GameState.findOne({ where: { id: 1 } }); // ゲームの状態を取得
+  return gameState ? gameState.rule_type : null;
+}
+
 export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
   const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
 
   
-  
+    
   try {
-    
-    // プレイヤーが登録済みか確認
-    const player = await User.findOne({ where: { id: userId } });
-    if (!player) {
-      return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
+    const rule_type = await getGameRule(); // Sequelizeからルールを取得
+
+    if (!rule_type) {
+      return await interaction.reply('エラー: ルールが設定されていません。まず /rule でルールを決めてください。');
     }
     
-    const currentRank = player.rank;
-    
-    // 撃破処理
-    const { newRank, kills, rankUp } = processKill(currentRank);
-
-    // 兵士データを更新
-    player.rank = newRank;
-    player.total_kills += kills;
-    player.gekiha_counts += 1;
-    await player.save();
-
-    // A軍とB軍の総撃破数を計算
-    const totalKillsA = await User.sum('total_kills', { where: { army: 'A' } }) || 0;
-    const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
-
-    // A軍とB軍の名前を取得
-    const armyNameA = getArmyName('A');
-    const armyNameB = getArmyName('B');
-
-    // メッセージ作成（ユーザーのメッセージを最初に追加）
-    let message = "";
-   
-    // メッセージ作成
-    message += `-#  :military_helmet: ${username} の攻撃！\n`;
-    if(kills === 0){
-      message += `## 残念、${kills} 撃破\n.\n`; //0撃破の場合
-    }else{
-      message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
-    }
-    
-    if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
-    //自分の撃破数
-    message += `-# >>> 🏅戦績\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
-    //軍の総撃破数を表示
-    message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> :green_circle: ${armyNameB}: 総${totalKillsB} 撃破\n`;
-    
-     // メッセージ（ユーザーが入力したもの）
-    if (customMessage) {
-      message += ` \`\`\`${customMessage}\`\`\`\n`;
-    }   
-
-    
-    await interaction.reply(message);
-  } catch (error) {
-    console.error('撃破処理エラー:', error);
-    await interaction.reply('エラー: 撃破処理に失敗しました');
+    if (rule_type === 'ranked') {
+      // **階級制の処理**
+      await kaikyu_main(interaction);
+    }else {
+      await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
+    } 
+  }catch (error) {
+      console.error('撃破処理エラー:', error);
+      await interaction.reply('エラー: 撃破処理に失敗しました');
   }
 }
