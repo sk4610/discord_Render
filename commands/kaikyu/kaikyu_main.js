@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from './kaikyu.mjs';
-import { kaikyu_main } from './kaikyu_main.js';
 
 const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
 const specialRank = '軍神Å';
@@ -65,32 +64,18 @@ function processKill(currentRank) {
   return { newRank, kills, rankUp };
 }
 
-export const data = new SlashCommandBuilder()
-  .setName('gekiha')
-  .setDescription('撃破数を決定します')
-  .addStringOption(option =>
-      option.setName("message")
-      .setDescription("一言レスを表示")
-      .setRequired(false) // trueにすると必須、falseにすると任意 
-  );
-
-export async function execute(interaction) {
-  const userId = interaction.user.id;
-  const username = interaction.member.displayName;
-  const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
-
-  
-  
+export async function kaikyu_main(interaction) {
   try {
-    
-    // プレイヤーが登録済みか確認
+    const userId = interaction.user.id;
     const player = await User.findOne({ where: { id: userId } });
+    const currentRank = player.rank;
+    const username = interaction.member.displayName;
+    const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
+    
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }
-    
-    const currentRank = player.rank;
-    
+
     // 撃破処理
     const { newRank, kills, rankUp } = processKill(currentRank);
 
