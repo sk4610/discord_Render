@@ -24,8 +24,8 @@ export const data = new SlashCommandBuilder()
         { name: armyNames.B, value: 'B' }
       ));
 
-  // gekiha.mjsで表示するためのグローバル関数の設定　軍命の変更をkaikyu.mjsだけで留める
-  // 正直なところarmy
+// gekiha.mjsで軍名を表示するためのグローバル関数の設定　変更をkaikyu.mjsだけで留める
+// 正直なところarmyNamesを使えばいいのだが、先にこのgetArymyNameを作ったので変更するのが面倒なため階級制ではこのまま運用する
 export const armyName_global = {A:armyNames.A,B:armyNames.B};
 export function getArmyName(army) {
   return armyName_global[army] || '不明';
