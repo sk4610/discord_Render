@@ -118,7 +118,7 @@ export async function kaikyu_main(interaction) {
     
     await interaction.reply(message);
   } catch (error) {
-    console.error('撃破処理エラー:', error);
-    await interaction.reply('エラー: 撃破処理に失敗しました');
+    console.error('撃破処理エラー1:', error);
+    await interaction.reply('エラー1: 撃破処理に失敗しました');
   }
 }
