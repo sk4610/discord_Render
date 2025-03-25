@@ -88,32 +88,10 @@ export async function execute(interaction) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }
     
-    // 撃破数の処理（ランダム、昇格処理など）
-//    let kills = 0;
-//    let rankUp = false;
-//    let newRank = currentRank;
-      const currentRank = player.rank;
+    const currentRank = player.rank;
     
-     // 通常撃破処理
-//    if (Math.random() < 0.1) { // 10%で通常撃破（1撃破）
-//      kills = 1;
-//    }   
-//    // 撃破数をランダム決定
-//    let kills = Math.random() < 0.01 ? 5 : Math.floor(Math.random() * 2); // 1%で5撃破, それ以外は0 or 1
-
     // 撃破処理
     const { newRank, kills, rankUp } = processKill(currentRank);
-
-
-    // 階級昇格判定
-//    let rankUp = false;
-//    if (kills === 5) {
-//      const currentRankIndex = ranks.indexOf(player.rank);
-//      if (currentRankIndex < ranks.length - 1) {
-//        player.rank = ranks[currentRankIndex + 1]; // 階級を1つ昇格
-//        rankUp = true;
-//      }
-//    }
 
     // 兵士データを更新
     player.rank = newRank;
