@@ -99,7 +99,7 @@ export async function kaikyu_main(interaction) {
     // メッセージ作成
     message += `-#  :military_helmet: ${username} の攻撃！\n`;
     if(kills === 0){
-      message += `## 残念、${kills} 撃破\n.\n`; //0撃破の場合
+      message += `## ざんねん、${kills} 撃破\n.\n`; //0撃破の場合
     }else{
       message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
     }

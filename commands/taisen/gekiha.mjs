@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
-import { getArmyName } from './kaikyu.mjs';
-import { kaikyu_main } from './kaikyu_main.js';
+import { getArmyName } from '../kaikyu/kaikyu.mjs';
+import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 
 
 export const data = new SlashCommandBuilder()
@@ -9,7 +9,7 @@ export const data = new SlashCommandBuilder()
   .setDescription('撃破数を決定します')
   .addStringOption(option =>
       option.setName("message")
-      .setDescription("一言レスを表示")
+      .setDescription("一言レスを表示") // 一行レスを打つことができる
       .setRequired(false) // trueにすると必須、falseにすると任意 
   );
 
@@ -35,7 +35,7 @@ export async function execute(interaction) {
     
     if (rule_type === 'ranked') {
       // **階級制の処理**
-      await kaikyu_main(interaction);
+      await kaikyu_main(interaction); // kaikyu_main.jsを実行
     }else {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 

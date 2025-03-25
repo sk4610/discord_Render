@@ -4,6 +4,13 @@ import { GameState, User } from '../taisen/game.js';
 const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
 const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の確率順を基に100％になるように微調整
 
+//**階級制処理の流れ**
+// rule.mjs /ruleで rule_typeをname:階級制, value:rankedに設定
+// 次にkaikyu.mjs(ここ) /kaikyuで userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
+// 次にgekiha.mjs /gekihaで　階級制の撃破判定処理を実行　ただし実際に階級制の処理をしているのはkaikyu_main.js
+// gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
+
+
 // 軍名設定　変更はここから
 const nameA = 'きのこ軍';
 const nameB = 'たけのこ軍';

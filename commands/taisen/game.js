@@ -1,12 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../utils/database.js';
 
-//const sequelize = new Sequelize({
-//  dialect: 'sqlite',
-//  storage: path.join(process.cwd(), 'game.db'),
-//  logging: false
-//});
-
 //大戦の源となるデータベースファイル
 //sequelizeのデータベースを呼び出しUser,GameStateを始めとした関数に情報を格納している
 //各大戦ルールについてはそれぞれのフォルダを参照のこと
@@ -33,7 +27,7 @@ const User = sequelize.define('User', {
 
 // ゲームの状態
 const GameState = sequelize.define('GameState', {
-  rule_set: {
+  rule_set: {　// ruleがsetされたかどうかの状態を保存
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
@@ -41,7 +35,7 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.STRING,
     defaultValue: 'none'
   },
-  a_team_kills: {
+  a_team_kills: { //
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
