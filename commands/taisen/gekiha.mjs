@@ -19,6 +19,12 @@ async function getGameRule() {
   return gameState ? gameState.rule_type : null;
 }
 
+// State.countMode を取得する関数
+async function getCountMode() {
+  const gameState = await GameState.findOne({ where: { id: 1 } });
+  return gameState ? gameState.countMode : "up"; // デフォルトは up
+}
+
 export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
