@@ -1,5 +1,5 @@
 import { GameState } from '../taisen/game.js';
-import { client } from '../main.mjs';
+import { client } from '../../main.mjs';
 
 export async function sendEndShukei() {
   try {
