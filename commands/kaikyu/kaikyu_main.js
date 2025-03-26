@@ -27,6 +27,13 @@ function isSuperMassiveKill() {
   return Math.random() < 1 / 1000; // 0.1% の確率で超・大量撃破
 }
 
+// State.countMode を取得する関数
+// 大戦方式（カウントダウンorカウントアップ）により書き込み欄下の集計を切り替える
+async function getCountMode() {
+  const gameState = await GameState.findOne({ where: { id: 1 } });
+  return gameState ? gameState.countMode : "up"; // デフォルトは up
+}
+
 // 撃破処理と昇格判定
 function processKill(currentRank) {
   let kills = 0; // 初期撃破数は0
@@ -71,6 +78,7 @@ export async function kaikyu_main(interaction) {
     const currentRank = player.rank;
     const username = interaction.member.displayName;
     const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
+    const countMode = await getCountMode(); // ここで countMode を取得
     
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
@@ -105,11 +113,18 @@ export async function kaikyu_main(interaction) {
     }
     
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
-    //自分の撃破数
+    // 自分の撃破数
     message += `-# >>> 🏅戦績\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
-    //軍の総撃破数を表示
-    message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> :green_circle: ${armyNameB}: 総${totalKillsB} 撃破\n`;
-    
+    // 軍の総撃破数を表示
+    // カウントダウンの場合は残存兵力を表示する
+    if (countMode === "down") {
+      const gameState = await GameState.findOne({ where: { id: 1 } });
+      const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
+      const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
+      
+      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> :green_circle: ${armyNameB}: 総${totalKillsB} 撃破\n`;
+    }else if (countMode === "up") {
+      
      // メッセージ（ユーザーが入力したもの）
     if (customMessage) {
       message += ` \`\`\`${customMessage}\`\`\`\n`;

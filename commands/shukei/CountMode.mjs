@@ -36,7 +36,7 @@ export async function execute(interaction) {
       gameState.countMode = 'up';
       gameState.initialArmyHP = null;
       await gameState.save();
-      return await interaction.reply('カウント方式を **カウントアップ** に変更しました。');
+      return await interaction.reply('大戦方式を **カウントアップ** に変更しました。');
     }
 
     if (mode === 'down') {
@@ -47,11 +47,11 @@ export async function execute(interaction) {
       gameState.countMode = 'down';
       gameState.initialArmyHP = initialHP;
       await gameState.save();
-      return await interaction.reply(`カウント方式を **カウントダウン** に変更しました。（初期兵力: ${initialHP}）`);
+      return await interaction.reply(`大戦方式を **カウントダウン** に変更しました。（初期兵力: ${initialHP}）`);
     }
 
   } catch (error) {
-    console.error('カウント方式の変更エラー:', error);
-    await interaction.reply('エラー: カウント方式の変更に失敗しました。');
+    console.error('大戦方式の変更エラー:', error);
+    await interaction.reply('エラー: 大戦方式の変更に失敗しました。');
   }
 }
