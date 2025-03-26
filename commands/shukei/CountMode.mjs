@@ -3,7 +3,7 @@ import { GameState } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('count')
-  .setDescription('撃破数のカウント方式を切り替えます')
+  .setDescription('大戦の終戦方式を切り替えます')
   .addStringOption(option =>
     option.setName('mode')
       .setDescription('カウントモード (up/down)')
@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
   )
   .addIntegerOption(option =>
     option.setName('initial_hp')
-      .setDescription('カウントダウン時の初期兵力（省略可）')
+      .setDescription('カウントダウン時の初期兵力（ダウン時のみ）')
       .setRequired(false)
   );
 
