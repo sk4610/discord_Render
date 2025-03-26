@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { gameState } from "../taisen/gekiha.js";
+import { gameState } from "../taisen/gekiha.mjs";
 
 export const data = new SlashCommandBuilder()
   .setName("shukeiChannel")
