@@ -43,6 +43,16 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.STRING,
     defaultValue: 'none'
   },  
+  // 大戦の終戦方式を決定
+  countMode: {  
+    type: DataTypes.STRING,
+    defaultValue: 'up'
+  },    
+  // 初期HPの決定（カウントダウン方式のみ）
+  initialArmyHP: {  
+    type: DataTypes.INTEGER,
+    defaultValue: 100
+  },     
   // A軍の撃破数
   a_team_kills: { 
     type: DataTypes.INTEGER,

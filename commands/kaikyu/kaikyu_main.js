@@ -31,7 +31,6 @@ function isSuperMassiveKill() {
 // 大戦方式（カウントダウンorカウントアップ）により書き込み欄下の集計を切り替える
 async function getCountMode() {
   const gameState = await GameState.findOne({ where: { id: 1 } });
-  console.log("gameState:", gameState);
   return gameState ? gameState.countMode : "up"; // デフォルトは up
 }
 
@@ -80,11 +79,6 @@ export async function kaikyu_main(interaction) {
     const username = interaction.member.displayName;
     const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
     const countMode = await getCountMode(); // ここで countMode を取得
-    let gameState = await GameState.findOne({ where: { id: 1 } }); // デバッグ用
-//以下デバッグ用    
-    console.log("Current countMode: ", gameState.countMode); // ここでデバッグ
-
-  //デバッグ用ここまで
     
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
