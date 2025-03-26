@@ -49,7 +49,9 @@ export async function execute(interaction) {
       await gameState.save();
       return await interaction.reply(`大戦方式を **カウントダウン** に変更しました。（初期兵力: ${initialHP}）`);
     }
-
+    
+    console.log("Current countMode: ", gameState.countMode); // ここでデバッグ
+    
   } catch (error) {
     console.error('大戦方式の変更エラー:', error);
     await interaction.reply('エラー: 大戦方式の変更に失敗しました。');
