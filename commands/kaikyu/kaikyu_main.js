@@ -117,13 +117,18 @@ export async function kaikyu_main(interaction) {
     message += `-# >>> 🏅戦績\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     // 軍の総撃破数を表示
     // カウントダウンの場合は残存兵力を表示する
-    if (countMode === "down") {
+    if (countMode === 'down') {
       const gameState = await GameState.findOne({ where: { id: 1 } });
-      const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
-      const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
+      const remainingHP_A = gameState.initialArmyHP - totalKillsB;
+      const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
+      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}残存兵力: ${remainingHP_A} \n-# >>> :green_circle: ${armyNameB}残存兵力: ${remainingHP_B} \n`;
+
+    }else if (countMode === 'up') {    
+    
       message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> :green_circle: ${armyNameB}: 総${totalKillsB} 撃破\n`;
-    }else if (countMode === "up") {
+      
+    }
       
      // メッセージ（ユーザーが入力したもの）
     if (customMessage) {
