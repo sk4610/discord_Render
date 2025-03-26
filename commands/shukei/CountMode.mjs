@@ -36,6 +36,7 @@ export async function execute(interaction) {
       gameState.countMode = 'up';
       gameState.initialArmyHP = null;
       await gameState.save();
+      console.log("Current countMode: ", gameState.countMode); // ここでデバッグ
       return await interaction.reply('大戦方式を **カウントアップ** に変更しました。');
     }
 
@@ -50,7 +51,7 @@ export async function execute(interaction) {
       return await interaction.reply(`大戦方式を **カウントダウン** に変更しました。（初期兵力: ${initialHP}）`);
     }
     
-    console.log("Current countMode: ", gameState.countMode); // ここでデバッグ
+
     
   } catch (error) {
     console.error('大戦方式の変更エラー:', error);
