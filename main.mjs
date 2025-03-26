@@ -43,6 +43,9 @@ const client = new Client({
   ],
 });
 
+// 必要なエクスポートを追加
+export { client };
+
 client.commands = new Collection();
 
 const categoryFoldersPath = path.join(process.cwd(), "commands");
