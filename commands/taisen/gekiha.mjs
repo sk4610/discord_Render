@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from '../kaikyu/kaikyu.mjs';
 import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
-import { sendEndShukei } from "../taisen/shukeiNotice.js";
+import { sendEndShukei } from "../shukei/shukeiNotice.js";
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
@@ -48,6 +48,8 @@ export async function execute(interaction) {
     } 
     
     // カウントダウンの場合、兵力をチェックして通知
+    //const state = await GameState.findOne({ where: { id: 1 } });
+    //if (state.countMode === "down" && state.initialArmyHP) {
     if (countMode === "down") {
       const gameState = await GameState.findOne({ where: { id: 1 } });
       const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
