@@ -47,15 +47,7 @@ export async function execute(interaction) {
       return;
     }
     
-    // DBを最新の状態に同期
-    await gameState.reload();
-    
-    const loserTeam = await checkShusen();
-    if (loserTeam) {
-      await interaction.reply(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
-      return;
-    }
-    
+   
     if (rule_type === 'ranked') {
       // **階級制の処理**
       await kaikyu_main(interaction); // kaikyu_main.jsを実行
@@ -63,6 +55,12 @@ export async function execute(interaction) {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
     
+      
+    const loserTeam = await checkShusen();
+    if (loserTeam) {
+      await interaction.followUp(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
+      return;
+    }
 
 
     

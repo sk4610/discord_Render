@@ -93,6 +93,22 @@ export async function kaikyu_main(interaction) {
     player.gekiha_counts += 1;
     await player.save();
 
+    // **GameStateに撃破数を反映**
+    const gameState = await GameState.findOne({ where: { id: 1 } });
+    if (!gameState) {
+      return await interaction.reply("エラー: ゲームデータが見つかりません。");
+    }
+    
+    if (player.army === "A") {
+      await gameState.increment("a_team_kills", { by: kills });
+    } else {
+      await gameState.increment("b_team_kills", { by: kills });
+    }
+
+    // **DBを最新の状態に更新**
+    await gameState.reload();
+
+    
     // A軍とB軍の総撃破数を計算
     const totalKillsA = await User.sum('total_kills', { where: { army: 'A' } }) || 0;
     const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
