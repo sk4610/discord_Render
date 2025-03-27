@@ -55,10 +55,20 @@ export async function execute(interaction) {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
     
-      
+    // 終戦判定
+    // initialArmyHPはカウントダウン方式しか使わないためカウントダウンしか判定されない
     const loserTeam = await checkShusen();
     if (loserTeam) {
-      await interaction.followUp(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
+      const gameState = await GameState.findOne({ where: { id: 1 } });
+      
+      // 残存兵力チェック
+      const totalKillsA = gameState.a_team_kills;
+      const totalKillsB = gameState.b_team_kills;
+      
+      const remainingHP_A = gameState.initialArmyHP - totalKillsB;
+      const remainingHP_B = gameState.initialArmyHP - totalKillsA;
+      
+      await interaction.followUp(`**${loserTeam}の兵力が0になりました。終戦しました！**`);
       return;
     }
 

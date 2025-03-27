@@ -89,7 +89,7 @@ export async function checkShusen() {
   const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
   const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
 
-    console.log(`🛡️ 兵力状況 - A軍: ${remainingHP_A}, B軍: ${remainingHP_B}`);
+//    console.log(`🛡️ 兵力状況 - A軍: ${remainingHP_A}, B軍: ${remainingHP_B}`);
 
   
   // どちらかの軍のHPが0以下になったら終戦
