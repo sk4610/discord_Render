@@ -79,10 +79,7 @@ export async function kaikyu_main(interaction) {
     const username = interaction.member.displayName;
     const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
     const countMode = await getCountMode(); // ここで countMode を取得
-    const UserArmyName = await User.findOne({ where: { id: userId }, raw: true});
-    
-    const userArmy = interaction.user.army;
-    
+
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
     }
@@ -103,12 +100,16 @@ export async function kaikyu_main(interaction) {
     // A軍とB軍の名前を取得
     const armyNameA = getArmyName('A');
     const armyNameB = getArmyName('B');
+    
+    // ユーザの所属軍を取得
+    const UserArmy = await User.findOne({ where: { id: userId }, raw: true});
+    const UserArmyName = UserArmy.army === 'A' ? armyNameA : armyNameB;
 
     // メッセージ作成（ユーザーのメッセージを最初に追加）
     let message = "";
    
     // メッセージ作成
-    message += `-#  :military_helmet: ${userArmy} ${username} の攻撃！\n`;
+    message += `-#  :military_helmet: ${UserArmyName} ${username} の攻撃！\n`;
     if(kills === 0){
       message += `## ざんねん、${kills} 撃破\n.\n`; //0撃破の場合
     }else{
@@ -117,7 +118,7 @@ export async function kaikyu_main(interaction) {
     
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
     // 自分の撃破数
-    message += `-# >>> 🏅戦績\n-# >>> ${userArmy} ${username}  階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
+    message += `-# >>> 🏅戦績\n-# >>> ${UserArmyName} ${username}  階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     // 軍の総撃破数を表示
     // カウントダウンの場合は残存兵力を表示する
     if (countMode === 'down') {
