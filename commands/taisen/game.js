@@ -62,7 +62,12 @@ const GameState = sequelize.define('GameState', {
   b_team_kills: {  
     type: DataTypes.INTEGER,
     defaultValue: 0
-  }
+  },
+  // 終戦状態をフラグ管理
+  isGameOver: {   
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
 });
 
 // テーブルの同期（テーブルが存在しない場合は作成されます）
