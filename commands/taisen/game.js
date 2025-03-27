@@ -89,12 +89,16 @@ export async function checkShusen() {
   const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
   const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
 
+    console.log(`🛡️ 兵力状況 - A軍: ${remainingHP_A}, B軍: ${remainingHP_B}`);
+
+  
   // どちらかの軍のHPが0以下になったら終戦
   if (remainingHP_A <= 0 || remainingHP_B <= 0) {
     const loserTeam = remainingHP_A <= 0 ? armyNames.A : armyNames.B ;
 
     try {
       await gameState.update({ isGameOver: true });  // 終戦フラグをON
+      await gameState.reload(); // 更新後のデータを同期
       console.log(`⚔️ ${loserTeam}の兵力が尽きました。終戦しました！`);
     } catch (error) {
       console.error("❌ 終戦状態の更新に失敗:", error);

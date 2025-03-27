@@ -41,6 +41,21 @@ export async function execute(interaction) {
       return await interaction.reply('エラー: ルールが設定されていません。まず /rule でルールを決めてください。');
     }
     
+    
+    if (gameState.isGameOver) {
+      await interaction.reply("ゲームはすでに終了しています！");
+      return;
+    }
+    
+    // DBを最新の状態に同期
+    await gameState.reload();
+    
+    const loserTeam = await checkShusen();
+    if (loserTeam) {
+      await interaction.reply(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
+      return;
+    }
+    
     if (rule_type === 'ranked') {
       // **階級制の処理**
       await kaikyu_main(interaction); // kaikyu_main.jsを実行
@@ -49,16 +64,7 @@ export async function execute(interaction) {
     } 
     
 
-    if (gameState.isGameOver) {
-      await interaction.reply("ゲームはすでに終了しています！");
-      return;
-    }
-    
-    const loserTeam = await checkShusen();
-    if (loserTeam) {
-      await interaction.reply(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
-      return;
-    }
+
     
     // カウントダウンの場合、兵力をチェックして通知
     //const state = await GameState.findOne({ where: { id: 1 } });
