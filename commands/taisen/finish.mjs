@@ -3,7 +3,7 @@ import { User } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('finish')
-  .setDescription('終戦させることとして結果発表します');
+  .setDescription('終戦し結果発表します');
 
 export async function execute(interaction) {
   try {
@@ -12,7 +12,7 @@ export async function execute(interaction) {
     const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
 
     // 勝敗判定
-    let resultMessage = '🏆 **勝敗結果:** ';
+    let resultMessage = '🏆 **大戦結果:** ';
     if (totalKillsA > totalKillsB) {
       resultMessage += '🎖 **A軍の勝利！** 🎉';
     } else if (totalKillsB > totalKillsA) {
