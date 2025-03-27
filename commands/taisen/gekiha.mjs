@@ -44,7 +44,7 @@ export async function execute(interaction) {
     
     // 大戦が終了すると通知が変わる
     if (gameState.isGameOver) {
-      await interaction.reply("大戦はすでに終了しています！次回をお楽しみに！");
+      await interaction.reply("大戦はすでに終了した！次回の号砲を待て！");
       return;
     }
     
@@ -71,7 +71,7 @@ export async function execute(interaction) {
       const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
       //終戦時の自動通知
-      await interaction.followUp(`**${loserTeam}の兵力が0になりました。\n ${WinnerTeam}**の勝利！\n\n **■最終結果\n ${armyNames.A}残存兵力${remainingHP_A}  : ${armyNames.B}残存兵力${remainingHP_B}\n**本大戦は終戦しました！**`);
+      await interaction.followUp(`**${loserTeam}の兵力が0になった。**\n# ${WinnerTeam}**の勝利だ！\n\n\n\n_ **\n■最終結果\n 【${armyNames.A}の残存兵力】${remainingHP_A} \n 【${armyNames.B}の残存兵力】${remainingHP_B}\n\n**今次大戦は終戦した！次の大戦でまた会おう！**`);
       return;
     }
 
