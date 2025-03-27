@@ -4,6 +4,7 @@ import { getArmyName } from '../kaikyu/kaikyu.mjs';
 import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 import { sendEndShukei } from "../shukei/shukeiNotice.js";
 import { checkShusen } from '../taisen/game.js';
+import { armyNames } from '../armyname/armyname.js';
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
@@ -41,9 +42,9 @@ export async function execute(interaction) {
       return await interaction.reply('エラー: ルールが設定されていません。まず /rule でルールを決めてください。');
     }
     
-    
+    // 大戦が終了すると通知が変わる
     if (gameState.isGameOver) {
-      await interaction.reply("ゲームはすでに終了しています！");
+      await interaction.reply("大戦はすでに終了しています！次回をお楽しみに！");
       return;
     }
     
@@ -58,6 +59,7 @@ export async function execute(interaction) {
     // 終戦判定
     // initialArmyHPはカウントダウン方式しか使わないためカウントダウンしか判定されない
     const loserTeam = await checkShusen();
+    const WinnerTeam = await checkShusen();
     if (loserTeam) {
       const gameState = await GameState.findOne({ where: { id: 1 } });
       
@@ -68,7 +70,8 @@ export async function execute(interaction) {
       const remainingHP_A = gameState.initialArmyHP - totalKillsB;
       const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
-      await interaction.followUp(`**${loserTeam}の兵力が0になりました。終戦しました！**`);
+      //終戦時の自動通知
+      await interaction.followUp(`**${loserTeam}の兵力が0になりました。\n ${WinnerTeam}**の勝利！\n\n **■最終結果\n ${armyNames.A}残存兵力${remainingHP_A}  : ${armyNames.B}残存兵力${remainingHP_B}\n**本大戦は終戦しました！**`);
       return;
     }
 

@@ -74,7 +74,7 @@ const GameState = sequelize.define('GameState', {
 
 
 /**
- * 終戦かどうかをチェックする
+ * 終戦かどうかをチェックする 終戦だった場合、isGameOverをtrueにしてフラグをON、その結果をgekiha.mjsで判定して自動通知させる
  * @returns {Promise<string|null>} 負けた軍の名前（"きのこ軍" or "たけのこ軍"）、または null（未終戦）
  */
 
@@ -90,21 +90,21 @@ export async function checkShusen() {
   const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
 
 //    console.log(`🛡️ 兵力状況 - A軍: ${remainingHP_A}, B軍: ${remainingHP_B}`);
-
-  
   // どちらかの軍のHPが0以下になったら終戦
   if (remainingHP_A <= 0 || remainingHP_B <= 0) {
-    const loserTeam = remainingHP_A <= 0 ? armyNames.A : armyNames.B ;
+    const loserTeam = remainingHP_A <= 0 ? armyNames.A : armyNames.B ; // 敗北軍
+    const winnerTeam = loserTeam === armyNames.A ? armyNames.B : armyNames.A; // 勝利軍
 
     try {
       await gameState.update({ isGameOver: true });  // 終戦フラグをON
       await gameState.reload(); // 更新後のデータを同期
-      console.log(`⚔️ ${loserTeam}の兵力が尽きました。終戦しました！`);
+//      console.log(`⚔️ ${loserTeam}の兵力が尽きました。終戦しました！`);
     } catch (error) {
       console.error("❌ 終戦状態の更新に失敗:", error);
     }
 
     return loserTeam;
+    return winnerTeam;
   }
 
   return null;  // まだ終戦していない
