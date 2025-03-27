@@ -1,5 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../utils/database.js';
+import { armyNames } from '../armyname/armyname.js';
 
 //大戦の源となるデータベースファイル
 //sequelizeのデータベースを呼び出しUser,GameStateを始めとした値に情報を格納している
@@ -69,6 +70,41 @@ const GameState = sequelize.define('GameState', {
     defaultValue: false
   },
 });
+
+
+
+/**
+ * 終戦かどうかをチェックする
+ * @returns {Promise<string|null>} 負けた軍の名前（"きのこ軍" or "たけのこ軍"）、または null（未終戦）
+ */
+
+export async function checkShusen() {
+  const gameState = await GameState.findOne({ where: { id: 1 } });
+  if (!gameState) {
+    console.error("❌ GameState not found.");
+    return null;
+  }
+
+  // 残りHPの計算
+  const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
+  const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
+
+  // どちらかの軍のHPが0以下になったら終戦
+  if (remainingHP_A <= 0 || remainingHP_B <= 0) {
+    const loserTeam = remainingHP_A <= 0 ? armyNames.A : armyNames.B ;
+
+    try {
+      await gameState.update({ isGameOver: true });  // 終戦フラグをON
+      console.log(`⚔️ ${loserTeam}の兵力が尽きました。終戦しました！`);
+    } catch (error) {
+      console.error("❌ 終戦状態の更新に失敗:", error);
+    }
+
+    return loserTeam;
+  }
+
+  return null;  // まだ終戦していない
+}
 
 // テーブルの同期（テーブルが存在しない場合は作成されます）
 // 新しいコマンドを作成したときなど一度trueにしてからfalseにすると作成されエラーを回避できる

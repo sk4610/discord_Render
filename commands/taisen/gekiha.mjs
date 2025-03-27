@@ -3,6 +3,7 @@ import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from '../kaikyu/kaikyu.mjs';
 import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 import { sendEndShukei } from "../shukei/shukeiNotice.js";
+import { GameState, User } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
@@ -33,7 +34,7 @@ export async function checkShusen() {
 
   if (remainingHP_A <= 0 || remainingHP_B <= 0) {
     gameState.isGameOver = true;
-    return remainingHP_A <= 0 ? "A軍" : "B軍";
+    return remainingHP_A <= 0 ? "きのこ軍" : "たけのこ軍";
   }
   return null;  
 }
@@ -60,6 +61,11 @@ export async function execute(interaction) {
     }else {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
+
+        if (gameState.isGameOver) {
+      await interaction.reply("ゲームはすでに終了しています！");
+      return;
+    }
     
     // カウントダウンの場合、兵力をチェックして通知
     //const state = await GameState.findOne({ where: { id: 1 } });
