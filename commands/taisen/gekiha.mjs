@@ -3,7 +3,7 @@ import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from '../kaikyu/kaikyu.mjs';
 import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 import { sendEndShukei } from "../shukei/shukeiNotice.js";
-import { GameState, User } from '../taisen/game.js';
+import { checkShusen } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('gekiha')
@@ -26,25 +26,11 @@ async function getCountMode() {
   return gameState ? gameState.countMode : "up"; // デフォルトは up
 }
 
-// 終戦かどうかをチェックする
-export async function checkShusen() {
-  const gameState = await GameState.findOne({ where: { id: 1 } });
-      const remainingHP_A = gameState.initialArmyHP - gameState.b_team_kills;
-      const remainingHP_B = gameState.initialArmyHP - gameState.a_team_kills;
-
-  if (remainingHP_A <= 0 || remainingHP_B <= 0) {
-    gameState.isGameOver = true;
-    return remainingHP_A <= 0 ? "きのこ軍" : "たけのこ軍";
-  }
-  return null;  
-}
-
-
 export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
   const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
-
+  const gameState = await GameState.findOne({ where: { id: 1 } });
   
     
   try {
@@ -61,9 +47,16 @@ export async function execute(interaction) {
     }else {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
+    
 
-        if (gameState.isGameOver) {
+    if (gameState.isGameOver) {
       await interaction.reply("ゲームはすでに終了しています！");
+      return;
+    }
+    
+    const loserTeam = await checkShusen();
+    if (loserTeam) {
+      await interaction.reply(`**${loserTeam}の兵力が尽きました。終戦しました！**`);
       return;
     }
     
