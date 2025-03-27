@@ -34,6 +34,13 @@ async function getCountMode() {
   return gameState ? gameState.countMode : "up"; // デフォルトは up
 }
 
+// State.countMode を取得する関数
+// 大戦方式（カウントダウンorカウントアップ）により書き込み欄下の集計を切り替える
+async function getUserArmyName() {
+  const UserArmyName = await User.findOne({ where: { id: 1 } });
+  return UserArmyName ? UserArmyName.armyname : "NoName"; // デフォルトは NoName
+}
+
 // 撃破処理と昇格判定
 function processKill(currentRank) {
   let kills = 0; // 初期撃破数は0
@@ -79,6 +86,7 @@ export async function kaikyu_main(interaction) {
     const username = interaction.member.displayName;
     const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
     const countMode = await getCountMode(); // ここで countMode を取得
+    const userArmy = await getUserArmyName();
     
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
@@ -105,7 +113,7 @@ export async function kaikyu_main(interaction) {
     let message = "";
    
     // メッセージ作成
-    message += `-#  :military_helmet: ${username} の攻撃！\n`;
+    message += `-#  :military_helmet: ${userArmy} ${username} の攻撃！\n`;
     if(kills === 0){
       message += `## ざんねん、${kills} 撃破\n.\n`; //0撃破の場合
     }else{
