@@ -34,13 +34,6 @@ async function getCountMode() {
   return gameState ? gameState.countMode : "up"; // デフォルトは up
 }
 
-// State.countMode を取得する関数
-// 大戦方式（カウントダウンorカウントアップ）により書き込み欄下の集計を切り替える
-async function getUserArmyName() {
-  const UserArmyName = await User.findOne({ where: { id: 1 } });
-  return UserArmyName ? UserArmyName.armyname : "NoName"; // デフォルトは NoName
-}
-
 // 撃破処理と昇格判定
 function processKill(currentRank) {
   let kills = 0; // 初期撃破数は0
@@ -86,7 +79,9 @@ export async function kaikyu_main(interaction) {
     const username = interaction.member.displayName;
     const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
     const countMode = await getCountMode(); // ここで countMode を取得
-    const userArmy = await getUserArmyName();
+    const UserArmyName = await User.findOne({ where: { id: userId }, raw: true});
+    
+    const userArmy = interaction.user.army;
     
     if (!player) {
       return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
@@ -122,7 +117,7 @@ export async function kaikyu_main(interaction) {
     
     if (rankUp) message += `## 🔥大量撃破だ！！🔥 \n **新階級: ${player.rank}**へ昇格！ \n\n`;
     // 自分の撃破数
-    message += `-# >>> 🏅戦績\n-# >>> ${username} 階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
+    message += `-# >>> 🏅戦績\n-# >>> ${userArmy} ${username}  階級:${player.rank} \n-# >>> 攻撃数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n-# >>> -\n`
     // 軍の総撃破数を表示
     // カウントダウンの場合は残存兵力を表示する
     if (countMode === 'down') {
@@ -130,7 +125,7 @@ export async function kaikyu_main(interaction) {
       const remainingHP_A = gameState.initialArmyHP - totalKillsB;
       const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
-      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}残存兵力: ${remainingHP_A} \n-# >>> :green_circle: ${armyNameB}残存兵力: ${remainingHP_B} \n`;
+      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA} 残存兵力: ${remainingHP_A} \n-# >>> :green_circle: ${armyNameB} 残存兵力: ${remainingHP_B} \n`;
 
     }else if (countMode === 'up') {    
     
