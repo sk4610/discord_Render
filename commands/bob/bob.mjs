@@ -13,7 +13,7 @@ export const data = new SlashCommandBuilder()
           { name: 'on', value: 'on' },
           { name: 'off', value: 'off' }
         )
-    ),
+    );
 
 export async function execute(interaction) {
     const mode = interaction.options.getString('mode');
