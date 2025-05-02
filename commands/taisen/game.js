@@ -53,7 +53,12 @@ const GameState = sequelize.define('GameState', {
   initialArmyHP: {  
     type: DataTypes.INTEGER,
     defaultValue: 100
-  },     
+  },
+ // 初期HPの決定（カウントダウン方式のみ）
+  bobEnabled: {  
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }, 
   // A軍の撃破数
   a_team_kills: { 
     type: DataTypes.INTEGER,
