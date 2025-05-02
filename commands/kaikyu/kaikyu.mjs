@@ -74,6 +74,31 @@ export async function execute(interaction) {
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
 
     await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);
+    
+    
+   // ---- 👇 BOB支援制度が有効な場合、BOBの階級も登録 ----
+    if (GameState.bobEnabled) {
+      const bobId = `bob-${userId}`; // BOBのIDはユーザーIDに紐付けて区別
+      const existingBOB = await User.findOne({ where: { id: bobId }, raw: true });
+      
+      if (!existingBOB) {
+        // BOBにもランダムな階級を割り当てる
+        let bobRandom = Math.floor(Math.random() * totalWeight);
+        let bobRank = '';
+        for (let i = 0; i < weight.length; i++) {
+          if (bobRandom < weight[i]) {
+            bobRank = ranks[i];
+            break;
+          } else {
+            bobRandom -= weight[i];
+          }
+        }
+
+        await User.create({ id: bobId, username: `BOB - ${username}のパートナー`, army: army, rank: bobRank, total_kills: 0　});
+
+        await interaction.followUp(` あなたの支援兵 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
+      }
+    }
   } catch (error) {
     console.error('軍配属エラー:', error);
     await interaction.reply('エラー: 軍の選択に失敗しました');
