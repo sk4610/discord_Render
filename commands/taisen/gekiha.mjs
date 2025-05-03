@@ -56,11 +56,7 @@ export async function execute(interaction) {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
     
-    if (gameState.bobEnabled) {
-      const bobId = `bob-${userId}`;
-      const bobUser = await User.findOne({ where: { id: bobId } });
-      if (bobUser) {
-        
+      
         
     // 終戦判定
     // initialArmyHPはカウントダウン方式しか使わないためカウントダウンしか判定されない
