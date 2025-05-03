@@ -57,6 +57,7 @@ const GameState = sequelize.define('GameState', {
  // BOBを使用するか
   bobEnabled: {  
     type: DataTypes.BOOLEAN,
+    allowNull: false,
     defaultValue: false
   }, 
   // A軍の撃破数
