@@ -189,12 +189,12 @@ export async function kaikyu_main(interaction) {
 
       if (bobKills === 0) {
         bobMessage += `## ざんねん、${bobKills} 撃破\n.\n`;
-      }else if(kills === 16){
-        message += `## 超・大量撃破！${kills} 撃破！\n.\n`; //16撃破の場合
-      }else if(kills === 32){
-        message += `## 超・超・大量撃破！${kills} 撃破！\n.\n`; //32撃破の場合
+      }else if(bobKills === 16){
+        bobMessage += `## 超・大量撃破！${bobKills} 撃破！\n.\n`; //16撃破の場合
+      }else if(bobKills === 32){
+        bobMessage += `## 超・超・大量撃破！${bobKills} 撃破！\n.\n`; //32撃破の場合
       }else{   
-        message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
+        bobMessage += `## 命中！${bobKills} 撃破！\n.\n`;
       }
       
       if (bobRankUp) {
