@@ -46,6 +46,7 @@ export async function execute(interaction) {
   const username = interaction.member.displayName;
     // army の値に対応する軍名を取得
   const armyName = army === 'A' ? armyNames.A : armyNames.B;
+  const user = await User.findOne({ where: { id: userId } });
   
   try {
     // ルールが設定されているか確認
@@ -85,7 +86,7 @@ export async function execute(interaction) {
     
     
    // ---- 👇 BOB支援制度が有効な場合、BOBの階級も登録 ----
-    if (existingPlayer.bobEnabled) {
+    if (user.bobEnabled) {
       const bobId = `bob-${userId}`; // BOBのIDはユーザーIDに紐付けて区別
       const existingBOB = await User.findOne({ where: { id: bobId }, raw: true });
       const bobname = `BOB - ${username}のパートナー`;

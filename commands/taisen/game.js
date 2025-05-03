@@ -28,8 +28,13 @@ const User = sequelize.define('User', {
   total_kills: {
     type: DataTypes.INTEGER,
     defaultValue: 0
-  }
-
+  },
+ // BOBを使用するか
+  bobEnabled: {  
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  }, 
 });
 
 // ゲームの状態を格納する GamaState
@@ -54,12 +59,6 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.INTEGER,
     defaultValue: 100
   },
- // BOBを使用するか
-  bobEnabled: {  
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  }, 
   // A軍の撃破数
   a_team_kills: { 
     type: DataTypes.INTEGER,
