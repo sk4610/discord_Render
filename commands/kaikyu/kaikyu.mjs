@@ -58,6 +58,33 @@ export async function execute(interaction) {
     const existingPlayer = await User.findOne({ where: { id: userId }, raw: true});
     if (existingPlayer) {
       const existingArmyName = existingPlayer.army === 'A' ? armyNames.A : armyNames.B;
+      
+      // 💡BOB有効かつBOB未作成なら、BOBだけ生成する
+      if (existingPlayer.bobEnabled) {
+            const user = await User.findOne({ where: { id: userId } });
+          if (user.bobEnabled) {
+            const bobId = `bob-${userId}`; // BOBのIDはユーザーIDに紐付けて区別
+            const existingBOB = await User.findOne({ where: { id: bobId }, raw: true });
+            const bobname = `BOB - ${username}のパートナー`;
+            
+          if (!existingBOB) {
+            // BOBにもランダムな階級を割り当てる
+            let bobRandom = Math.floor(Math.random() * totalWeight);
+            let bobRank = '';
+            for (let i = 0; i < weight.length; i++) {
+              if (bobRandom < weight[i]) {
+                bobRank = ranks[i];
+                break;
+              } else {
+                bobRandom -= weight[i];
+              }
+            }
+
+        await User.create({ id: bobId, username: bobname, army: army, rank: bobRank, total_kills: 0 });
+
+        await interaction.followUp(` あなたの支援兵 **BOB** ${bobname}も **${bobRank}** で **${armyName}** に配属されました！`);
+      }
+    }
       return await interaction.reply(`エラー: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
     }
 

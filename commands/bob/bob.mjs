@@ -29,12 +29,12 @@ export async function execute(interaction) {
   
     //個別IDごとにBOBをON/OFFする
     if (mode === 'on') {
-      user[0].bobEnabled = true;
-      await user[0].save();
+      user.bobEnabled = true;
+      await user.save();
       await interaction.reply(`${emoji}あなたのBOB支援制度を **有効化** しました！`);
     } else if (mode === 'off') {
-      user[0].bobEnabled = false;
-      await user[0].save();
+      user.bobEnabled = false;
+      await user.save();
       await interaction.reply('🔴あなたのBOB支援制度を **無効化** しました。');
     } else {
       await interaction.reply('モードは `on` か `off` を指定してください。');
