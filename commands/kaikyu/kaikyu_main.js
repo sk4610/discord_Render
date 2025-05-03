@@ -157,6 +157,50 @@ export async function kaikyu_main(interaction) {
 
     
     await interaction.reply(message);
+    
+  // BOB支援制度の撃破処理を追加（ゲーム設定で有効になっている場合）
+    if (gameState?.bobEnabled) {
+      const bobId = `bob-${userId}`;
+      const bobUser = await User.findOne({ where: { id: bobId } });
+
+    if (bobUser) {
+      const bobRank = bobUser.rank;
+      const { newRank: bobNewRank, kills: bobKills, rankUp: bobRankUp } = processKill(bobRank);
+
+      // BOBのデータを更新
+      bobUser.rank = bobNewRank;
+      bobUser.total_kills += bobKills;
+      bobUser.gekiha_counts += 1;
+      await bobUser.save();
+
+      // BOBの所属軍にも撃破数を加算
+        if (bobUser.army === 'A') {
+          await gameState.increment("a_team_kills", { by: bobKills });
+        } else {
+          await gameState.increment("b_team_kills", { by: bobKills });
+        }
+
+      // フォローアップでBOBの戦果も通知
+      let bobMessage = `-# 🤖 **BOB支援制度**が発動！\n`;
+      bobMessage += `-# :military_helmet: ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
+
+      if (bobKills === 0) {
+        bobMessage += `## ざんねん、${bobKills} 撃破\n.\n`;
+      } else {
+        bobMessage += `## 命中！${bobKills} 撃破！\n.\n`;
+      }
+
+      if (bobRankUp) {
+        bobMessage += `## 🔥大量撃破だ！！🔥 \n **新階級: ${bobUser.rank}**へ昇格！\n\n`;
+      }
+
+      bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${getArmyName(bobUser.army)} ${bobUser.username} 階級: ${bobUser.rank} \n-# >>> 攻撃数: **${bobUser.gekiha_counts}**回 \n-# >>> 撃破数: **${bobUser.total_kills}** 撃破\n`;
+
+      await interaction.followUp(bobMessage);
+    }
+  }
+  
+  
   } catch (error) {
     console.error('撃破処理エラー1:', error);
     await interaction.reply('エラー1: 撃破処理に失敗しました');
