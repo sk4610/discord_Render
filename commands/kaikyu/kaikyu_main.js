@@ -128,7 +128,11 @@ export async function kaikyu_main(interaction) {
     message += `-#  :military_helmet: ${UserArmyName} ${username} の攻撃！\n`;
     if(kills === 0){
       message += `## ざんねん、${kills} 撃破\n.\n`; //0撃破の場合
-    }else{
+    }else if(kills === 16){
+      message += `## 超・大量撃破！${kills} 撃破！\n.\n`; //16撃破の場合
+    }else if(kills === 32){
+      message += `## 超・超・大量撃破！${kills} 撃破！\n.\n`; //32撃破の場合
+    }else{   
       message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
     }
     
@@ -161,7 +165,6 @@ export async function kaikyu_main(interaction) {
     if (GameState?.bobEnabled) {
       const bobId = `bob-${userId}`;
       const bobUser = await User.findOne({ where: { id: bobId } });
-      const bobname = `BOB - ${username}のパートナー`;
       
     if (bobUser) {
       const bobRank = bobUser.rank;
@@ -186,10 +189,14 @@ export async function kaikyu_main(interaction) {
 
       if (bobKills === 0) {
         bobMessage += `## ざんねん、${bobKills} 撃破\n.\n`;
-      } else {
-        bobMessage += `## 命中！${bobKills} 撃破！\n.\n`;
+      }else if(kills === 16){
+        message += `## 超・大量撃破！${kills} 撃破！\n.\n`; //16撃破の場合
+      }else if(kills === 32){
+        message += `## 超・超・大量撃破！${kills} 撃破！\n.\n`; //32撃破の場合
+      }else{   
+        message += `## 命中！${kills} 撃破！\n.\n`; //1撃破以上の場合
       }
-
+      
       if (bobRankUp) {
         bobMessage += `## 🔥大量撃破だ！！🔥 \n **新階級: ${bobUser.rank}**へ昇格！\n\n`;
       }
