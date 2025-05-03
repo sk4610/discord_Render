@@ -14,7 +14,7 @@ const User = sequelize.define('User', {
     primaryKey: true
   },
   // ユーザネームを保存
-  name: DataTypes.STRING,
+  username: DataTypes.STRING,
   // ユーザ所属軍を保存
   army: DataTypes.STRING,
   // ユーザ階級を保存（階級制で使用）
@@ -117,7 +117,7 @@ export async function checkShusen() {
 
 // テーブルの同期（テーブルが存在しない場合は作成されます）
 // 新しいコマンドを作成したときなど一度trueにしてからfalseにすると作成されエラーを回避できる
-sequelize.sync({ force: false  }) // force: false にすると、テーブルが存在していれば再作成されません
+sequelize.sync({ force: true  }) // force: false にすると、テーブルが存在していれば再作成されません
   .then(() => {
     console.log('✅ Models synced successfully.');
   })
