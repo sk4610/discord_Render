@@ -153,10 +153,9 @@ export async function kaikyu_main(interaction) {
      // メッセージ（ユーザーが入力したもの）
     if (customMessage) {
       message += ` \`\`\`${customMessage}\`\`\`\n`;
-    }   
-
-    
+    }      
     await interaction.reply(message);
+    
     
   // BOB支援制度の撃破処理を追加（ゲーム設定で有効になっている場合）
     if (GameState?.bobEnabled) {
@@ -195,7 +194,20 @@ export async function kaikyu_main(interaction) {
       }
 
       bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${getArmyName(bobUser.army)} ${bobUser.username} 階級: ${bobUser.rank} \n-# >>> 攻撃数: **${bobUser.gekiha_counts}**回 \n-# >>> 撃破数: **${bobUser.total_kills}** 撃破\n`;
+    // 軍の総撃破数を表示
+    // カウントダウンの場合は残存兵力を表示する
+    if (countMode === 'down') {
+      const gameState = await GameState.findOne({ where: { id: 1 } });
+      const remainingHP_A = gameState.initialArmyHP - totalKillsB;
+      const remainingHP_B = gameState.initialArmyHP - totalKillsA;
+      
+      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA} 残存兵力: ${remainingHP_A} \n-# >>> :green_circle: ${armyNameB} 残存兵力: ${remainingHP_B} \n`;
 
+    }else if (countMode === 'up') {    
+    
+      message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNameA}: 　総${totalKillsA} 撃破\n-# >>> :green_circle: ${armyNameB}: 総${totalKillsB} 撃破\n`;
+      
+    }
       await interaction.followUp(bobMessage);
     }
   }

@@ -54,7 +54,7 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.INTEGER,
     defaultValue: 100
   },
- // 初期HPの決定（カウントダウン方式のみ）
+ // BOBを使用するか
   bobEnabled: {  
     type: DataTypes.BOOLEAN,
     defaultValue: false
