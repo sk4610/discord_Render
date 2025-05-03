@@ -181,7 +181,7 @@ export async function kaikyu_main(interaction) {
         }
 
       // フォローアップでBOBの戦果も通知
-      let bobMessage = `-# 🤖 **BOB支援制度**が発動！\n`;
+      let bobMessage = `-#  **BOB支援制度**が発動！\n`;
       bobMessage += `-# :military_helmet: ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
 
       if (bobKills === 0) {
