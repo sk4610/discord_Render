@@ -159,7 +159,7 @@ export async function kaikyu_main(interaction) {
     await interaction.reply(message);
     
   // BOB支援制度の撃破処理を追加（ゲーム設定で有効になっている場合）
-    if (gameState?.bobEnabled) {
+    if (GameState?.bobEnabled) {
       const bobId = `bob-${userId}`;
       const bobUser = await User.findOne({ where: { id: bobId } });
 
