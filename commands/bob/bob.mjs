@@ -18,11 +18,15 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     const userId = interaction.user.id;
     const mode = interaction.options.getString('mode');
-    const user = await User.findOrCreate({ where: { id: userId } });    
+    const user = await User.findOne({ where: { id: userId } });
     // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
     // 1350367513271341088 = 盾専
     const emoji = "<:custom_emoji:1350367513271341088>";
-
+    
+    if (!user) {
+      return await interaction.reply('まず `/kaikyu` で所属軍を決めてからBOB支援制度を有効にしてください。');
+    }
+  
     //個別IDごとにBOBをON/OFFする
     if (mode === 'on') {
       user[0].bobEnabled = true;
