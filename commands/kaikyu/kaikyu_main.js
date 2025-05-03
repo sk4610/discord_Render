@@ -2,13 +2,13 @@ import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyName } from './kaikyu.mjs';
 
-const ranks = ['二等兵＝', '一等兵〓', '軍曹¶', '曹長†', '大尉‡', '大佐▽', '准将◇', '大将Θ', '元帥☆'];
-const specialRank = '軍神Å';
+const ranks = ['二等兵🔸', '一等兵🔺', '軍曹🔶', '曹長♦️', '大尉⚡', '大佐💠', '准将🔆', '大将🔱', '元帥🎖️'];
+const specialRank = '軍神🌟';
 
 // 各階級ごとの大量撃破時の撃破数
 const largeKillCounts = {
-  '二等兵＝': 4, '一等兵〓': 5, '軍曹¶': 6, '曹長†': 7, '大尉‡': 8,
-  '大佐▽': 9, '准将◇': 10, '大将Θ': 11, '元帥☆': 12, '軍神Å': 16
+  '二等兵🔸': 4, '一等兵🔺': 5, '軍曹🔶': 6, '曹長♦️': 7, '大尉⚡': 8,
+  '大佐💠': 9, '准将🔆': 10, '大将🔱': 11, '元帥🎖️': 12, '軍神🌟': 16
 };
 
 // 超・大量撃破の撃破数（軍神のみ特別）
@@ -188,16 +188,16 @@ export async function kaikyu_main(interaction) {
       // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
       // 1350367513271341088 = 盾専
       const emoji = "<:custom_emoji:1350367513271341088>";
-      bobMessage += `-${emoji} ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
+      bobMessage += `-# ${emoji} ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
 
       if (bobKills === 0) {
-        bobMessage += `## ざんねん、${bobKills} 撃破\n.\n`;
+        bobMessage += `### ざんねん、${bobKills} 撃破\n\n`;
       }else if(bobKills === 16){
-        bobMessage += `## 超・大量撃破！${bobKills} 撃破！\n.\n`; //16撃破の場合
+        bobMessage += `### 超・大量撃破！${bobKills} 撃破！\n\n`; //16撃破の場合
       }else if(bobKills === 32){
-        bobMessage += `## 超・超・大量撃破！${bobKills} 撃破！\n.\n`; //32撃破の場合
+        bobMessage += `### 超・超・大量撃破！${bobKills} 撃破！\n\n`; //32撃破の場合
       }else{   
-        bobMessage += `## 命中！${bobKills} 撃破！\n.\n`;
+        bobMessage += `### 命中！${bobKills} 撃破！\n\n`;
       }
       
       if (bobRankUp) {
