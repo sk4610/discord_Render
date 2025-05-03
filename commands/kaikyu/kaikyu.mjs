@@ -103,7 +103,7 @@ export async function execute(interaction) {
           }
         }
 
-        await User.create({ id: bobId, username: `BOB - ${username}のパートナー`, army: army, rank: bobRank, total_kills: 0　});
+        await User.create({ id: bobId, username: `BOB - ${username}のパートナー`, army: army, rank: bobRank, total_kills: 0 });
 
         await interaction.followUp(` あなたの支援兵 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
       }
