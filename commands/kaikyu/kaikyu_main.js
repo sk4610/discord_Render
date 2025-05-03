@@ -185,7 +185,10 @@ export async function kaikyu_main(interaction) {
 
       // フォローアップでBOBの戦果も通知
       let bobMessage = `-#  **BOB支援制度**が発動！\n`;
-      bobMessage += `-# :military_helmet: ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
+      // 絵文字を追加する（カスタム絵文字IDは Discord中で\:emoji:と打ち込めば返る
+      // 1350367513271341088 = 盾専
+      const emoji = "<:custom_emoji:1350367513271341088>";
+      bobMessage += `-${emoji} ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
 
       if (bobKills === 0) {
         bobMessage += `## ざんねん、${bobKills} 撃破\n.\n`;
