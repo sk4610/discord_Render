@@ -89,7 +89,8 @@ export async function execute(interaction) {
     if (GameState.bobEnabled) {
       const bobId = `bob-${userId}`; // BOBのIDはユーザーIDに紐付けて区別
       const existingBOB = await User.findOne({ where: { id: bobId }, raw: true });
-      
+      const bobname = `BOB - ${username}のパートナー`;
+            
       if (!existingBOB) {
         // BOBにもランダムな階級を割り当てる
         let bobRandom = Math.floor(Math.random() * totalWeight);
@@ -103,7 +104,7 @@ export async function execute(interaction) {
           }
         }
 
-        await User.create({ id: bobId, username: `BOB - ${username}のパートナー`, army: army, rank: bobRank, total_kills: 0 });
+        await User.create({ id: bobId, username: bobname, army: army, rank: bobRank, total_kills: 0 });
 
         await interaction.followUp(` あなたの支援兵 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
       }

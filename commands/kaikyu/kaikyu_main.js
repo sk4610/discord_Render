@@ -161,7 +161,8 @@ export async function kaikyu_main(interaction) {
     if (GameState?.bobEnabled) {
       const bobId = `bob-${userId}`;
       const bobUser = await User.findOne({ where: { id: bobId } });
-
+      const bobname = `BOB - ${username}のパートナー`;
+      
     if (bobUser) {
       const bobRank = bobUser.rank;
       const { newRank: bobNewRank, kills: bobKills, rankUp: bobRankUp } = processKill(bobRank);
