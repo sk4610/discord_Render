@@ -26,8 +26,17 @@ export async function execute(interaction) {
   if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
 
   const army = player.army; // 'A' または 'B'
-  const element = interaction.options.getString('element');
-
+  const column = interaction.options.getString('element');
+  
+  const elementToColumn = {
+    fire: 'fire_coin',
+    wood: 'wood_coin',
+    earth: 'earth_coin',
+    thunder: 'thunder_coin',
+    water: 'water_coin',
+  };
+  const element = elementToColumn[column];
+  
   const gameState = await GameState.findOne();
   if (gameState.rule_type !== 'coin') {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
@@ -37,7 +46,7 @@ export async function execute(interaction) {
   let acquired = 0;
   const roll = Math.random();
   if (roll < 0.01) acquired = 5;
-  else if (roll < 0.10) acquired = 1;
+  else if (roll < 0.90) acquired = 1;
 
   player[element] += acquired;
   await player.save();
