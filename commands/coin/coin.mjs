@@ -134,7 +134,7 @@ export async function execute(interaction) {
   } else {
     const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
     const myHP = gameState.initialArmyHP - myKills;
-    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+    message += `\n📊 ${army}軍の兵力：${myHP}\n${myKills}`;
   }
 
   message += `🔥 火: ${player.fire_coin}枚 🌲 木: ${player.wood_coin}枚 🪨 土: ${player.earth_coin}枚 ⚡ 雷: ${player.thunder_coin}枚 💧 水: ${player.water_coin}枚`;
