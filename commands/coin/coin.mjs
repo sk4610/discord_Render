@@ -14,7 +14,7 @@ export const data = new SlashCommandBuilder()
         { name: '木', value: 'wood' },
         { name: '土', value: 'earth' },
         { name: '雷', value: 'thunder' },
-        { name: '水', value: 'water' }
+        { name: '水', value: 'water' },
       )
   );
 
@@ -22,71 +22,61 @@ export async function execute(interaction) {
   await interaction.deferReply();
 
   const userId = interaction.user.id;
-  const element = interaction.options.getString('element');
-
   const player = await User.findOne({ where: { id: userId } });
-  if (!player || !player.army) {
-    return interaction.editReply('まず /kaikyu でチームに参加してください。');
-  }
+  if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
 
   const army = player.army; // 'A' または 'B'
-  const enemyArmy = army === 'A' ? 'B' : 'A';
+  const element = interaction.options.getString('element');
 
-  const game = await GameState.findOne();
-  if (game.rule !== 'coin') {
+  const gameState = await GameState.findOne();
+  if (gameState.rule !== 'coin') {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
   }
 
-  // コイン情報の取得
-  const coin = player;
-
-  // コイン取得処理
+  // --- コイン獲得処理 ---
   let acquired = 0;
   const roll = Math.random();
-  if (roll < 0.01) {
-    acquired = 5;
-  } else if (roll < 0.10) {
-    acquired = 1;
-  }
+  if (roll < 0.01) acquired = 5;
+  else if (roll < 0.10) acquired = 1;
 
-  coin[element] += acquired;
-  await coin.save();
+  player[element] += acquired;
+  await player.save();
 
   let message = `🎲 【${element}】コイン取得判定！\n`;
   message += acquired > 0
     ? `👉 ${element}属性コインを${acquired}枚獲得！\n`
     : '👉 残念！今回は獲得できませんでした。\n';
 
-  // スキル発動条件
-  if (acquired > 0 && coin[element] % 5 === 0) {
+  // --- スキル発動チェック ---
+  if (acquired > 0 && player[element] % 5 === 0) {
+    const enemyArmy = army === 'A' ? 'B' : 'A';
+    const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
+
     let damage = 0;
     let heal = 0;
     let eraseTarget = '';
-    const amount = coin[element];
-
-    const currentState = await GameState.findOne();
-
-    let teamHP = army === 'A' ? currentState.armyAHP : currentState.armyBHP;
-    let enemyHP = army === 'A' ? currentState.armyBHP : currentState.armyAHP;
+    const amount = player[element];
 
     switch (element) {
       case 'fire':
         damage = amount * 2;
         eraseTarget = 'wood';
         break;
-      case 'wood':
-        if (teamHP < enemyHP) damage = amount * 3;
-        else if (teamHP > enemyHP) damage = amount * 1;
-        else damage = amount * 2;
+      case 'wood': {
+        const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+        const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+        damage = myHP < enemyHP ? amount * 3 : myHP > enemyHP ? amount * 1 : amount * 2;
         eraseTarget = 'earth';
         break;
-      case 'earth':
-        if (teamHP > enemyHP) damage = amount * 3;
-        else if (teamHP < enemyHP) damage = amount * 1;
-        else damage = amount * 2;
+      }
+      case 'earth': {
+        const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+        const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+        damage = myHP > enemyHP ? amount * 3 : myHP < enemyHP ? amount * 1 : amount * 2;
         eraseTarget = 'thunder';
         break;
-      case 'thunder':
+      }
+      case 'thunder': {
         const rand = Math.floor(Math.random() * 100) + 1;
         message += `🔢 雷スキル判定: ${rand} → `;
         if (rand % 2 === 0) {
@@ -97,6 +87,7 @@ export async function execute(interaction) {
         }
         eraseTarget = 'water';
         break;
+      }
       case 'water':
         damage = amount;
         heal = amount;
@@ -104,50 +95,49 @@ export async function execute(interaction) {
         break;
     }
 
-    // ダメージ適用
     if (damage > 0) {
-      if (army === 'A') {
-        currentState.armyBHP = Math.max(0, currentState.armyBHP - damage);
-      } else {
-        currentState.armyAHP = Math.max(0, currentState.armyAHP - damage);
-      }
+      if (army === 'A') gameState.b_team_kills += damage;
+      else gameState.a_team_kills += damage;
+
+      player.total_kills += damage;
+      await player.save();
     }
 
-    // 回復適用
     if (heal > 0) {
-      if (army === 'A') {
-        currentState.armyAHP += heal;
-      } else {
-        currentState.armyBHP += heal;
+      if (army === 'A') gameState.a_team_kills = Math.max(0, gameState.a_team_kills - heal);
+      else gameState.b_team_kills = Math.max(0, gameState.b_team_kills - heal);
+    }
+
+    if (eraseTarget) {
+      for (const enemy of enemyUsers) {
+        enemy[eraseTarget] = 0;
+        await enemy.save();
       }
     }
 
-    // 敵軍の該当属性コインを0に
-    const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
-    for (const enemy of enemyUsers) {
-      enemy[eraseTarget] = 0;
-      await enemy.save();
-    }
+    await gameState.save();
 
-    await currentState.save();
-
-    const finalEnemyHP = army === 'A' ? currentState.armyBHP : currentState.armyAHP;
+    const enemyKills = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
+    const enemyHP = gameState.initialArmyHP - enemyKills;
+    const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
+    const myHP = gameState.initialArmyHP - myKills;
 
     message += `💥 ${enemyArmy}軍に ${damage} ダメージ！\n`;
     if (heal > 0) message += `💖 ${army}軍の兵力が ${heal} 回復！\n`;
     if (eraseTarget) message += `💨 敵軍の【${eraseTarget}】コインを全て吹き飛ばした！\n`;
 
-    if (finalEnemyHP <= 0) {
+    if (enemyHP <= 0) {
       message += `\n🎉 **${army}軍が勝利しました！**`;
     }
+
+    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+  } else {
+    const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
+    const myHP = gameState.initialArmyHP - myKills;
+    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
   }
 
-  // 現在の兵力とコイン表示
-  const refreshed = await GameState.findOne();
-  const curTeamHP = army === 'A' ? refreshed.armyAHP : refreshed.armyBHP;
-
-  message += `\n📊 ${army}軍の兵力：${curTeamHP}\n`;
-  message += `🔥 火: ${coin.fire}枚 🌲 木: ${coin.wood}枚 🪨 土: ${coin.earth}枚 ⚡ 雷: ${coin.thunder}枚 💧 水: ${coin.water}枚`;
+  message += `🔥 火: ${player.fire}枚 🌲 木: ${player.wood}枚 🪨 土: ${player.earth}枚 ⚡ 雷: ${player.thunder}枚 💧 水: ${player.water}枚`;
 
   return interaction.editReply(message);
 }
