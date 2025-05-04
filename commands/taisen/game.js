@@ -34,7 +34,32 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false
-  }, 
+  },
+  //属性コイン　火
+  fire_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  //属性コイン　木
+  wood_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  //属性コイン　土
+  earth_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  //属性コイン　雷
+  thunder_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  //属性コイン　水
+  water_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
 });
 
 // ゲームの状態を格納する GamaState

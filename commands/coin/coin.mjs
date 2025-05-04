@@ -37,7 +37,7 @@ export async function execute(interaction) {
     const UserArmy = await User.findOne({ where: { id: userId }, raw: true});
     const UserArmyName = UserArmy.army === 'A' ? armyNameA : armyNameB;
   
-  if (!team) {
+  if (!UserArmyName) {
     return interaction.editReply('まず /kaikyu でチームに参加してください。');
   }
 
