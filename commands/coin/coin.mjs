@@ -37,7 +37,7 @@ export async function execute(interaction) {
   let acquired = 0;
   const roll = Math.random();
   if (roll < 0.01) acquired = 5;
-  else if (roll < 0.90) acquired = 1;
+  else if (roll < 0.10) acquired = 1;
 
   player[element] += acquired;
   await player.save();
