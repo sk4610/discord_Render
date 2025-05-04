@@ -79,7 +79,13 @@ export async function execute(interaction) {
           }
         //BOBのユーザークリエイト
         await User.create({ id: bobId, username: bobname, army: army, rank: bobRank, total_kills: 0 });
-        await interaction.reply(` ⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！\nただし、あなたの支援兵士 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
+        //各ルールで初期表示を変える
+        if(gameState.rule_type === 'ranked'){// 階級制のとき          
+          await interaction.reply(` ⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！\nただし、あなたの支援兵士 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
+        }else{
+          await interaction.reply(` ⚠️: あなたはすでに **${existingArmyName}**  です！\nただし、あなたの支援兵士 **BOB** も **${armyName}** に配属されました！`);
+        }
+          
         return;
       }
     }
@@ -105,8 +111,13 @@ export async function execute(interaction) {
     
     // データベースにプレイヤーを追加
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
-
-    await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);
+    
+    //各ルールで初期表示を変える
+    if(gameState.rule_type === 'ranked'){ // 階級制のとき
+      await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);    
+    }else{ // その他（属性コイン制）のとき
+      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+    }
 
 
   } catch (error) {

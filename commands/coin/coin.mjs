@@ -29,7 +29,7 @@ export async function execute(interaction) {
   const element = interaction.options.getString('element');
 
   const gameState = await GameState.findOne();
-  if (gameState.rule !== 'coin') {
+  if (gameState.rule_type !== 'coin') {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
   }
 
@@ -137,7 +137,7 @@ export async function execute(interaction) {
     message += `\n📊 ${army}軍の兵力：${myHP}\n`;
   }
 
-  message += `🔥 火: ${player.fire}枚 🌲 木: ${player.wood}枚 🪨 土: ${player.earth}枚 ⚡ 雷: ${player.thunder}枚 💧 水: ${player.water}枚`;
+  message += `🔥 火: ${player.fire_coin}枚 🌲 木: ${player.wood_coin}枚 🪨 土: ${player.earth_coin}枚 ⚡ 雷: ${player.thunder_coin}枚 💧 水: ${player.water_coin}枚`;
 
   return interaction.editReply(message);
 }
