@@ -63,7 +63,7 @@ export async function execute(interaction) {
     // 終戦判定
     // initialArmyHPはカウントダウン方式しか使わないためカウントダウンしか判定されない
     const loserTeam = await checkShusen();
-    const WinnerTeam = await checkShusen();
+    const winnerTeam = await checkShusen();
     if (loserTeam) {
       const gameState = await GameState.findOne({ where: { id: 1 } });
       
@@ -75,7 +75,7 @@ export async function execute(interaction) {
       const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
       //終戦時の自動通知
-      await interaction.followUp(`** 📢 ${loserTeam}の兵力が0になった。**\n# 🎖 ${WinnerTeam}の勝利だ！\n\n\n\n_ **\n🏆 大戦結果:\n 【${armyNames.A}の残存兵力】${remainingHP_A} \n 【${armyNames.B}の残存兵力】${remainingHP_B}\n\n**今次大戦は終戦した！次の大戦でまた会おう！**`);
+      await interaction.followUp(`** 📢 ${loserTeam}の兵力が0になった。**\n# 🎖 ${winnerTeam}の勝利だ！\n\n\n\n_ **\n🏆 大戦結果:\n 【${armyNames.A}の残存兵力】${remainingHP_A} \n 【${armyNames.B}の残存兵力】${remainingHP_B}\n\n**今次大戦は終戦した！次の大戦でまた会おう！**`);
       return;
     }
 
