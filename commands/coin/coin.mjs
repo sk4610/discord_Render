@@ -46,7 +46,9 @@ export async function execute(interaction) {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
   }
 
-  let coin = await CoinStatus.findByPk(userId);
+  //ユーザのコイン状況を把握
+  let coin = await User.findOne({ where: { id: userId } });
+  
   if (!coin) {
     coin = await CoinStatus.create({ userId, team, fire: 0, wood: 0, earth: 0, thunder: 0, water: 0 });
   }

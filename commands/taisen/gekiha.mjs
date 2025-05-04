@@ -53,7 +53,7 @@ export async function execute(interaction) {
       // **階級制の処理**
       await kaikyu_main(interaction); // kaikyu_main.jsを実行　階級制
     }else if(rule_type === 'coin'){
-      await coin_main(interaction); // coin_main.jsを実行　属性コイン制
+      await interaction.reply('エラー: 属性コイン制では/coinを使ってください。');
     }else {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 
