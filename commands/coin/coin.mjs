@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
-import { getArmyName } from '../kaikyu/kaikyu.mjs';
 
 export const data = new SlashCommandBuilder()
   .setName('coin')
@@ -32,6 +31,7 @@ export async function execute(interaction) {
 
   const army = player.army;
   const column = interaction.options.getString('element');
+
   const elementToColumn = {
     fire: 'fire_coin',
     wood: 'wood_coin',
@@ -53,119 +53,105 @@ export async function execute(interaction) {
   else if (roll < 0.9) acquired = 1;
 
   const before = player[element];
-  player[element] += acquired;
-  const after = player[element];
+  player[element] = before + acquired;
   await player.save();
 
-  const beforeSet = Math.floor(before / 5);
-  const afterSet = Math.floor(after / 5);
-  const triggerCount = afterSet - beforeSet;
+  const after = player[element];
+  let message = `🎲 【${element}】コイン取得判定！\n`;
+  message += acquired > 0
+    ? `👉 ${element}属性コインを${acquired}枚獲得！\n`
+    : '👉 残念！今回は獲得できませんでした。\n';
 
-  const enemyArmy = army === 'A' ? 'B' : 'A';
-  const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
+  // --- スキル発動チェック ---
+  if (acquired > 0 && after % 5 === 0) {
+    const enemyArmy = army === 'A' ? 'B' : 'A';
+    const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
 
-  let totalDamage = 0;
-  let totalHeal = 0;
-  let eraseTarget = '';
-  let skillMessages = '';
-
-  for (let i = 0; i < triggerCount; i++) {
-    const amount = 5;
     let damage = 0;
     let heal = 0;
+    let eraseTarget = '';
+    const amount = after;
 
     switch (element) {
       case 'fire':
         damage = amount * 2;
-        eraseTarget = 'wood_coin';
+        eraseTarget = 'wood';
         break;
       case 'wood': {
         const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
         const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
         damage = myHP < enemyHP ? amount * 3 : myHP > enemyHP ? amount * 1 : amount * 2;
-        eraseTarget = 'earth_coin';
+        eraseTarget = 'earth';
         break;
       }
       case 'earth': {
         const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
         const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
         damage = myHP > enemyHP ? amount * 3 : myHP < enemyHP ? amount * 1 : amount * 2;
-        eraseTarget = 'thunder_coin';
+        eraseTarget = 'thunder';
         break;
       }
       case 'thunder': {
         const rand = Math.floor(Math.random() * 100) + 1;
-        skillMessages += `🔢 雷スキル判定: ${rand} → `;
+        message += `🔢 雷スキル判定: ${rand} → `;
         if (rand % 2 === 0) {
           damage = amount * 4;
-          skillMessages += `偶数 → 成功！${damage}ダメージ！\n`;
+          message += `偶数 → 成功！${damage}ダメージ！\n`;
         } else {
-          skillMessages += `奇数 → 発動失敗（0ダメージ）\n`;
+          message += '奇数 → 発動失敗（0ダメージ）\n';
         }
-        eraseTarget = 'water_coin';
+        eraseTarget = 'water';
         break;
       }
       case 'water':
         damage = amount;
         heal = amount;
-        eraseTarget = 'fire_coin';
+        eraseTarget = 'fire';
         break;
     }
 
     if (damage > 0) {
       if (army === 'A') gameState.b_team_kills += damage;
       else gameState.a_team_kills += damage;
+
       player.total_kills += damage;
-      totalDamage += damage;
+      await player.save();
     }
 
     if (heal > 0) {
       if (army === 'A') gameState.a_team_kills = Math.max(0, gameState.a_team_kills - heal);
       else gameState.b_team_kills = Math.max(0, gameState.b_team_kills - heal);
-      totalHeal += heal;
     }
 
     if (eraseTarget) {
       for (const enemy of enemyUsers) {
-        enemy[eraseTarget] = 0;
+        enemy[`${eraseTarget}_coin`] = 0;
         await enemy.save();
       }
     }
+
+    await gameState.save();
+
+    const enemyKills = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
+    const enemyHP = gameState.initialArmyHP - enemyKills;
+    const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
+    const myHP = gameState.initialArmyHP - myKills;
+
+    message += `💥 ${enemyArmy}軍に ${damage} ダメージ！\n`;
+    if (heal > 0) message += `💖 ${army}軍の兵力が ${heal} 回復！\n`;
+    if (eraseTarget) message += `💨 敵軍の【${eraseTarget}】コインを全て吹き飛ばした！\n`;
+
+    if (enemyHP <= 0) {
+      message += `\n🎉 **${army}軍が勝利しました！**`;
+    }
+
+    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+  } else {
+    const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
+    const myHP = gameState.initialArmyHP - myKills;
+    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
   }
 
-  await player.save();
-  await gameState.save();
-
-  const enemyKills = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
-  const enemyHP = gameState.initialArmyHP - enemyKills;
-  const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
-  const myHP = gameState.initialArmyHP - myKills;
-
-  let message = `🎲 【${element}】コイン取得判定！\n`;
-  message += acquired > 0
-    ? `👉 ${element}属性コインを${acquired}枚獲得！\n`
-    : '👉 残念！今回は獲得できませんでした。\n';
-
-  if (totalDamage > 0) message += `💥 ${enemyArmy}軍に ${totalDamage} ダメージ！\n`;
-  if (totalHeal > 0) message += `💖 ${army}軍の兵力が ${totalHeal} 回復！\n`;
-  if (eraseTarget && triggerCount > 0) {
-    const readable = {
-      fire_coin: '火',
-      wood_coin: '木',
-      earth_coin: '土',
-      thunder_coin: '雷',
-      water_coin: '水',
-    };
-    message += `💨 敵軍の【${readable[eraseTarget]}】コインを全て吹き飛ばした！\n`;
-  }
-
-  message += skillMessages;
-
-  if (enemyHP <= 0) {
-    message += `\n🎉 **${army}軍が勝利しました！**\n`;
-  }
-
-  message += `📊 ${army}軍の兵力：${myHP}\n`;
   message += `🔥 火: ${player.fire_coin}枚 🌲 木: ${player.wood_coin}枚 🪨 土: ${player.earth_coin}枚 ⚡ 雷: ${player.thunder_coin}枚 💧 水: ${player.water_coin}枚`;
 
   return interaction.editReply(message);
