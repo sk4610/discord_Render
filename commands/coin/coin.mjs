@@ -62,15 +62,16 @@ export async function execute(interaction) {
     ? `👉 ${element}属性コインを${acquired}枚獲得！\n`
     : '👉 残念！今回は獲得できませんでした。\n';
 
+  const amount = after;
+  
   // --- スキル発動チェック ---
-  if (acquired > 0 && after % 5 === 0) {
+  if (acquired > 0 && after % 5 === 0 && after % 5 < acquired) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
 
     let damage = 0;
     let heal = 0;
     let eraseTarget = '';
-    const amount = after;
 
     switch (element) {
       case 'fire':
@@ -146,6 +147,8 @@ export async function execute(interaction) {
     }
 
     message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+    console.log(`[DEBUG] element: ${element}, after: ${after}, amount: ${amount}, damage: ${damage}`);
+
   } else {
     const myKills = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
     const myHP = gameState.initialArmyHP - myKills;
