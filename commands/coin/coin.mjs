@@ -16,7 +16,13 @@ export const data = new SlashCommandBuilder()
         { name: '雷', value: 'thunder' },
         { name: '水', value: 'water' },
       )
+  )
+  .addStringOption(option =>
+      option.setName("message")
+      .setDescription("一言添える") // 一行レスを打つことができる
+      .setRequired(false) // trueにすると必須、falseにすると任意 
   );
+
 
 export async function execute(interaction) {
   await interaction.deferReply();
