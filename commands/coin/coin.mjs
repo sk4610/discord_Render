@@ -55,9 +55,9 @@ export async function execute(interaction) {
   let acquired = 0;
   const roll = Math.random();
   
-  if (roll < 0.01) {
+  if (roll < 0.21) {
     acquired = 5; // 1%で5枚
-  } else if (roll < 0.91) {
+  } else if (roll < 0.41) {
     acquired = 1; // 10%で1枚 (0.01～0.11の範囲)
   }
   // それ以外は0枚
