@@ -49,11 +49,12 @@ export async function execute(interaction) {
     }
     
    
+      // **ルールの処理**   
     if (rule_type === 'ranked') {
       // **階級制の処理**
       await kaikyu_main(interaction); // kaikyu_main.jsを実行　階級制
     }else if(rule_type === 'coin'){
-      await interaction.reply('エラー: 属性コイン制では/coinを使ってください。');
+      await interaction.reply('エラー: 属性コイン制では/coinを使ってください。');  // 属性コイン制ではエラー
     }else {
       await interaction.reply('エラー: 未知のルール「${rule_type}」です。');
     } 

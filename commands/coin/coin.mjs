@@ -123,13 +123,13 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP > enemyHP) {
           multiplier = 3;
-          message += `🌍 優勢時土攻撃: ${amount} × 3 = `;
+          message += `:rock: 優勢時土攻撃: ${amount} × 3 = `;
         } else if (myHP < enemyHP) {
           multiplier = 1;
-          message += `🌍 劣勢時土攻撃: ${amount} × 1 = `;
+          message += `:rock: 劣勢時土攻撃: ${amount} × 1 = `;
         } else {
           multiplier = 2;
-          message += `🌍 均衡時土攻撃: ${amount} × 2 = `;
+          message += `:rock: 均衡時土攻撃: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
         message += `${damage}ダメージ！\n`;
@@ -228,14 +228,14 @@ export async function execute(interaction) {
   message += `【${armyNames[army]}】\n`;
   message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
-  message += `🪨 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
+  message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
   
   message += `【${armyNames[enemyArmy]}】\n`;
   message += `🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
-  message += `🪨 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
+  message += `:rock: 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
 
