@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
+import { armyNames } from '../armyname/armyname.js';
 
 export const data = new SlashCommandBuilder()
   .setName('coin')
@@ -68,7 +69,7 @@ export async function execute(interaction) {
   
   let message = `🎲 【${elementName}】コイン取得判定！\n`;
   message += acquired > 0
-    ? `👉 ${army}軍が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
+    ? `👉 ${armyNames[army]}が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
     : '👉 残念！今回は獲得できませんでした。\n';
 
   // --- スキル発動チェック ---
@@ -83,7 +84,7 @@ export async function execute(interaction) {
     let eraseTarget = '';
     const amount = after; // 軍全体の総コイン数
 
-    message += `\n🔥 **${army}軍の${elementName}属性スキル発動！** (${amount}枚)\n`;
+    message += `\n🔥 **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚)\n`;
 
     switch (selectedElement) {
       case 'fire':
@@ -189,25 +190,25 @@ export async function execute(interaction) {
       const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${eraseTarget}_coin`;
       gameState[enemyEraseColumn] = 0;
       
-      message += `💨 ${enemyArmy}軍の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
+      message += `💨 ${armyNames[enemyArmy]}の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
     }
 
     await gameState.save();
 
-    // 戦況表示
+    // 戦況表示（修正版）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `💥 ${enemyArmy}軍に ${damage} ダメージ！\n`;
-    if (heal > 0) message += `💖 ${army}軍の兵力が ${heal} 回復！\n`;
+    if (damage > 0) message += `💥 ${armyNames[enemyArmy]}に ${damage} ダメージ！\n`;
+    if (heal > 0) message += `💖 ${armyNames[army]}の兵力が ${heal} 回復！\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
       const winner = aHP <= 0 ? 'B' : 'A';
-      message += `\n🎉 **${winner}軍が勝利しました！**\n`;
+      message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
     }
 
-    message += `\n📊 戦況: A軍 ${aHP} vs B軍 ${bHP}\n`;
+    message += `\n📊 戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
     
     console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
@@ -215,18 +216,28 @@ export async function execute(interaction) {
     // スキル発動なしの場合の戦況表示
     const myDamageReceived = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
     const myHP = gameState.initialArmyHP - myDamageReceived;
-    message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+    message += `\n📊 ${armyNames[army]}の兵力：${myHP}\n`;
     
     await gameState.save(); // コイン獲得だけでも保存
   }
 
-  // 軍全体のコイン状況表示
-  message += `\n💰 ${army}軍の現在のコイン:\n`;
+  // 軍全体のコイン状況表示（自軍 + 敵軍）
+  const enemyArmy = army === 'A' ? 'B' : 'A';
+  
+  message += `\n💰 各軍のコイン状況:\n`;
+  message += `【${armyNames[army]}】\n`;
   message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
   message += `🪨 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
-  message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚`;
+  message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
+  
+  message += `【${armyNames[enemyArmy]}】\n`;
+  message += `🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
+  message += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
+  message += `🪨 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
+  message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
+  message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
 
   return interaction.editReply(message);
 }
