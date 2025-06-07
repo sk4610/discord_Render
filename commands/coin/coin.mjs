@@ -66,8 +66,11 @@ export async function execute(interaction) {
   gameState[coinColumn] = before + acquired;
   
   const after = gameState[coinColumn];
+      // ユーザの所属軍を取得
+    const UserArmy = await User.findOne({ where: { id: userId }, raw: true});
+    const UserArmyName = UserArmy.army === 'A' ? armyNameA : armyNameB;
   
-  let message = `🎲 【${elementName}】コイン取得判定！\n`;
+  let message = `-#  :military_helmet: ${UserArmyName} ${username} の【${elementName}】コイン取得判定！\n`;
   message += acquired > 0
     ? `👉 ${armyNames[army]}が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
     : '👉 残念！今回は獲得できませんでした。\n';
