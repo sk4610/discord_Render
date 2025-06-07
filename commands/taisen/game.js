@@ -35,8 +35,9 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: false
   },
+  // 属性コインを個人管理ではないため個人のテーブルにコイン情報は不要
   //属性コイン　火
-  fire_coin: {
+/*  fire_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
@@ -59,7 +60,7 @@ const User = sequelize.define('User', {
   water_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
-  },
+  }, */
 });
 
 // ゲームの状態を格納する GamaState
@@ -98,6 +99,50 @@ const GameState = sequelize.define('GameState', {
   isGameOver: {   
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  // ===== 属性コイン制で使用　軍全体のコイン管理 =====
+  // A軍のコイン
+  a_fire_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  a_wood_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  a_earth_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  a_thunder_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  a_water_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  
+  // B軍のコイン
+  b_fire_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  b_wood_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  b_earth_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  b_thunder_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  b_water_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   },
 });
 

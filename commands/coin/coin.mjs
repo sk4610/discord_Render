@@ -32,14 +32,6 @@ export async function execute(interaction) {
   const army = player.army;
   const selectedElement = interaction.options.getString('element');
 
-  const elementToColumn = {
-    fire: 'fire_coin',
-    wood: 'wood_coin', 
-    earth: 'earth_coin',
-    thunder: 'thunder_coin',
-    water: 'water_coin',
-  };
-  
   const elementNames = {
     fire: '火',
     wood: '木',
@@ -48,7 +40,6 @@ export async function execute(interaction) {
     water: '水'
   };
 
-  const coinColumn = elementToColumn[selectedElement];
   const elementName = elementNames[selectedElement];
 
   const gameState = await GameState.findOne();
@@ -56,6 +47,9 @@ export async function execute(interaction) {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
   }
 
+  // 軍全体のコインカラム名を決定
+  const coinColumn = `${army.toLowerCase()}_${selectedElement}_coin`;
+  
   // --- コイン獲得処理 ---
   let acquired = 0;
   const roll = Math.random();
@@ -67,31 +61,29 @@ export async function execute(interaction) {
   }
   // それ以外は0枚
 
-  const before = player[coinColumn];
-  player[coinColumn] = before + acquired;
-  await player.save();
-
-  const after = player[coinColumn];
+  const before = gameState[coinColumn];
+  gameState[coinColumn] = before + acquired;
+  
+  const after = gameState[coinColumn];
   
   let message = `🎲 【${elementName}】コイン取得判定！\n`;
   message += acquired > 0
-    ? `👉 ${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
+    ? `👉 ${army}軍が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
     : '👉 残念！今回は獲得できませんでした。\n';
 
-  // --- スキル発動チェック（修正版） ---
+  // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
   const afterMultiple = Math.floor(after / 5);
   
   if (acquired > 0 && afterMultiple > beforeMultiple) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
-    const enemyUsers = await User.findAll({ where: { army: enemyArmy } });
 
     let damage = 0;
     let heal = 0;
     let eraseTarget = '';
-    const amount = after; // 現在の総コイン数
+    const amount = after; // 軍全体の総コイン数
 
-    message += `\n🔥 **${elementName}属性スキル発動！** (${amount}枚)\n`;
+    message += `\n🔥 **${army}軍の${elementName}属性スキル発動！** (${amount}枚)\n`;
 
     switch (selectedElement) {
       case 'fire':
@@ -166,7 +158,7 @@ export async function execute(interaction) {
         break;
     }
 
-    // ダメージ処理（修正版）
+    // ダメージ処理
     if (damage > 0) {
       if (army === 'A') {
         gameState.a_team_kills += damage; // A軍が与えたダメージを加算
@@ -174,6 +166,7 @@ export async function execute(interaction) {
         gameState.b_team_kills += damage; // B軍が与えたダメージを加算
       }
       
+      // 個人の撃破数にも加算（ランキング用）
       player.total_kills += damage;
       await player.save();
     }
@@ -193,11 +186,10 @@ export async function execute(interaction) {
         fire: '火', wood: '木', earth: '土', thunder: '雷', water: '水'
       };
       
-      for (const enemy of enemyUsers) {
-        enemy[`${eraseTarget}_coin`] = 0;
-        await enemy.save();
-      }
-      message += `💨 敵軍の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
+      const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${eraseTarget}_coin`;
+      gameState[enemyEraseColumn] = 0;
+      
+      message += `💨 ${enemyArmy}軍の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
     }
 
     await gameState.save();
@@ -217,18 +209,24 @@ export async function execute(interaction) {
 
     message += `\n📊 戦況: A軍 ${aHP} vs B軍 ${bHP}\n`;
     
-    console.log(`[DEBUG] element: ${selectedElement}, before: ${before}, after: ${after}, damage: ${damage}, heal: ${heal}`);
+    console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
   } else {
     // スキル発動なしの場合の戦況表示
     const myDamageReceived = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
     const myHP = gameState.initialArmyHP - myDamageReceived;
     message += `\n📊 ${army}軍の兵力：${myHP}\n`;
+    
+    await gameState.save(); // コイン獲得だけでも保存
   }
 
-  // コイン状況表示
-  message += `\n💰 現在のコイン:\n`;
-  message += `🔥 火: ${player.fire_coin}枚 🌲 木: ${player.wood_coin}枚 🪨 土: ${player.earth_coin}枚 ⚡ 雷: ${player.thunder_coin}枚 💧 水: ${player.water_coin}枚`;
+  // 軍全体のコイン状況表示
+  message += `\n💰 ${army}軍の現在のコイン:\n`;
+  message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
+  message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
+  message += `🪨 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
+  message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
+  message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚`;
 
   return interaction.editReply(message);
 }
