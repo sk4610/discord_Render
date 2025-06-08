@@ -112,7 +112,7 @@ export async function execute(interaction) {
           message += `　🌲 均衡!加勢の木!: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
-        message += `${damage}ダメージ！\n**`;
+        message += `${damage}ダメージ！\n`;
         eraseTarget = 'earth';
         break;
       }
@@ -133,20 +133,20 @@ export async function execute(interaction) {
           message += `　:rock: 均衡!唸れ大地!: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
-        message += `${damage}ダメージ！**\n`;
+        message += `${damage}ダメージ！\n`;
         eraseTarget = 'thunder';
         break;
       }
       
       case 'thunder': {
         const rand = Math.floor(Math.random() * 100) + 1;
-        message += ` 雷スキル判定: ${rand} → `;
+        message += `　雷スキル判定: ${rand} \n`;
         if (rand % 2 === 0) {
           damage = amount * 4;
-          message += `**偶数 → ⚡ 成功！轟雷!: ${damage}ダメージ！**\n`;
+          message += `　　偶数 → ⚡ 成功！轟雷!: ${damage}ダメージ！\n`;
         } else {
           damage = 0;
-          message += `**奇数 → 発動失敗..（0ダメージ）**\n`;
+          message += `　　奇数 → 発動失敗..（0ダメージ）\n`;
         }
         eraseTarget = 'water';
         break;
@@ -155,7 +155,7 @@ export async function execute(interaction) {
       case 'water':
         damage = amount;
         heal = amount;
-        message += `　💧 水の治癒!: ${damage}ダメージ + ${heal}回復！**\n`;
+        message += `　💧 水の治癒!: ${damage}ダメージ + ${heal}回復！\n`;
         eraseTarget = 'fire';
         break;
     }
@@ -200,8 +200,8 @@ export async function execute(interaction) {
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `➡️ ${armyNames[enemyArmy]}に **${damage}** ダメージ！\n`;
-    if (heal > 0) message += `➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal}** 回復！\n`;
+    if (damage > 0) message += `### 　　➡️ ${armyNames[enemyArmy]}に **${damage}** ダメージ！\n`;
+    if (heal > 0) message += `### 　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal}** 回復！\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
