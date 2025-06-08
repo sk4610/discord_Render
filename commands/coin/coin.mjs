@@ -58,7 +58,7 @@ export async function execute(interaction) {
   
   if (roll < 0.01) {
     acquired = 5; // 1%で5枚
-  } else if (roll < 0.11) {
+  } else if (roll < 0.61) {
     acquired = 1; // 10%で1枚 (0.01～0.11の範囲)
   }
   // それ以外は0枚
@@ -209,9 +209,9 @@ export async function execute(interaction) {
       message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
     }
 
-    message += `\n📊 戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
+    message += `\n-# >>> :crossed_swords:  現在の戦況:\n# >>> :yellow_circle: ${armyNames.A} ${aHP} vs :green_circle: ${armyNames.B} ${bHP}\n`;
     
-    console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
+ //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
   } else {
     // スキル発動なしの場合の戦況表示
@@ -225,16 +225,16 @@ export async function execute(interaction) {
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
-  message += `\n💰 各軍のコイン状況:\n`;
-  message += `【${armyNames[army]}】\n`;
-  message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
+  message += `-# >>> \n 各軍のコイン取得状況:\n`;
+  message += `-# >>> 【${armyNames[army]}】\n`;
+  message += `-# >>> 🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
   message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
   
-  message += `【${armyNames[enemyArmy]}】\n`;
-  message += `🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
+  message += `-# >>> 【${armyNames[enemyArmy]}】\n`;
+  message += `-# >>> 🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
   message += `:rock: 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
