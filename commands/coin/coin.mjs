@@ -220,8 +220,8 @@ export async function execute(interaction) {
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `### 　　➡️ ${armyNames[enemyArmy]}に **${damage}** ダメージ！\n`;
-    if (heal > 0) message += `### 　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal}** 回復！\n`;
+    if (damage > 0) message += `### 　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
+    if (heal > 0) message += `### 　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal} 回復！**\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
@@ -244,7 +244,7 @@ export async function execute(interaction) {
   }
   //個人戦績
   //message += `-# >>> -\n`;
-  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}**回　撃破数: **${player.total_kills}** 撃破\n`;
+  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills} 撃破**\n`;
   message += `-# >>> 個人コイン取得 →　火:${player.personal_fire_coin}枚/木:${player.personal_wood_coin}枚/土:${player.personal_earth_coin}枚/雷:${player.personal_thunder_coin}枚/水:${player.personal_water_coin}枚 \n` ;
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
