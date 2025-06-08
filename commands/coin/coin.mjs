@@ -49,7 +49,12 @@ export async function execute(interaction) {
   if (gameState.rule_type !== 'coin') {
     return interaction.editReply('現在は属性コイン制ルールではありません。');
   }
-
+ 
+  // 大戦が終了している場合はストップ
+  if (gameState.isGameOver) {
+    return interaction.editReply("大戦はすでに終戦した！次回の号砲を待て！");
+  }
+  
   // 軍全体のコインカラム名を決定
   const coinColumn = `${army.toLowerCase()}_${selectedElement}_coin`;
   
@@ -260,5 +265,26 @@ export async function execute(interaction) {
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
 
-  return interaction.editReply(message);
+  // 通常のメッセージを送信
+  await interaction.editReply(message);
+  
+  // 終戦判定（メッセージ送信後に別途通知）
+  const loserTeam = await checkShusen();
+  if (loserTeam) {
+    const gameState = await GameState.findOne({ where: { id: 1 } });
+    
+    // 残存兵力チェック
+    const totalKillsA = gameState.a_team_kills;
+    const totalKillsB = gameState.b_team_kills;
+    
+    const remainingHP_A = gameState.initialArmyHP - totalKillsB;
+    const remainingHP_B = gameState.initialArmyHP - totalKillsA;
+    
+    const winnerTeam = loserTeam === armyNames.A ? armyNames.B : armyNames.A;
+    
+    // 終戦時の自動通知（別メッセージで送信）
+    await interaction.followUp(`** 📢 ${loserTeam}の兵力が0になった。**\n# 🎖 ${winnerTeam}の勝利だ！\n\n\n\n_ **\n🏆 大戦結果:\n 【${armyNames.A}の残存兵力】${remainingHP_A} \n 【${armyNames.B}の残存兵力】${remainingHP_B}\n\n**今次大戦は終戦した！次の大戦でまた会おう！**`);
+    return;
+  }  
+  return;
 }
