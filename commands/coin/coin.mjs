@@ -27,6 +27,7 @@ export async function execute(interaction) {
   await interaction.deferReply();
 
   const userId = interaction.user.id;
+  const username = interaction.member.displayName;
   const player = await User.findOne({ where: { id: userId } });
   if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
 
@@ -55,9 +56,9 @@ export async function execute(interaction) {
   let acquired = 0;
   const roll = Math.random();
   
-  if (roll < 0.21) {
+  if (roll < 0.01) {
     acquired = 5; // 1%で5枚
-  } else if (roll < 0.41) {
+  } else if (roll < 0.11) {
     acquired = 1; // 10%で1枚 (0.01～0.11の範囲)
   }
   // それ以外は0枚
@@ -66,14 +67,11 @@ export async function execute(interaction) {
   gameState[coinColumn] = before + acquired;
   
   const after = gameState[coinColumn];
-      // ユーザの所属軍を取得
-    const UserArmy = await User.findOne({ where: { id: userId }, raw: true});
-    const UserArmyName = UserArmy.army === 'A' ? armyNameA : armyNameB;
   
-  let message = `-#  :military_helmet: ${UserArmyName} ${username} の【${elementName}】コイン取得判定！\n`;
+  let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
   message += acquired > 0
-    ? `👉 ${armyNames[army]}が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : '👉 残念！今回は獲得できませんでした。\n';
+    ? `### ${armyNames[army]}が${elementName}属性コインを${acquired}枚獲得！(${before} → ${after}枚)\n`
+    : '### ざんねん！獲得ならず…\n';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -93,7 +91,7 @@ export async function execute(interaction) {
       case 'fire':
         damage = amount * 2;
         eraseTarget = 'wood';
-        message += `🔥 火炎攻撃: ${amount} × 2 = ${damage}ダメージ！\n`;
+        message += `　**燃え盛る炎🔥: ${amount} × 2 = ${damage}ダメージ！\n`;
         break;
         
       case 'wood': {
@@ -105,13 +103,13 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP < enemyHP) {
           multiplier = 3;
-          message += `🌱 劣勢時木攻撃: ${amount} × 3 = `;
+          message += `　**劣勢!反撃の木!🌲: ${amount} × 3 = `;
         } else if (myHP > enemyHP) {
           multiplier = 1;
-          message += `🌱 優勢時木攻撃: ${amount} × 1 = `;
+          message += ` **優勢!とどめの木!🌲: ${amount} × 1 = `;
         } else {
           multiplier = 2;
-          message += `🌱 均衡時木攻撃: ${amount} × 2 = `;
+          message += ` **均衡!加勢の木!🌲: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
         message += `${damage}ダメージ！\n`;
@@ -126,7 +124,7 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP > enemyHP) {
           multiplier = 3;
-          message += `:rock: 優勢時土攻撃: ${amount} × 3 = `;
+          message += `優勢!:rock: 優勢時土攻撃: ${amount} × 3 = `;
         } else if (myHP < enemyHP) {
           multiplier = 1;
           message += `:rock: 劣勢時土攻撃: ${amount} × 1 = `;
