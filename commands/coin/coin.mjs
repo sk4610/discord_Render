@@ -66,6 +66,11 @@ export async function execute(interaction) {
   const before = gameState[coinColumn];
   gameState[coinColumn] = before + acquired;
   
+  // 個人のコイン取得履歴も更新
+  const personalCoinColumn = `personal_${selectedElement}_coin`;
+  player[personalCoinColumn] += acquired;
+  await player.save();
+  
   const after = gameState[coinColumn];
   
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
@@ -173,10 +178,17 @@ export async function execute(interaction) {
       await player.save();
     }
 
-    // 回復処理（自軍が受けたダメージを減らす）
+    // 回復処理（修正版：現在のHPに直接回復量を加算）
     if (heal > 0) {
+      // 現在の自軍HP
+      const currentMyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+      // 回復後のHP（初期HPを超えないように制限）
+      const healedHP = Math.min(currentMyHP + heal, gameState.initialArmyHP);
+      // 回復分だけ受けたダメージを減らす
+      const actualHeal = healedHP - currentMyHP;
+      
       if (army === 'A') {
-        gameState.b_team_kills = Math.max(0, gameState.b_team_kills - heal);
+        gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
       } else {
         gameState.a_team_kills = Math.max(0, gameState.a_team_kills - heal);
       }
