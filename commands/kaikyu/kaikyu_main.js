@@ -27,7 +27,7 @@ function processKillWithRandom(currentRank) {
   const randomNum = Math.floor(Math.random() * 1000);
   const randomStr = randomNum.toString().padStart(3, '0'); // 3桁表示（001, 023など）
   
-  displayMessage += `\n🎲 **数字: ${randomStr}**\n`;
+  displayMessage += `\n:slot_machine:  運命数 → **${randomStr}**\n`;
   
   // 下2桁を取得
   const lastTwoDigits = randomNum % 100;
@@ -51,15 +51,15 @@ function processKillWithRandom(currentRank) {
     // 全桁ゾロ目（111-999）：大量撃破 + 通常昇格
     kills = largeKillCounts[currentRank] || 1;
     rankUp = true;
-    displayMessage += `## 🔥 **全桁ゾロ目！大量撃破！** 🔥 → **${kills}撃破** + **昇格**\n`;
+    displayMessage += `### 🔥 **全桁ゾロ目！大量撃破！** 🔥 : **${kills}撃破！** + **昇格！**\n`;
   } else if (secondDigit === thirdDigit) {
     // 下2桁ゾロ目：通常撃破
     kills = 1;
-    displayMessage += `## **下2桁ゾロ目！** → **${kills}撃破**\n`;
+    displayMessage += `### **下2桁ゾロ目！** : **${kills}撃破！**\n`;
   } else {
     // ハズレ
     kills = 0;
-    displayMessage += `## **ざんねん** → **${kills}撃破**\n`;
+    displayMessage += `### **ざんねん、${kills}撃破**\n`;
   }
   
   // 通常昇格処理（000以外の場合）
@@ -138,9 +138,9 @@ export async function kaikyu_main(interaction) {
     // 戦績表示
     message += `-# >>> 🏅戦績\n`;
     message += `-# >>> ${UserArmyName} ${username}  階級:${player.rank}\n`;
-    message += `-# >>> 攻撃数: **${player.gekiha_counts}回** \n`;
-    message += `-# >>> 撃破数: **${player.total_kills}撃破**\n`;
-    message += `-# >>> -\n`;
+    message += `-# >>> 攻撃数: **${player.gekiha_counts}回** `;
+    message += `　撃破数: **${player.total_kills}撃破**\n`;
+    //message += `-# >>> -\n`;
     
     // 戦況表示
     if (countMode === 'down') {
@@ -190,7 +190,7 @@ export async function kaikyu_main(interaction) {
         
         // BOBの乱数判定結果
         bobMessage += bobDisplayMessage;
-        bobMessage += `\n`;
+        bobMessage += `.\n`;
         
         if (bobRankUp) {
           bobMessage += `## 🔥階級昇格！🔥 \n **新階級: ${bobUser.rank}** へ昇格！\n\n`;
@@ -198,8 +198,8 @@ export async function kaikyu_main(interaction) {
 
         bobMessage += `-# >>> 🏅戦績（BOB）\n`;
         bobMessage += `-# >>> ${getArmyName(bobUser.army)} ${bobUser.username} 階級: ${bobUser.rank}\n`;
-        bobMessage += `-# >>> 攻撃数: **${bobUser.gekiha_counts}回**\n`;
-        bobMessage += `-# >>> 撃破数: **${bobUser.total_kills}撃破**\n`;
+        bobMessage += `-# >>> 攻撃数: **${bobUser.gekiha_counts}回**`;
+        bobMessage += `　撃破数: **${bobUser.total_kills}撃破**\n`;
         
         // BOBの戦況表示
         if (countMode === 'down') {
