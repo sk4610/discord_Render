@@ -85,7 +85,7 @@ export async function execute(interaction) {
     let eraseTarget = '';
     const amount = after; // 軍全体の総コイン数
 
-    message += `\n🔥 **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚)\n`;
+    message += `\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚)\n`;
 
     switch (selectedElement) {
       case 'fire':
@@ -106,10 +106,10 @@ export async function execute(interaction) {
           message += `　**劣勢!反撃の木!🌲: ${amount} × 3 = `;
         } else if (myHP > enemyHP) {
           multiplier = 1;
-          message += ` **優勢!とどめの木!🌲: ${amount} × 1 = `;
+          message += `　**優勢!とどめの木!🌲: ${amount} × 1 = `;
         } else {
           multiplier = 2;
-          message += ` **均衡!加勢の木!🌲: ${amount} × 2 = `;
+          message += `　**均衡!加勢の木!🌲: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
         message += `${damage}ダメージ！\n`;
@@ -124,13 +124,13 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP > enemyHP) {
           multiplier = 3;
-          message += `優勢!:rock: 優勢時土攻撃: ${amount} × 3 = `;
+          message += `　**優勢!怒れ大地!:rock: 優勢時土攻撃: ${amount} × 3 = `;
         } else if (myHP < enemyHP) {
           multiplier = 1;
-          message += `:rock: 劣勢時土攻撃: ${amount} × 1 = `;
+          message += `　**劣勢!鎮まれ大地!:rock: 劣勢時土攻撃: ${amount} × 1 = `;
         } else {
           multiplier = 2;
-          message += `:rock: 均衡時土攻撃: ${amount} × 2 = `;
+          message += `　**均衡!唸れ大地!:rock: 均衡時土攻撃: ${amount} × 2 = `;
         }
         damage = amount * multiplier;
         message += `${damage}ダメージ！\n`;
@@ -140,10 +140,10 @@ export async function execute(interaction) {
       
       case 'thunder': {
         const rand = Math.floor(Math.random() * 100) + 1;
-        message += `⚡ 雷スキル判定: ${rand} → `;
+        message += ` 雷スキル判定: ${rand} → `;
         if (rand % 2 === 0) {
           damage = amount * 4;
-          message += `偶数 → 成功！${damage}ダメージ！\n`;
+          message += `偶数 → 成功！轟雷!⚡${damage}ダメージ！\n`;
         } else {
           damage = 0;
           message += `奇数 → 発動失敗（0ダメージ）\n`;
@@ -191,7 +191,7 @@ export async function execute(interaction) {
       const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${eraseTarget}_coin`;
       gameState[enemyEraseColumn] = 0;
       
-      message += `💨 ${armyNames[enemyArmy]}の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
+      message += `　💨 ${armyNames[enemyArmy]}の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
     }
 
     await gameState.save();
@@ -200,8 +200,8 @@ export async function execute(interaction) {
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `💥 ${armyNames[enemyArmy]}に ${damage} ダメージ！\n`;
-    if (heal > 0) message += `💖 ${armyNames[army]}の兵力が ${heal} 回復！\n`;
+    if (damage > 0) message += `${armyNames[enemyArmy]}に ${damage} ダメージ！\n`;
+    if (heal > 0) message += `:chocolate_bar: ${armyNames[army]}の兵力が ${heal} 回復！\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
