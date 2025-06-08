@@ -264,7 +264,7 @@ export async function execute(interaction) {
   message += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
   message += `:rock: 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
-  message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
+  message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚\n`;
 
   // メッセージ（ユーザーが入力したもの）
   if (customMessage) {
