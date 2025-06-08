@@ -274,6 +274,214 @@ export async function execute(interaction) {
   // 通常のメッセージを送信
   await interaction.editReply(message);
   
+  
+  // BOB支援制度の処理を追加
+  // 都合、処理はプレイヤーとBOBで2回回すことになる
+  if (player.bobEnabled) {
+    const bobId = `bob-${userId}`;
+    const bobUser = await User.findOne({ where: { id: bobId } });
+    
+    if (bobUser) {
+      // BOBのコイン獲得判定
+      let bobAcquired = 0;
+      const bobRoll = Math.random();
+      
+      if (bobRoll < 0.01) {
+        bobAcquired = 5; // 1%で5枚
+      } else if (bobRoll < 0.11) {
+        bobAcquired = 1; // 10%で1枚
+      }
+      
+      // BOBの軍全体コイン更新
+      const bobBefore = gameState[coinColumn];
+      gameState[coinColumn] = bobBefore + bobAcquired;
+      
+      // BOBの個人コイン履歴更新
+      bobUser[personalCoinColumn] += bobAcquired;
+      bobUser.gekiha_counts += 1;
+      await bobUser.save();
+      
+      const bobAfter = gameState[coinColumn];
+      
+      let bobMessage = `-#  **BOB支援制度**が発動！\n`;
+      const emoji = "<:custom_emoji:1350367513271341088>";
+      bobMessage += `-# ${emoji} ${armyNames[army]} ${bobUser.username} の【${elementName}】コイン獲得判定！\n`;
+      bobMessage += bobAcquired > 0
+        ? `### ${armyNames[army]}　${elementName}属性コイン ${bobAcquired}枚獲得！(${bobBefore} → ${bobAfter}枚)\n`
+        : '### ざんねん！獲得ならず…\n';
+
+      // BOBのスキル発動チェック
+      const bobBeforeMultiple = Math.floor(bobBefore / 5);
+      const bobAfterMultiple = Math.floor(bobAfter / 5);
+      
+      if (bobAcquired > 0 && bobAfterMultiple > bobBeforeMultiple) {
+        const enemyArmy = army === 'A' ? 'B' : 'A';
+
+        let bobDamage = 0;
+        let bobHeal = 0;
+        let bobEraseTarget = '';
+        const bobAmount = bobAfter;
+
+        bobMessage += `\n\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+
+        switch (selectedElement) {
+          case 'fire':
+            bobDamage = bobAmount * 2;
+            bobEraseTarget = 'wood';
+            bobMessage += `　🔥 燃え盛る炎: ${bobAmount} × 2 = ${bobDamage}ダメージ！\n`;
+            break;
+            
+          case 'wood': {
+            const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+            const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+            
+            let multiplier;
+            if (myHP < enemyHP) {
+              multiplier = 3;
+              bobMessage += `　🌲 劣勢!反撃の木!: ${bobAmount} × 3 = `;
+            } else if (myHP > enemyHP) {
+              multiplier = 1;
+              bobMessage += `　🌲 優勢!とどめの木!: ${bobAmount} × 1 = `;
+            } else {
+              multiplier = 2;
+              bobMessage += `　🌲 均衡!加勢の木!: ${bobAmount} × 2 = `;
+            }
+            bobDamage = bobAmount * multiplier;
+            bobMessage += `${bobDamage}ダメージ！\n`;
+            bobEraseTarget = 'earth';
+            break;
+          }
+          
+          case 'earth': {
+            const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+            const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+            
+            let multiplier;
+            if (myHP > enemyHP) {
+              multiplier = 3;
+              bobMessage += `　:rock: 優勢!怒れ大地!: ${bobAmount} × 3 = `;
+            } else if (myHP < enemyHP) {
+              multiplier = 1;
+              bobMessage += `　:rock: 劣勢!鎮まれ大地!: ${bobAmount} × 1 = `;
+            } else {
+              multiplier = 2;
+              bobMessage += `　:rock: 均衡!唸れ大地!: ${bobAmount} × 2 = `;
+            }
+            bobDamage = bobAmount * multiplier;
+            bobMessage += `${bobDamage}ダメージ！\n`;
+            bobEraseTarget = 'thunder';
+            break;
+          }
+          
+          case 'thunder': {
+            const rand = Math.floor(Math.random() * 100) + 1;
+            bobMessage += `　雷スキル判定: ${rand} \n`;
+            if (rand % 2 === 0) {
+              bobDamage = bobAmount * 4;
+              bobMessage += `　　偶数 → ⚡ 成功！轟雷!: ${bobDamage}ダメージ！\n`;
+            } else {
+              bobDamage = 0;
+              bobMessage += `　　奇数 → 発動失敗..（0ダメージ）\n`;
+            }
+            bobEraseTarget = 'water';
+            break;
+          }
+          
+          case 'water':
+            bobDamage = bobAmount;
+            bobHeal = bobAmount;
+            bobMessage += `　💧 水の治癒!: ${bobDamage}ダメージ + ${bobHeal}回復！\n`;
+            bobEraseTarget = 'fire';
+            break;
+        }
+
+        // BOBのダメージ処理
+        if (bobDamage > 0) {
+          if (army === 'A') {
+            gameState.a_team_kills += bobDamage;
+          } else {
+            gameState.b_team_kills += bobDamage;
+          }
+          
+          bobUser.total_kills += bobDamage;
+          await bobUser.save();
+        }
+
+        // BOBの回復処理
+        if (bobHeal > 0) {
+          const currentMyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+          const healedHP = Math.min(currentMyHP + bobHeal, gameState.initialArmyHP);
+          const actualHeal = healedHP - currentMyHP;
+          
+          if (army === 'A') {
+            gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
+          } else {
+            gameState.a_team_kills = Math.max(0, gameState.a_team_kills - actualHeal);
+          }
+        }
+
+        // BOBの敵軍コイン消去
+        if (bobEraseTarget) {
+          const eraseNames = {
+            fire: '火', wood: '木', earth: '土', thunder: '雷', water: '水'
+          };
+          
+          const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${bobEraseTarget}_coin`;
+          gameState[enemyEraseColumn] = 0;
+          
+          bobMessage += `　💨 ${armyNames[enemyArmy]}の**【${eraseNames[bobEraseTarget]}】コイン**を全て吹き飛ばした！\n`;
+        }
+
+        await gameState.save();
+
+        // BOBの戦況表示
+        const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+        const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+        
+        if (bobDamage > 0) bobMessage += `　　➡️ ${armyNames[enemyArmy]}に **${bobDamage}** ダメージ！\n`;
+        if (bobHeal > 0) bobMessage += `　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${bobHeal}** 回復！\n`;
+
+        bobMessage += `.\n`;
+        bobMessage += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
+
+      } else {
+        // BOBのスキル発動なしの場合も戦況表示
+        await gameState.save();
+        const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+        const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+        bobMessage += `.\n`;
+        bobMessage += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`; 
+      }
+      
+      // BOBの戦績表示
+      bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
+      bobMessage += `-# >>> 個人コイン取得 →　火:${bobUser.personal_fire_coin}枚/木:${bobUser.personal_wood_coin}枚/土:${bobUser.personal_earth_coin}枚/雷:${bobUser.personal_thunder_coin}枚/水:${bobUser.personal_water_coin}枚 \n`;
+      
+      // BOBの軍全体コイン状況表示
+      const enemyArmy = army === 'A' ? 'B' : 'A';
+      
+      bobMessage += `-# >>> :coin: 各軍のコイン取得状況:\n`;
+      bobMessage += `-# >>> 【${armyNames[army]}】`;
+      bobMessage += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
+      bobMessage += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
+      bobMessage += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
+      bobMessage += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
+      bobMessage += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
+      
+      bobMessage += `-# >>> 【${armyNames[enemyArmy]}】`;
+      bobMessage += `🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
+      bobMessage += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
+      bobMessage += `:rock: 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
+      bobMessage += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
+      bobMessage += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
+
+      await interaction.followUp(bobMessage);
+    }
+  }
+  
+  
+  
+  
   // 終戦判定（メッセージ送信後に別途通知）
   const loserTeam = await checkShusen();
   if (loserTeam) {
