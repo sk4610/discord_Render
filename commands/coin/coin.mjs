@@ -65,7 +65,7 @@ export async function execute(interaction) {
   
   if (roll < 0.01) {
     acquired = 5; // 1%で5枚
-  } else if (roll < 0.61) {
+  } else if (roll < 0.11) {
     acquired = 1; // 10%で1枚 (0.01～0.11の範囲)
   }
   // それ以外は0枚
