@@ -69,6 +69,8 @@ export async function execute(interaction) {
   // 個人のコイン取得履歴も更新
   const personalCoinColumn = `personal_${selectedElement}_coin`;
   player[personalCoinColumn] += acquired;
+  // 個人の書き込み回数も保存
+  player.gekiha_counts += 1;
   await player.save();
   
   const after = gameState[coinColumn];
@@ -232,9 +234,11 @@ export async function execute(interaction) {
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     message += `.`;
-    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`; 
+    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`; 
   }
-
+  //個人戦績
+  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}  \n-# >>> 行動数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n`
+  message += `-# >>> 個人コイン取得状況　火: 木: 土: 雷: 水: ` 
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
