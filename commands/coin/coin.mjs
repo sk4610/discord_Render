@@ -237,22 +237,23 @@ export async function execute(interaction) {
     message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`; 
   }
   //個人戦績
-  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}  \n-# >>> 行動数: **${player.gekiha_counts}**回 \n-# >>> 撃破数: **${player.total_kills}** 撃破\n`
-  message += `-# >>> 個人コイン取得状況　火: 木: 土: 雷: 水: ` 
+  //message += `-# >>> -\n`;
+  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}**回　撃破数: **${player.total_kills}** 撃破\n`;
+  message += `-# >>> 個人コイン取得 →　火:${player.personal_fire_coin}枚/木:${player.personal_wood_coin}枚/土:${player.personal_earth_coin}枚/雷:${player.personal_thunder_coin}枚/水:${player.personal_water_coin}枚 \n` ;
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
-  message += `-# >>> -\n`;
+  //message += `-# >>> -\n`;
   message += `-# >>> :coin: 各軍のコイン取得状況:\n`;
-  message += `-# >>> 【${armyNames[army]}】\n`;
-  message += `-# >>> 🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
+  message += `-# >>> 【${armyNames[army]}】`;
+  message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
   message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
   
-  message += `-# >>> 【${armyNames[enemyArmy]}】\n`;
-  message += `-# >>> 🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
+  message += `-# >>> 【${armyNames[enemyArmy]}】`;
+  message += `🔥 火: ${gameState[`${enemyArmy.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${enemyArmy.toLowerCase()}_wood_coin`]}枚 `;
   message += `:rock: 土: ${gameState[`${enemyArmy.toLowerCase()}_earth_coin`]}枚 `;
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
