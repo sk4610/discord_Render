@@ -30,6 +30,7 @@ export async function execute(interaction) {
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
   const player = await User.findOne({ where: { id: userId } });
+  const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
   if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
 
   const army = player.army;
@@ -229,7 +230,7 @@ export async function execute(interaction) {
       message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
     }
     message += `.`;
-    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
+    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
 
     //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
@@ -265,6 +266,11 @@ export async function execute(interaction) {
   message += `⚡ 雷: ${gameState[`${enemyArmy.toLowerCase()}_thunder_coin`]}枚 `;
   message += `💧 水: ${gameState[`${enemyArmy.toLowerCase()}_water_coin`]}枚`;
 
+  // メッセージ（ユーザーが入力したもの）
+  if (customMessage) {
+      message += ` \`\`\`${customMessage}\`\`\`\n`;
+  }
+  
   // 通常のメッセージを送信
   await interaction.editReply(message);
   
