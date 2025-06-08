@@ -91,7 +91,7 @@ export async function execute(interaction) {
       case 'fire':
         damage = amount * 2;
         eraseTarget = 'wood';
-        message += `　**燃え盛る炎🔥: ${amount} × 2 = ${damage}ダメージ！\n`;
+        message += `　**燃え盛る炎🔥: ${amount} × 2 = ${damage}ダメージ！**\n`;
         break;
         
       case 'wood': {
@@ -103,16 +103,16 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP < enemyHP) {
           multiplier = 3;
-          message += `　**劣勢!反撃の木!🌲: ${amount} × 3 = `;
+          message += `　**劣勢!反撃の木!🌲: ${amount} × 3 = **`;
         } else if (myHP > enemyHP) {
           multiplier = 1;
-          message += `　**優勢!とどめの木!🌲: ${amount} × 1 = `;
+          message += `　**優勢!とどめの木!🌲: ${amount} × 1 = **`;
         } else {
           multiplier = 2;
-          message += `　**均衡!加勢の木!🌲: ${amount} × 2 = `;
+          message += `　**均衡!加勢の木!🌲: ${amount} × 2 = **`;
         }
         damage = amount * multiplier;
-        message += `${damage}ダメージ！\n`;
+        message += `**${damage}ダメージ！\n**`;
         eraseTarget = 'earth';
         break;
       }
@@ -124,16 +124,16 @@ export async function execute(interaction) {
         let multiplier;
         if (myHP > enemyHP) {
           multiplier = 3;
-          message += `　**優勢!怒れ大地!:rock: 優勢時土攻撃: ${amount} × 3 = `;
+          message += `　**優勢!怒れ大地!:rock: 優勢時土攻撃: ${amount} × 3 = **`;
         } else if (myHP < enemyHP) {
           multiplier = 1;
-          message += `　**劣勢!鎮まれ大地!:rock: 劣勢時土攻撃: ${amount} × 1 = `;
+          message += `　**劣勢!鎮まれ大地!:rock: 劣勢時土攻撃: ${amount} × 1 = **`;
         } else {
           multiplier = 2;
-          message += `　**均衡!唸れ大地!:rock: 均衡時土攻撃: ${amount} × 2 = `;
+          message += `　**均衡!唸れ大地!:rock: 均衡時土攻撃: ${amount} × 2 = **`;
         }
         damage = amount * multiplier;
-        message += `${damage}ダメージ！\n`;
+        message += `**${damage}ダメージ！**\n`;
         eraseTarget = 'thunder';
         break;
       }
@@ -143,10 +143,10 @@ export async function execute(interaction) {
         message += ` 雷スキル判定: ${rand} → `;
         if (rand % 2 === 0) {
           damage = amount * 4;
-          message += `偶数 → 成功！轟雷!⚡${damage}ダメージ！\n`;
+          message += `**偶数 → 成功！轟雷!⚡${damage}ダメージ！**\n`;
         } else {
           damage = 0;
-          message += `奇数 → 発動失敗（0ダメージ）\n`;
+          message += `**奇数 → 発動失敗（0ダメージ）**\n`;
         }
         eraseTarget = 'water';
         break;
@@ -155,7 +155,7 @@ export async function execute(interaction) {
       case 'water':
         damage = amount;
         heal = amount;
-        message += `💧 水治癒: ${damage}ダメージ + ${heal}回復！\n`;
+        message += `**💧 水の治癒!: ${damage}ダメージ + ${heal}回復！**\n`;
         eraseTarget = 'fire';
         break;
     }
@@ -191,7 +191,7 @@ export async function execute(interaction) {
       const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${eraseTarget}_coin`;
       gameState[enemyEraseColumn] = 0;
       
-      message += `　💨 ${armyNames[enemyArmy]}の【${eraseNames[eraseTarget]}】コインを全て吹き飛ばした！\n`;
+      message += `　💨 ${armyNames[enemyArmy]}の**【${eraseNames[eraseTarget]}】コイン**を全て吹き飛ばした！\n`;
     }
 
     await gameState.save();
@@ -200,8 +200,8 @@ export async function execute(interaction) {
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `${armyNames[enemyArmy]}に ${damage} ダメージ！\n`;
-    if (heal > 0) message += `:chocolate_bar: ${armyNames[army]}の兵力が ${heal} 回復！\n`;
+    if (damage > 0) message += `\n\n${armyNames[enemyArmy]}に **${damage}** ダメージ！\n`;
+    if (heal > 0) message += `\n\n:chocolate_bar: ${armyNames[army]}の兵力が **${heal}** 回復！\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
@@ -209,7 +209,7 @@ export async function execute(interaction) {
       message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
     }
 
-    message += `\n-# >>> :crossed_swords:  現在の戦況:\n# >>> :yellow_circle: ${armyNames.A} ${aHP} vs :green_circle: ${armyNames.B} ${bHP}\n`;
+    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} VS :green_circle: ${armyNames.B} 兵力${bHP}\n`;
     
  //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
@@ -225,7 +225,7 @@ export async function execute(interaction) {
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
-  message += `-# >>> \n 各軍のコイン取得状況:\n`;
+  message += `-# >>> :coin: 各軍のコイン取得状況:\n`;
   message += `-# >>> 【${armyNames[army]}】\n`;
   message += `-# >>> 🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
