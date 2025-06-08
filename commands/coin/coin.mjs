@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { armyNames } from '../armyname/armyname.js';
+import { checkShusen } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('coin')
@@ -224,8 +225,8 @@ export async function execute(interaction) {
     }
     message += `.`;
     message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
-    
- //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
+
+    //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
   } else {
     // スキル発動なしの場合も戦況表示
