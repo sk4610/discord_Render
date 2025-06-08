@@ -190,7 +190,7 @@ export async function execute(interaction) {
       if (army === 'A') {
         gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
       } else {
-        gameState.a_team_kills = Math.max(0, gameState.a_team_kills - heal);
+        gameState.a_team_kills = Math.max(0, gameState.a_team_kills - actualHeal);
       }
     }
 
@@ -220,24 +220,25 @@ export async function execute(interaction) {
       const winner = aHP <= 0 ? 'B' : 'A';
       message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
     }
-
+    message += `.`;
     message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
     
  //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
   } else {
-    // スキル発動なしの場合の戦況表示
-    const myDamageReceived = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
-    const myHP = gameState.initialArmyHP - myDamageReceived;
-    message += `\n📊 ${armyNames[army]}の兵力：${myHP}\n`;
-    
+    // スキル発動なしの場合も戦況表示
     await gameState.save(); // コイン獲得だけでも保存
+    // 戦況表示（スキル発動なしでも表示）
+    const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+    const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+    message += `.`;
+    message += `\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`; 
   }
 
   // 軍全体のコイン状況表示（自軍 + 敵軍）
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
-  message += `.\n`;
+  message += `-# >>> -\n`;
   message += `-# >>> :coin: 各軍のコイン取得状況:\n`;
   message += `-# >>> 【${armyNames[army]}】\n`;
   message += `-# >>> 🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
