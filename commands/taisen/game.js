@@ -35,32 +35,27 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: false
   },
-  // 属性コインを個人管理ではないため個人のテーブルにコイン情報は不要
-  //属性コイン　火
-/*  fire_coin: {
+  // 属性コイン制　個人のコイン取得履歴（戦績表示用）
+  personal_fire_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  //属性コイン　木
-  wood_coin: {
+  personal_wood_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  //属性コイン　土
-  earth_coin: {
+  personal_earth_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  //属性コイン　雷
-  thunder_coin: {
+  personal_thunder_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  //属性コイン　水
-  water_coin: {
+  personal_water_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
-  }, */
+  },
 });
 
 // ゲームの状態を格納する GamaState
