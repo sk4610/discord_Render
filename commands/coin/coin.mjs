@@ -31,7 +31,7 @@ export async function execute(interaction) {
   const username = interaction.member.displayName;
   const player = await User.findOne({ where: { id: userId } });
   const customMessage = interaction.options.getString("message") || ""; // メッセージ取得（デフォルトは空）
-  if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
+  if (!player) return interaction.editReply('まず /start でチームに参加してください。');
 
   const army = player.army;
   const selectedElement = interaction.options.getString('element');
