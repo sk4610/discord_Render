@@ -27,7 +27,7 @@ function processKillWithRandom(currentRank) {
   const randomNum = Math.floor(Math.random() * 1000);
   const randomStr = randomNum.toString().padStart(3, '0'); // 3桁表示（001, 023など）
   
-  displayMessage += `\n :scales: ジャッジナンバー ➡️　__${randomStr}__\n`;
+  displayMessage += `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
   
   // 下2桁を取得
   const lastTwoDigits = randomNum % 100;
