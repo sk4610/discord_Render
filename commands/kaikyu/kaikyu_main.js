@@ -27,7 +27,7 @@ function processKillWithRandom(currentRank) {
   const randomNum = Math.floor(Math.random() * 1000);
   const randomStr = randomNum.toString().padStart(3, '0'); // 3桁表示（001, 023など）
   
-  displayMessage += `\n:slot_machine:  運命数 → **${randomStr}**\n`;
+  displayMessage += `\n### :scales: ジャッジナンバー → **${randomStr}**\n`;
   
   // 下2桁を取得
   const lastTwoDigits = randomNum % 100;
@@ -40,11 +40,11 @@ function processKillWithRandom(currentRank) {
     // 000の場合：軍神昇格 or 軍神時32撃破
     if (currentRank === specialRank) {
       kills = 32;
-      displayMessage += `✨ **000！軍神の超・超・大量撃破！** → **${kills}撃破**\n`;
+      displayMessage += `### ✨ **000！軍神の超・超・大量撃破！** → **${kills}撃破**\n`;
     } else {
       kills = 16;
       rankUp = true;
-      displayMessage += `🌟 **000！軍神昇格！** → **${kills}撃破**\n`;
+      displayMessage += `### 🌟 **000！軍神昇格！** → **${kills}撃破**\n`;
       return { newRank: specialRank, kills, rankUp, displayMessage };
     }
   } else if (firstDigit === secondDigit && secondDigit === thirdDigit && randomNum !== 0) {

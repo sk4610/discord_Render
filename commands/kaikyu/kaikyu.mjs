@@ -16,13 +16,13 @@ const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の�
 
 //**階級制処理の流れ**
 // rule.mjs /ruleで rule_typeをname:階級制, value:rankedに設定
-// 次にkaikyu.mjs(ここ) /kaikyuで userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
+// 次にkaikyu.mjs(ここ) /start userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
 // 次にgekiha.mjs /gekihaで　階級制の撃破判定処理を実行　ただし実際に階級制の処理をしているのはkaikyu_main.js
 // gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
 
 
 export const data = new SlashCommandBuilder()
-  .setName('kaikyu')
+  .setName('start')
   .setDescription('軍を選択し、ランダムな階級を割り当てます')
   .addStringOption(option =>
     option.setName('army')

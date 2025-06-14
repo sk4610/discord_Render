@@ -33,9 +33,9 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
 //console.log(gameState); // ここでgameStateの内容をログに出力
 
     if(mode === 'ranked'){
-      await interaction.reply(`ルールを階級制に設定しました！ 参加者は /kaikyu コマンドで軍に参加してください。`); 
+      await interaction.reply(`ルールを階級制に設定しました！ 参加者は /start コマンドで軍に参加してください。`); 
     }else if(mode === 'coin'){
-      await interaction.reply(`ルールを属性コイン制に設定しました！ 参加者は /kaikyu コマンドで軍に参加してください。`);
+      await interaction.reply(`ルールを属性コイン制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }
     } catch (error) {
     console.error('ルール設定エラー:', error);

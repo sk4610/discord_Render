@@ -14,7 +14,7 @@ commands
 ├general
 │　└say.mjs            // "say"でコメントを打てるサンプルプログラム
 ├kaikyu
-│　├kaikyu.mjs        // "/kaikyu"でuserの所属軍、階級をランダムに割当（所属軍はユーザ選択）
+│　├kaikyu.mjs        // "/start"でuserの所属軍、階級をランダムに割当（所属軍はユーザ選択）
 │　└kaikyu_main.js   // "/gekiha"時にruleが階級制のときに書き込みから撃破数を判定実行するメインファイル
 ├money
 │　└money.mjs        // "/money"で100Gを追加するだけのプログラム
@@ -37,6 +37,6 @@ commands
 
 //**階級制処理の流れ**
 // rule.mjs /ruleで rule_typeをname:階級制, value:rankedに設定
-// 次にkaikyu.mjs(ここ) /kaikyuで userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
+// 次にkaikyu.mjs(ここ) /start userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
 // 次にgekiha.mjs /gekihaで　階級制の撃破判定処理を実行　ただし実際に階級制の処理をしているのはkaikyu_main.js
 // gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
