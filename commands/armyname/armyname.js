@@ -2,5 +2,5 @@
 
 export const armyNames = {
   A: 'きのこ軍',
-  B: 'たけのこ軍'
+  B: 'ネオうどん軍'
 };
