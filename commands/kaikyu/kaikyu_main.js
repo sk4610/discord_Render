@@ -27,7 +27,7 @@ function processKillWithRandom(currentRank) {
   const randomNum = Math.floor(Math.random() * 1000);
   const randomStr = randomNum.toString().padStart(3, '0'); // 3桁表示（001, 023など）
   
-  displayMessage += `\n-# :scales: ジャッジナンバー\n### ➡️ ${randomStr}\n`;
+  displayMessage += `\n-# :scales: ジャッジナンバー\n## __${randomStr}__\n`;
   
   // 下2桁を取得
   const lastTwoDigits = randomNum % 100;
@@ -51,15 +51,15 @@ function processKillWithRandom(currentRank) {
     // 全桁ゾロ目（111-999）：大量撃破 + 通常昇格
     kills = largeKillCounts[currentRank] || 1;
     rankUp = true;
-    displayMessage += `### 🔥 **全桁ゾロ目！大量撃破！** 🔥 : **${kills}撃破！** + **昇格！**\n`;
+    displayMessage += `### 🔥 **全桁ゾロ目！大量撃破！** 🔥  **${kills}撃破！** + **昇格！**\n`;
   } else if (secondDigit === thirdDigit) {
     // 下2桁ゾロ目：通常撃破
     kills = 1;
-    displayMessage += `### **下2桁ゾロ目！** : **${kills}撃破！**\n`;
+    displayMessage += `### ➡️ **下2桁ゾロ目！**  **${kills}撃破！**\n`;
   } else {
     // ハズレ
     kills = 0;
-    displayMessage += `### **ざんねん、${kills}撃破**\n`;
+    displayMessage += `### ➡️ **ざんねん、${kills}撃破**\n`;
   }
   
   // 通常昇格処理（000以外の場合）
