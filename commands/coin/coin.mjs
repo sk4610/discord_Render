@@ -66,11 +66,12 @@ export async function execute(interaction) {
   
   let acquired = 0;
   let displayMessage = `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
-  //const roll = Math.random();
+
   // 下2桁を取得
   const firstDigit = Math.floor(randomNum / 100);
   const secondDigit = Math.floor((randomNum % 100) / 10);
   const thirdDigit = randomNum % 10;
+  
   // 判定処理
   if (firstDigit === secondDigit && secondDigit === thirdDigit) {
     // 全桁ゾロ目（000-999）：5枚獲得
@@ -99,9 +100,11 @@ export async function execute(interaction) {
   const after = gameState[coinColumn];
   
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
+  message += displayMessage;
+  //message += `.\n`;
   message += acquired > 0
     ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : '### ざんねん！GETならず…\n';
+    : '.\n';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -298,14 +301,30 @@ export async function execute(interaction) {
     const bobUser = await User.findOne({ where: { id: bobId } });
     
     if (bobUser) {
-      // BOBのコイン獲得判定
-      let bobAcquired = 0;
-      const bobRoll = Math.random();
+      // BOBのコイン獲得判定（乱数表示版）
+      const bobRandomNum = Math.floor(Math.random() * 1000);
+      const bobRandomStr = bobRandomNum.toString().padStart(3, '0');
       
-      if (bobRoll < 0.01) {
-        bobAcquired = 5; // 1%で5枚
-      } else if (bobRoll < 0.11) {
-        bobAcquired = 1; // 10%で1枚
+      let bobAcquired = 0;
+      let bobDisplayMessage = `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${bobRandomStr}__\n`;
+      
+      // BOBの判定処理
+      const bobFirstDigit = Math.floor(bobRandomNum / 100);
+      const bobSecondDigit = Math.floor((bobRandomNum % 100) / 10);
+      const bobThirdDigit = bobRandomNum % 10;
+      
+      if (bobFirstDigit === bobSecondDigit && bobSecondDigit === bobThirdDigit) {
+        // 全桁ゾロ目：5枚獲得
+        bobAcquired = 5;
+        bobDisplayMessage += `### 🌟 **全桁ゾロ目！大量取得！** 🌟  **${bobAcquired}枚GET!**\n`;
+      } else if (bobSecondDigit === bobThirdDigit) {
+        // 下2桁ゾロ目：1枚獲得
+        bobAcquired = 1;
+        bobDisplayMessage += `### ➡️ **下2桁ゾロ目！**  **${bobAcquired}枚GET!**\n`;
+      } else {
+        // ハズレ
+        bobAcquired = 0;
+        bobDisplayMessage += `### ➡️ **ざんねん、${bobAcquired}枚**\n`;
       }
       
       // BOBの軍全体コイン更新
@@ -322,6 +341,7 @@ export async function execute(interaction) {
       let bobMessage = `-#  **BOB支援制度**が発動！\n`;
       const emoji = "<:custom_emoji:1350367513271341088>";
       bobMessage += `-# ${emoji} ${armyNames[army]} ${bobUser.username} の【${elementName}】コイン獲得判定！\n`;
+      bobMessage += bobDisplayMessage;
       bobMessage += bobAcquired > 0
         ? `### ${armyNames[army]}　${elementName}属性コイン ${bobAcquired}枚獲得！(${bobBefore} → ${bobAfter}枚)\n`
         : '### ざんねん！獲得ならず…\n';
