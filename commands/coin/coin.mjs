@@ -59,17 +59,33 @@ export async function execute(interaction) {
   // 軍全体のコインカラム名を決定
   const coinColumn = `${army.toLowerCase()}_${selectedElement}_coin`;
   
-  // --- コイン獲得処理 ---
-  let acquired = 0;
-  const roll = Math.random();
+  // --- コイン獲得処理（乱数表示版） ---
+  // 3桁乱数生成（000-999）
+  const randomNum = Math.floor(Math.random() * 1000);
+  const randomStr = randomNum.toString().padStart(3, '0');
   
-  if (roll < 0.01) {
-    acquired = 5; // 1%で5枚
-  } else if (roll < 0.11) {
-    acquired = 1; // 10%で1枚 (0.01～0.11の範囲)
-  }
-  // それ以外は0枚
-
+  let acquired = 0;
+  let displayMessage = `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
+  //const roll = Math.random();
+  // 下2桁を取得
+  const firstDigit = Math.floor(randomNum / 100);
+  const secondDigit = Math.floor((randomNum % 100) / 10);
+  const thirdDigit = randomNum % 10;
+  // 判定処理
+  if (firstDigit === secondDigit && secondDigit === thirdDigit) {
+    // 全桁ゾロ目（000-999）：5枚獲得
+    acquired = 5;
+    displayMessage += `### 🌟 **全桁ゾロ目！大量取得！** 🌟  **${acquired}枚GET!**\n`;
+  } else if (secondDigit === thirdDigit) {
+    // 下2桁ゾロ目：1枚獲得
+    acquired = 1;
+    displayMessage += `### ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
+  } else {
+    // ハズレ
+    acquired = 0;
+    displayMessage += `### ➡️ **ざんねん、${acquired}枚**\n`;
+  }  
+    
   const before = gameState[coinColumn];
   gameState[coinColumn] = before + acquired;
   
@@ -85,7 +101,7 @@ export async function execute(interaction) {
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
   message += acquired > 0
     ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : '### ざんねん！獲得ならず…\n';
+    : '### ざんねん！GETならず…\n';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
