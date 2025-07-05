@@ -49,7 +49,38 @@ export async function execute(interaction) {
     const totalPlayers = playersA + playersB;
     
     message += `-# >>> 👥 **参加者数**: ${totalPlayers}名\n`;
-    message += `-# >>> ${armyNames.A}: ${playersA}名　${armyNames.B}: ${playersB}名\n\n`;
+    message += `-# >>> ${armyNames.A}: ${playersA}名　${armyNames.B}: ${playersB}名\n`;
+    
+    // === あなたの戦績 ===
+    message += `-# >>> 🏅 **あなたの戦績**\n`;
+    message += `-# >>> ${armyNames[army]} ${username}\n`;
+    if (gameState.rule_type === 'ranked') {
+      message += `-# >>> 階級: ${player.rank}\n`;
+    }
+    message += `-# >>> 行動数: ${player.gekiha_counts}回　撃破数: ${player.total_kills}撃破\n`;
+    
+    if (gameState.rule_type === 'coin') {
+      message += `-# >>> 個人コイン取得: 🔥${player.personal_fire_coin}枚　🌲${player.personal_wood_coin}枚　:rock:${player.personal_earth_coin}枚　⚡${player.personal_thunder_coin}枚　💧${player.personal_water_coin}枚\n\n`;
+    }
+    
+    // === BOB情報 ===
+    if (player.bobEnabled) {
+      const bobId = `bob-${userId}`;
+      const bobUser = await User.findOne({ where: { id: bobId } });
+      
+      if (bobUser) {
+        message += `-# >>>  **<:custom_emoji:1350367513271341088>BOB支援兵の戦績**\n`;
+        message += `-# >>> ${armyNames[army]} ${bobUser.username}\n`;
+        if (gameState.rule_type === 'ranked') {
+          message += `-# >>> 階級: **${bobUser.rank}**\n`;
+        }
+        message += `-# >>> 行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
+        
+        if (gameState.rule_type === 'coin') {
+          message += `-# >>> BOBコイン取得: 🔥${bobUser.personal_fire_coin}枚　🌲${bobUser.personal_wood_coin}枚　:rock:${bobUser.personal_earth_coin}枚　⚡${bobUser.personal_thunder_coin}枚　💧${bobUser.personal_water_coin}枚\n\n`;
+        }
+      }
+    }
     
     // === 戦況表示 ===
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
@@ -121,36 +152,6 @@ export async function execute(interaction) {
       }
     }
 
-    // === あなたの戦績 ===
-    message += `🏅 **あなたの戦績**\n`;
-    message += `${armyNames[army]} ${username}\n`;
-    if (gameState.rule_type === 'ranked') {
-      message += `階級: ${player.rank}\n`;
-    }
-    message += `行動数: ${player.gekiha_counts}回　撃破数: ${player.total_kills}撃破\n`;
-    
-    if (gameState.rule_type === 'coin') {
-      message += `個人コイン取得: 🔥${player.personal_fire_coin}枚　🌲${player.personal_wood_coin}枚　:rock:${player.personal_earth_coin}枚　⚡${player.personal_thunder_coin}枚　💧${player.personal_water_coin}枚\n`;
-    }
-
-    // === BOB情報 ===
-    if (player.bobEnabled) {
-      const bobId = `bob-${userId}`;
-      const bobUser = await User.findOne({ where: { id: bobId } });
-      
-      if (bobUser) {
-        message += `\n🤖 **BOB支援兵**\n`;
-        message += `${armyNames[army]} ${bobUser.username}\n`;
-        if (gameState.rule_type === 'ranked') {
-          message += `階級: **${bobUser.rank}**\n`;
-        }
-        message += `行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
-        
-        if (gameState.rule_type === 'coin') {
-          message += `BOBコイン取得: 🔥${bobUser.personal_fire_coin}枚　🌲${bobUser.personal_wood_coin}枚　:rock:${bobUser.personal_earth_coin}枚　⚡${bobUser.personal_thunder_coin}枚　💧${bobUser.personal_water_coin}枚\n`;
-        }
-      }
-    }
 
     await interaction.editReply(message);
 
