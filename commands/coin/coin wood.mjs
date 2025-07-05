@@ -42,7 +42,7 @@ export async function execute(interaction) {
   const randomStr = randomNum.toString().padStart(3, '0');
   
   let acquired = 0;
-  let displayMessage = `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
+  let displayMessage = `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__`;
   
   const firstDigit = Math.floor(randomNum / 100);
   const secondDigit = Math.floor((randomNum % 100) / 10);
@@ -50,13 +50,13 @@ export async function execute(interaction) {
   
   if (firstDigit === secondDigit && secondDigit === thirdDigit) {
     acquired = 5;
-    displayMessage += `### 🌟 **全桁ゾロ目！大量取得！** 🌟  **${acquired}枚GET!**\n`;
+    displayMessage += `\n### 🌟 **全桁ゾロ目！大量取得！** 🌟  **${acquired}枚GET!**\n`;
   } else if (secondDigit === thirdDigit) {
     acquired = 1;
-    displayMessage += `### ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
+    displayMessage += `\n### ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
   } else {
     acquired = 0;
-    displayMessage += `### ➡️ **ざんねん、${acquired}枚**\n`;
+    displayMessage += ` ➡️ **ざんねん、${acquired}枚**\n`;
   }
     
   const before = gameState[coinColumn];
@@ -155,7 +155,7 @@ export async function execute(interaction) {
   }
   
   // 個人戦績（常時表示）
-  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
+  //message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
   message += `-# >>> 個人コイン取得 →　🔥火:${player.personal_fire_coin}枚/🌲木:${player.personal_wood_coin}枚/:rock:土:${player.personal_earth_coin}枚/⚡雷:${player.personal_thunder_coin}枚/💧水:${player.personal_water_coin}枚 \n`;
 
   if (customMessage) {
@@ -260,7 +260,7 @@ export async function execute(interaction) {
         await gameState.save();
       }
       
-      bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
+      //bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
       bobMessage += `-# >>> 個人コイン取得 →　🔥火:${bobUser.personal_fire_coin}枚/🌲木:${bobUser.personal_wood_coin}枚/:rock:土:${bobUser.personal_earth_coin}枚/⚡雷:${bobUser.personal_thunder_coin}枚/💧水:${bobUser.personal_water_coin}枚 \n`;
 
       await interaction.followUp(bobMessage);
