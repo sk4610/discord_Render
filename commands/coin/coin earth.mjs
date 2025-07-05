@@ -73,7 +73,7 @@ export async function execute(interaction) {
   message += displayMessage;
   message += acquired > 0
     ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : ' ';
+    : ' \n\n';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -206,7 +206,7 @@ export async function execute(interaction) {
       bobMessage += bobDisplayMessage;
       bobMessage += bobAcquired > 0
         ? `### ${armyNames[army]}　${elementName}属性コイン ${bobAcquired}枚獲得！(${bobBefore} → ${bobAfter}枚)\n`
-        : '### ざんねん！GETならず…\n';
+        : ' \n';
 
       const bobBeforeMultiple = Math.floor(bobBefore / 5);
       const bobAfterMultiple = Math.floor(bobAfter / 5);

@@ -25,7 +25,7 @@ export async function execute(interaction) {
       return interaction.editReply('エラー: ゲームデータが見つかりません。');
     }
 
-    let message = `**現在の戦況**\n\n`;
+    let message = `**現在の戦況**\n`;
 
     // ゲームルール表示
     if (gameState.rule_type === 'ranked') {
@@ -40,14 +40,22 @@ export async function execute(interaction) {
     if (gameState.isGameOver) {
       message += `-# >>> **状態**: :x:  終戦済み\n\n`;
     } else {
-      message += `-# >>> **状態**: :o: 大戦中\n\n`;
+      message += `-# >>> **状態**: :o: 大戦中\n`;
     }
 
+    // === 参加者情報 ===
+    const playersA = await User.count({ where: { army: 'A' } });
+    const playersB = await User.count({ where: { army: 'B' } });
+    const totalPlayers = playersA + playersB;
+    
+    message += `-# >>> 👥 **参加者数**: ${totalPlayers}名\n`;
+    message += `-# >>> ${armyNames.A}: ${playersA}名　${armyNames.B}: ${playersB}名\n\n`;
+    
     // === 戦況表示 ===
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    message += `:crossed_swords: **戦況**\n`;
+    message += `:crossed_swords: **両軍戦況**\n`;
     message += `:yellow_circle: ${armyNames.A}残存兵力: ${aHP} \n`;
     message += `:green_circle: ${armyNames.B}残存兵力: ${bHP} \n\n`;
 
@@ -66,10 +74,10 @@ export async function execute(interaction) {
     } else if (gameState.rule_type === 'coin') {
       // 属性コイン制：コイン状況表示
       message += `:coin: **各軍のコイン状況**\n`;
-      message += `**【${armyNames.A}】**\n`;
+      message += `【${armyNames.A}】\n`;
       message += `🔥 火: ${gameState.a_fire_coin}枚　🌲 木: ${gameState.a_wood_coin}枚　:rock: 土: ${gameState.a_earth_coin}枚　⚡ 雷: ${gameState.a_thunder_coin}枚　💧 水: ${gameState.a_water_coin}枚\n`;
       
-      message += `**【${armyNames.B}】**\n`;
+      message += `【${armyNames.B}】\n`;
       message += `🔥 火: ${gameState.b_fire_coin}枚　🌲 木: ${gameState.b_wood_coin}枚　:rock: 土: ${gameState.b_earth_coin}枚　⚡ 雷: ${gameState.b_thunder_coin}枚　💧 水: ${gameState.b_water_coin}枚\n\n`;
       
       // 各軍のスキル発動可能状況
@@ -117,9 +125,9 @@ export async function execute(interaction) {
     message += `🏅 **あなたの戦績**\n`;
     message += `${armyNames[army]} ${username}\n`;
     if (gameState.rule_type === 'ranked') {
-      message += `階級: **${player.rank}**\n`;
+      message += `階級: ${player.rank}\n`;
     }
-    message += `行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
+    message += `行動数: ${player.gekiha_counts}回　撃破数: ${player.total_kills}撃破\n`;
     
     if (gameState.rule_type === 'coin') {
       message += `個人コイン取得: 🔥${player.personal_fire_coin}枚　🌲${player.personal_wood_coin}枚　:rock:${player.personal_earth_coin}枚　⚡${player.personal_thunder_coin}枚　💧${player.personal_water_coin}枚\n`;
