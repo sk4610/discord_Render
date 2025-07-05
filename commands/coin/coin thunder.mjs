@@ -20,7 +20,7 @@ export async function execute(interaction) {
   const player = await User.findOne({ where: { id: userId } });
   const customMessage = interaction.options.getString("message") || "";
   
-  if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
+  if (!player) return interaction.editReply('まず /start でチームに参加してください。');
 
   const army = player.army;
   const selectedElement = 'thunder';
@@ -73,7 +73,7 @@ export async function execute(interaction) {
   message += displayMessage;
   message += acquired > 0
     ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : '### ざんねん！GETならず…\n';
+    : ' ';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
