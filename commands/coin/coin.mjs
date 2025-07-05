@@ -4,20 +4,8 @@ import { armyNames } from '../armyname/armyname.js';
 import { checkShusen } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('coin')
-  .setDescription('属性コインを集めます')
-  .addStringOption(option =>
-    option.setName('element')
-      .setDescription('属性を選択')
-      .setRequired(true)
-      .addChoices(
-        { name: '火', value: 'fire' },
-        { name: '木', value: 'wood' },
-        { name: '土', value: 'earth' },
-        { name: '雷', value: 'thunder' },
-        { name: '水', value: 'water' },
-      )
-  )
+  .setName('coin fire')
+  .setDescription('火属性コインを集めます')
   .addStringOption(option =>
     option.setName("message")
       .setDescription("一言添える")
@@ -34,17 +22,10 @@ export async function execute(interaction) {
   if (!player) return interaction.editReply('まず /start でチームに参加してください。');
 
   const army = player.army;
-  const selectedElement = interaction.options.getString('element');
+  const selectedElement = 'fire';
 
-  const elementNames = {
-    fire: '火',
-    wood: '木',
-    earth: '土', 
-    thunder: '雷',
-    water: '水'
-  };
+  const elementName = '火';
 
-  const elementName = elementNames[selectedElement];
 
   const gameState = await GameState.findOne();
   if (gameState.rule_type !== 'coin') {
@@ -113,88 +94,20 @@ export async function execute(interaction) {
   if (acquired > 0 && afterMultiple > beforeMultiple) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
 
-    let damage = 0;
-    let heal = 0;
-    let eraseTarget = '';
     const amount = after; // 軍全体の総コイン数
 
     message += `\n\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
 
-    switch (selectedElement) {
-      case 'fire':
+        //火属性スキル
         damage = amount * 2;
         eraseTarget = 'wood';
         message += `　🔥 燃え盛る炎: ${amount} × 2 = ${damage}ダメージ！**\n`;
-        break;
         
-      case 'wood': {
-        // A軍の兵力 = 初期HP - B軍が与えたダメージ
-        // B軍の兵力 = 初期HP - A軍が与えたダメージ  
-        const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
-        const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
-        
-        let multiplier;
-        if (myHP < enemyHP) {
-          multiplier = 3;
-          message += `　🌲 劣勢!反撃の木!: ${amount} × 3 = `;
-        } else if (myHP > enemyHP) {
-          multiplier = 1;
-          message += `　🌲 優勢!とどめの木!: ${amount} × 1 = `;
-        } else {
-          multiplier = 2;
-          message += `　🌲 均衡!加勢の木!: ${amount} × 2 = `;
-        }
-        damage = amount * multiplier;
-        message += `${damage}ダメージ！\n`;
-        eraseTarget = 'earth';
-        break;
-      }
-      
-      case 'earth': {
-        const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
-        const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
-        
-        let multiplier;
-        if (myHP > enemyHP) {
-          multiplier = 3;
-          message += `　:rock: 優勢!怒れ大地!: ${amount} × 3 = `;
-        } else if (myHP < enemyHP) {
-          multiplier = 1;
-          message += `　:rock: 劣勢!鎮まれ大地!: ${amount} × 1 = `;
-        } else {
-          multiplier = 2;
-          message += `　:rock: 均衡!唸れ大地!: ${amount} × 2 = `;
-        }
-        damage = amount * multiplier;
-        message += `${damage}ダメージ！\n`;
-        eraseTarget = 'thunder';
-        break;
-      }
-      
-      case 'thunder': {
-        const rand = Math.floor(Math.random() * 100) + 1;
-        message += `　雷スキル判定: ${rand} \n`;
-        if (rand % 2 === 0) {
-          damage = amount * 4;
-          message += `　　偶数 → ⚡ 成功！轟雷!: ${damage}ダメージ！\n`;
-        } else {
-          damage = 0;
-          message += `　　奇数 → 発動失敗..（0ダメージ）\n`;
-        }
-        eraseTarget = 'water';
-        break;
-      }
-      
-      case 'water':
-        damage = amount;
-        heal = amount;
-        message += `　💧 水の治癒!: ${damage}ダメージ + ${heal}回復！\n`;
-        eraseTarget = 'fire';
-        break;
+ 
     }
 
     // ダメージ処理
-    if (damage > 0) {
+
       if (army === 'A') {
         gameState.a_team_kills += damage; // A軍が与えたダメージを加算
       } else {
@@ -204,43 +117,21 @@ export async function execute(interaction) {
       // 個人の撃破数にも加算（ランキング用）
       player.total_kills += damage;
       await player.save();
-    }
+    
 
-    // 回復処理（修正版：現在のHPに直接回復量を加算）
-    if (heal > 0) {
-      // 現在の自軍HP
-      const currentMyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
-      // 回復後のHP（初期HPを超えないように制限）
-      const healedHP = Math.min(currentMyHP + heal, gameState.initialArmyHP);
-      // 回復分だけ受けたダメージを減らす
-      const actualHeal = healedHP - currentMyHP;
-      
-      if (army === 'A') {
-        gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
-      } else {
-        gameState.a_team_kills = Math.max(0, gameState.a_team_kills - actualHeal);
-      }
-    }
-
-    // 敵軍のコイン消去
-    if (eraseTarget) {
-      const eraseNames = {
-        fire: '火', wood: '木', earth: '土', thunder: '雷', water: '水'
-      };
-      
-      const enemyEraseColumn = `${enemyArmy.toLowerCase()}_${eraseTarget}_coin`;
-      gameState[enemyEraseColumn] = 0;
-      
-      message += `　💨 ${armyNames[enemyArmy]}の**【${eraseNames[eraseTarget]}】コイン**を全て吹き飛ばした！\n`;
-    }
-
+    // 敵軍の木コイン消去
+    const enemyEraseColumn = `${enemyArmy.toLowerCase()}_wood_coin`;
+    gameState[enemyEraseColumn] = 0;
+    message += `　💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
+  
     await gameState.save();
 
-    // 戦況表示（修正版）
+  
+    // 戦況表示（スキル発動時のみ）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
-    if (damage > 0) message += `### 　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
+    message += `### 　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
     if (heal > 0) message += `### 　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal} 回復！**\n`;
 
     // 勝敗判定
@@ -253,7 +144,7 @@ export async function execute(interaction) {
 
     //   console.log(`[DEBUG] ${army}軍 ${selectedElement}スキル: before=${before}, after=${after}, damage=${damage}, heal=${heal}`);
 
-  } else {
+   else {
     // スキル発動なしの場合も戦況表示
     await gameState.save(); // コイン獲得だけでも保存
     // 戦況表示（スキル発動なしでも表示）
