@@ -4,8 +4,8 @@ import { armyNames } from '../armyname/armyname.js';
 import { checkShusen } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('coin-water')
-  .setDescription('水属性コインを集めます')
+  .setName('coin-earth')
+  .setDescription('土属性コインを集めます')
   .addStringOption(option =>
     option.setName("message")
       .setDescription("一言添える")
@@ -23,8 +23,8 @@ export async function execute(interaction) {
   if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
 
   const army = player.army;
-  const selectedElement = 'water';
-  const elementName = '水';
+  const selectedElement = 'earth';
+  const elementName = '土';
 
   const gameState = await GameState.findOne();
   if (gameState.rule_type !== 'coin') {
@@ -85,10 +85,24 @@ export async function execute(interaction) {
     
     message += `\n\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
-    // 水属性スキル（ダメージ + 回復）
-    const damage = amount;
-    const heal = amount;
-    message += `　💧 水の治癒!: ${damage}ダメージ + ${heal}回復！\n`;
+    // 土属性スキル（兵力比較・木と逆）
+    const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+    const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+    
+    let multiplier;
+    let damage;
+    if (myHP > enemyHP) {
+      multiplier = 3;
+      message += `　:rock: 優勢!怒れ大地!: ${amount} × 3 = `;
+    } else if (myHP < enemyHP) {
+      multiplier = 1;
+      message += `　:rock: 劣勢!鎮まれ大地!: ${amount} × 1 = `;
+    } else {
+      multiplier = 2;
+      message += `　:rock: 均衡!唸れ大地!: ${amount} × 2 = `;
+    }
+    damage = amount * multiplier;
+    message += `${damage}ダメージ！\n`;
 
     // ダメージ処理
     if (army === 'A') {
@@ -100,21 +114,10 @@ export async function execute(interaction) {
     player.total_kills += damage;
     await player.save();
 
-    // 回復処理（現在のHPに直接回復量を加算）
-    const currentMyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
-    const healedHP = Math.min(currentMyHP + heal, gameState.initialArmyHP);
-    const actualHeal = healedHP - currentMyHP;
-    
-    if (army === 'A') {
-      gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
-    } else {
-      gameState.a_team_kills = Math.max(0, gameState.a_team_kills - actualHeal);
-    }
-
-    // 敵軍の火コイン消去
-    const enemyEraseColumn = `${enemyArmy.toLowerCase()}_fire_coin`;
+    // 敵軍の雷コイン消去
+    const enemyEraseColumn = `${enemyArmy.toLowerCase()}_thunder_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
+    message += `　💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
 
@@ -123,7 +126,6 @@ export async function execute(interaction) {
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
     message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
-    message += `　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${heal} 回復！**\n`;
     message += `.\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
     
     // 勝敗判定
@@ -215,9 +217,24 @@ export async function execute(interaction) {
 
         bobMessage += `\n\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
-        const bobDamage = bobAmount;
-        const bobHeal = bobAmount;
-        bobMessage += `　💧 水の治癒!: ${bobDamage}ダメージ + ${bobHeal}回復！\n`;
+        // BOBの土属性スキル（兵力比較）
+        const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+        const enemyHP = gameState.initialArmyHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+        
+        let multiplier;
+        let bobDamage;
+        if (myHP > enemyHP) {
+          multiplier = 3;
+          bobMessage += `　:rock: 優勢!怒れ大地!: ${bobAmount} × 3 = `;
+        } else if (myHP < enemyHP) {
+          multiplier = 1;
+          bobMessage += `　:rock: 劣勢!鎮まれ大地!: ${bobAmount} × 1 = `;
+        } else {
+          multiplier = 2;
+          bobMessage += `　:rock: 均衡!唸れ大地!: ${bobAmount} × 2 = `;
+        }
+        bobDamage = bobAmount * multiplier;
+        bobMessage += `${bobDamage}ダメージ！\n`;
 
         if (army === 'A') {
           gameState.a_team_kills += bobDamage;
@@ -228,20 +245,9 @@ export async function execute(interaction) {
         bobUser.total_kills += bobDamage;
         await bobUser.save();
 
-        // BOBの回復処理
-        const currentMyHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
-        const healedHP = Math.min(currentMyHP + bobHeal, gameState.initialArmyHP);
-        const actualHeal = healedHP - currentMyHP;
-        
-        if (army === 'A') {
-          gameState.b_team_kills = Math.max(0, gameState.b_team_kills - actualHeal);
-        } else {
-          gameState.a_team_kills = Math.max(0, gameState.a_team_kills - actualHeal);
-        }
-
-        const enemyEraseColumn = `${enemyArmy.toLowerCase()}_fire_coin`;
+        const enemyEraseColumn = `${enemyArmy.toLowerCase()}_thunder_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `　💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 
@@ -249,7 +255,6 @@ export async function execute(interaction) {
         const bHP = gameState.initialArmyHP - gameState.a_team_kills;
         
         bobMessage += `　　➡️ ${armyNames[enemyArmy]}に **${bobDamage}** ダメージ！\n`;
-        bobMessage += `　　➡️ :chocolate_bar: ${armyNames[army]}の兵力が **${bobHeal}** 回復！\n`;
         bobMessage += `.\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
       } else {
         await gameState.save();

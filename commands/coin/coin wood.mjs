@@ -128,6 +128,12 @@ export async function execute(interaction) {
     message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
     message += `.\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
     
+    // 勝敗判定
+    if (aHP <= 0 || bHP <= 0) {
+      const winner = aHP <= 0 ? 'B' : 'A';
+      message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
+    }
+    
     // 軍全体のコイン状況表示（スキル発動時のみ）
     const enemyArmyVar = army === 'A' ? 'B' : 'A';
     message += `-# >>> :coin: 各軍のコイン取得状況:\n`;
