@@ -56,7 +56,7 @@ export async function execute(interaction) {
     displayMessage += `\n### ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
   } else {
     acquired = 0;
-    displayMessage += ` ➡️ ざんねん、${acquired}枚**\n`;
+    displayMessage += `** ➡️ ざんねん、GETならず…\n`;
   }
     
   const before = gameState[coinColumn];
@@ -73,7 +73,7 @@ export async function execute(interaction) {
   message += displayMessage;
   message += acquired > 0
     ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : '.\n';
+    : ' ';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -141,9 +141,25 @@ export async function execute(interaction) {
     await gameState.save();
   }
   
+   // 軍全体のコイン状況表示（常時表示）
+   const enemyArmyVar = army === 'A' ? 'B' : 'A';
+   message += `\n-# >>> 【${armyNames[army]}のコイン状況】`;
+   message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
+   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
+   message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
+   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
+   message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
+    
+   message += `-# >>> 【${armyNames[enemyArmyVar]}のコイン状況】`;
+   message += `🔥 火: ${gameState[`${enemyArmyVar.toLowerCase()}_fire_coin`]}枚 `;
+   message += `🌲 木: ${gameState[`${enemyArmyVar.toLowerCase()}_wood_coin`]}枚 `;
+   message += `:rock: 土: ${gameState[`${enemyArmyVar.toLowerCase()}_earth_coin`]}枚 `;
+   message += `⚡ 雷: ${gameState[`${enemyArmyVar.toLowerCase()}_thunder_coin`]}枚 `;
+   message += `💧 水: ${gameState[`${enemyArmyVar.toLowerCase()}_water_coin`]}枚\n`;
+  
   // 個人戦績（獲得したら表示）
   if (acquired > 0){
-  message += `-# >>> 🏅戦績\n-# >>> ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
+  message += `-# >>> 🏅戦績 → ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
   message += `-# >>> 個人コイン取得 →　🔥火:${player.personal_fire_coin}枚/🌲木:${player.personal_wood_coin}枚/:rock:土:${player.personal_earth_coin}枚/⚡雷:${player.personal_thunder_coin}枚/💧水:${player.personal_water_coin}枚 \n`;
   }
   
