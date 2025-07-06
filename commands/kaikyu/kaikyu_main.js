@@ -143,13 +143,13 @@ export async function kaikyu_main(interaction) {
         const remainingHP_A = gameState.initialArmyHP - totalKillsB;
         const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
-        message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}`;
+        message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}\n`;
    
 
       } else if (countMode === 'up') {
-        message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}`;
+        message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}\n`;
       }
-      message += `-# >>> 🏅戦績 : ${UserArmyName} ${username}  階級:${player.rank}　　|　行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
+      message += `-# >>> 🏅戦績 : ${UserArmyName} ${username}  階級:${player.rank}　　|　行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**`;
       message += `.\n`;  
     }
     // カスタムメッセージ
@@ -199,10 +199,10 @@ export async function kaikyu_main(interaction) {
             const remainingHP_A = gameState.initialArmyHP - totalKillsB;
             const remainingHP_B = gameState.initialArmyHP - totalKillsA;
           
-            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}`;
+            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}\n`;
 
           } else if (countMode === 'up') {
-            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}`;
+            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}\n`;
           }
           bobMessage += `-# >>> 🏅戦績 : ${getArmyName(bobUser.army)} ${bobUser.username}  階級:${bobUser.rank}　　|　行動数: **${bobUser.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
         }
