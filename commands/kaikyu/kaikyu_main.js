@@ -27,7 +27,7 @@ function processKillWithRandom(currentRank) {
   const randomNum = Math.floor(Math.random() * 1000);
   const randomStr = randomNum.toString().padStart(3, '0'); // 3桁表示（001, 023など）
   
-  displayMessage += `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
+  displayMessage += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
   
   // 下2桁を取得
   const lastTwoDigits = randomNum % 100;
@@ -40,26 +40,26 @@ function processKillWithRandom(currentRank) {
     // 000の場合：軍神昇格 or 軍神時32撃破
     if (currentRank === specialRank) {
       kills = 32;
-      displayMessage += `### ✨ **000！軍神の超・超・大量撃破！** → **${kills}撃破**\n`;
+      displayMessage += ` ✨ **000！軍神の超・超・大量撃破！** → **${kills}撃破**\n`;
     } else {
       kills = 16;
       rankUp = true;
-      displayMessage += `### 🌟 **000！軍神昇格！** → **${kills}撃破**\n`;
+      displayMessage += ` 🌟 **000！軍神昇格！** → **${kills}撃破**\n`;
       return { newRank: specialRank, kills, rankUp, displayMessage };
     }
   } else if (firstDigit === secondDigit && secondDigit === thirdDigit && randomNum !== 0) {
     // 全桁ゾロ目（111-999）：大量撃破 + 通常昇格
     kills = largeKillCounts[currentRank] || 1;
     rankUp = true;
-    displayMessage += `### 🔥 **全桁ゾロ目！大量撃破！** 🔥  **${kills}撃破！** + **昇格！**\n`;
+    displayMessage += ` 🔥 **全桁ゾロ目！大量撃破！** 🔥  **${kills}撃破！** + **昇格！**\n`;
   } else if (secondDigit === thirdDigit) {
     // 下2桁ゾロ目：通常撃破
     kills = 1;
-    displayMessage += `### ➡️ **下2桁ゾロ目！**  **${kills}撃破！**\n`;
+    displayMessage += ` ➡️ **下2桁ゾロ目！**  **${kills}撃破！**\n`;
   } else {
     // ハズレ
     kills = 0;
-    displayMessage += `### ➡️ **ざんねん、${kills}撃破**\n`;
+    displayMessage += ` → ざんねん、${kills}撃破…\n`;
   }
   
   // 通常昇格処理（000以外の場合）
@@ -70,7 +70,7 @@ function processKillWithRandom(currentRank) {
   } else if (rankUp && currentIndex === ranks.length - 1) {
     // 既に元帥の場合は昇格しない
     rankUp = false;
-    displayMessage = displayMessage.replace(" + **昇格**", "");
+    displayMessage = displayMessage.replace(" + **昇進**", "");
   }
   
   return { newRank, kills, rankUp, displayMessage };
@@ -86,7 +86,7 @@ export async function kaikyu_main(interaction) {
     const countMode = await getCountMode();
 
     if (!player) {
-      return await interaction.reply('エラー: まず /kaikyu で軍と階級を決めてください。');
+      return await interaction.reply('エラー: まず /start で軍と階級を決めてください。');
     }
 
     // 撃破処理（乱数表示版）
@@ -132,15 +132,11 @@ export async function kaikyu_main(interaction) {
     
     // 昇格メッセージ
     if (rankUp) {
-      message += `## 🔥階級昇格！🔥 \n **新階級: ${player.rank}** へ昇格！\n\n`;
+      message += `## 🔥階級昇格！🔥 \n **新階級: ${player.rank}** へ昇格！\n`;
     }
     
     // 戦績表示
-    message += `-# >>> 🏅戦績\n`;
-    message += `-# >>> ${UserArmyName} ${username}  階級:${player.rank}\n`;
-    message += `-# >>> 攻撃数: **${player.gekiha_counts}回** `;
-    message += `　撃破数: **${player.total_kills}撃破**\n`;
-    //message += `-# >>> -\n`;
+    message += `-# >>> 🏅戦績 : ${UserArmyName} ${username}  階級:${player.rank} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**`;
     
     // 戦況表示
     if (countMode === 'down') {
@@ -148,10 +144,12 @@ export async function kaikyu_main(interaction) {
       const remainingHP_A = gameState.initialArmyHP - totalKillsB;
       const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
-      message += `-# >>> :crossed_swords:  現在の戦況:\n`;
-      message += `-# >>> :yellow_circle: ${armyNameA} 残存兵力: ${remainingHP_A}\n`;
-      message += `-# >>> :green_circle: ${armyNameB} 残存兵力: ${remainingHP_B}\n`;
+      message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}\n`;
+
     } else if (countMode === 'up') {
+      
+      message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}\n`;
+
       message += `-# >>> :crossed_swords:  現在の戦況:\n`;
       message += `-# >>> :yellow_circle: ${armyNameA}: 総${totalKillsA}撃破\n`;
       message += `-# >>> :green_circle: ${armyNameB}: 総${totalKillsB}撃破\n`;
@@ -159,6 +157,7 @@ export async function kaikyu_main(interaction) {
     
     // カスタムメッセージ
     if (customMessage) {
+      message += `.\n`; 
       message += `\`\`\`${customMessage}\`\`\`\n`;
     }
     
