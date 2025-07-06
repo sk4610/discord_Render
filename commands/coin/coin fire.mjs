@@ -106,18 +106,18 @@ export async function execute(interaction) {
     message += `　-# 💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
-    
-    // 勝敗判定
-    if (aHP <= 0 || bHP <= 0) {
-      const winner = aHP <= 0 ? 'B' : 'A';
-      message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
-    }
-    
+       
     // 戦況表示（スキル発動時のみ）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
     message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
+    // 勝敗判定
+    if (aHP <= 0 || bHP <= 0) {
+      const winner = aHP <= 0 ? 'B' : 'A';
+      message += `🎉 **${armyNames[winner]}が勝利しました！**\n`;
+    }
+    
     message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
 
 
@@ -236,7 +236,7 @@ export async function execute(interaction) {
         const bHP = gameState.initialArmyHP - gameState.a_team_kills;
         
         bobMessage += `　　➡️ ${armyNames[enemyArmy]}に **${bobDamage}** ダメージ！\n`;
-        bobMessage += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} \n-# >>> :green_circle: ${armyNames.B} 兵力${bHP}\n`;
+        bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
       } else {
         await gameState.save();
       }
@@ -244,7 +244,7 @@ export async function execute(interaction) {
       // BOBの戦績表示（獲得時）
       if (bobAcquired > 0){
         bobMessage += `\n-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
-        bobMessage += `-# >>> 個人コイン取得 →　🔥火:${bobUser.personal_fire_coin}枚/🌲木:${bobUser.personal_wood_coin}枚/:rock:土:${bobUser.personal_earth_coin}枚/⚡雷:${bobUser.personal_thunder_coin}枚/💧水:${bobUser.personal_water_coin}枚 \n`;
+        bobMessage += `-# >>> 個人コイン取得 →　火:${bobUser.personal_fire_coin}枚/木:${bobUser.personal_wood_coin}枚/土:${bobUser.personal_earth_coin}枚/雷:${bobUser.personal_thunder_coin}枚/水:${bobUser.personal_water_coin}枚 \n`;
         
       }
 
