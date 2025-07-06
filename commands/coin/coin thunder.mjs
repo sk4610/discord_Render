@@ -87,7 +87,7 @@ export async function execute(interaction) {
     
     // 雷属性スキル（偶奇判定）
     const rand = Math.floor(Math.random() * 100) + 1;
-    message += `　-# 雷スキル判定: ${rand} \n`;
+    message += `-# 　雷スキル判定: ${rand} \n`;
     
     let damage = 0;
     if (rand % 2 === 0) {
@@ -117,12 +117,7 @@ export async function execute(interaction) {
 
     await gameState.save();
 
-    // 勝敗判定
-    if (aHP <= 0 || bHP <= 0) {
-      const winner = aHP <= 0 ? 'B' : 'A';
-      message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
-    }
-    
+  
     // 戦況表示（スキル発動時のみ）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
@@ -130,6 +125,12 @@ export async function execute(interaction) {
     if (damage > 0) {
       message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
     }
+    // 勝敗判定
+    if (aHP <= 0 || bHP <= 0) {
+      const winner = aHP <= 0 ? 'B' : 'A';
+      message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
+    }
+    
     message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
 
   } else {
@@ -222,7 +223,7 @@ export async function execute(interaction) {
         
         // BOBの雷属性スキル（偶奇判定）
         const bobRand = Math.floor(Math.random() * 100) + 1;
-        bobMessage += `　-# 雷スキル判定: ${bobRand} \n`;
+        bobMessage += `-# 　雷スキル判定: ${bobRand} \n`;
         
         let bobDamage = 0;
         if (bobRand % 2 === 0) {
