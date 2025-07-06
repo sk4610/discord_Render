@@ -56,7 +56,7 @@ export async function execute(interaction) {
     displayMessage += ` ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
   } else {
     acquired = 0;
-    displayMessage += ` ➡️ ざんねん、GETならず…\n`;
+    displayMessage += ` → ざんねん、GETならず…\n`;
   }
     
   const before = gameState[coinColumn];
@@ -138,17 +138,18 @@ export async function execute(interaction) {
    message += `🌲 木: ${gameState[`${enemyArmyVar.toLowerCase()}_wood_coin`]}枚 `;
    message += `:rock: 土: ${gameState[`${enemyArmyVar.toLowerCase()}_earth_coin`]}枚 `;
    message += `⚡ 雷: ${gameState[`${enemyArmyVar.toLowerCase()}_thunder_coin`]}枚 `;
-   message += `💧 水: ${gameState[`${enemyArmyVar.toLowerCase()}_water_coin`]}枚\n`;
+   message += `💧 水: ${gameState[`${enemyArmyVar.toLowerCase()}_water_coin`]}枚`;
   
   // 個人戦績（獲得したら表示）
   if (acquired > 0){
-  message += `-# >>> 🏅戦績 → ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
-  message += `-# >>> 個人コイン取得 →　🔥火:${player.personal_fire_coin}枚/🌲木:${player.personal_wood_coin}枚/:rock:土:${player.personal_earth_coin}枚/⚡雷:${player.personal_thunder_coin}枚/💧水:${player.personal_water_coin}枚 `;
+  message += `\n-# >>> 🏅戦績 → ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
+  message += `-# >>> 個人コイン取得 →　火:${player.personal_fire_coin}枚/木:${player.personal_wood_coin}枚/土:${player.personal_earth_coin}枚/雷:${player.personal_thunder_coin}枚/水:${player.personal_water_coin}枚 `;
   }
   
   // カスタムメッセージ
   if (customMessage) {
-    message += ` \`\`\`${customMessage}\`\`\``;
+    message += `.\n`; 
+    message += `\`\`\`${customMessage}\`\`\``;
   }
   
   await interaction.editReply(message);
