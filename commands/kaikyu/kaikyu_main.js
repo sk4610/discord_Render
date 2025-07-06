@@ -144,14 +144,13 @@ export async function kaikyu_main(interaction) {
         const remainingHP_B = gameState.initialArmyHP - totalKillsA;
       
         message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}`;
-        message += `.\n`;     
+   
 
       } else if (countMode === 'up') {
         message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}`;
-        message += `.\n`;         
       }
       message += `-# >>> 🏅戦績 : ${UserArmyName} ${username}  階級:${player.rank}　　|　行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
-
+      message += `.\n`;  
     }
     // カスタムメッセージ
     if (customMessage) {
@@ -192,23 +191,22 @@ export async function kaikyu_main(interaction) {
           bobMessage += `### 🔥階級昇格！🔥  **新階級: ${bobUser.rank}** へ昇格！\n`;
         }
         // 戦績表示(撃破時)
-        if(kills > 0){   
-        bobMessage += `-# >>> 🏅戦績 : ${getArmyName(bobUser.army)} ${bobUser.username}  階級:${bobUser.rank}　　|　行動数: **${bobUser.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
-
-        
+        if(bobKills > 0){   
+       
         // BOBの戦況表示
-        if (countMode === 'down') {
-          const gameState = await GameState.findOne({ where: { id: 1 } });
-          const remainingHP_A = gameState.initialArmyHP - totalKillsB;
-          const remainingHP_B = gameState.initialArmyHP - totalKillsA;
+          if (countMode === 'down') {
+            const gameState = await GameState.findOne({ where: { id: 1 } });
+            const remainingHP_A = gameState.initialArmyHP - totalKillsB;
+            const remainingHP_B = gameState.initialArmyHP - totalKillsA;
           
-          bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}`;
+            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${remainingHP_A} 　|　 :green_circle: ${armyNameB} 兵力${remainingHP_B}`;
 
-        } else if (countMode === 'up') {
-          bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}`;
+          } else if (countMode === 'up') {
+            bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}`;
+          }
+          bobMessage += `-# >>> 🏅戦績 : ${getArmyName(bobUser.army)} ${bobUser.username}  階級:${bobUser.rank}　　|　行動数: **${bobUser.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
         }
-        
-        await interaction.followUp(bobMessage);
+          await interaction.followUp(bobMessage);
       }
     }
     
