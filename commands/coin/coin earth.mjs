@@ -269,7 +269,7 @@ export async function execute(interaction) {
       
       // BOBの戦績表示（獲得時）
       if (bobAcquired > 0){
-        bobMessage += `\n-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
+        bobMessage += `\n-# >>> 🏅戦績（BOB）: ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
         bobMessage += `-# >>> 個人コイン取得 →　火:${bobUser.personal_fire_coin}枚/木:${bobUser.personal_wood_coin}枚/土:${bobUser.personal_earth_coin}枚/雷:${bobUser.personal_thunder_coin}枚/水:${bobUser.personal_water_coin}枚 \n`;
         
       }
