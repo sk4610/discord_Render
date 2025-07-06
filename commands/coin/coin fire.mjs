@@ -71,9 +71,9 @@ export async function execute(interaction) {
   
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
   message += displayMessage;
-  message += acquired > 0
-    ? ` **${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)**\n`
-    : '\n';
+  if (acquired > 0) {
+    message += `** ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)**\n`;
+  }
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -143,12 +143,12 @@ export async function execute(interaction) {
   // 個人戦績（獲得したら表示）
   if (acquired > 0){
   message += `-# >>> 🏅戦績 → ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
-  message += `-# >>> 個人コイン取得 →　🔥火:${player.personal_fire_coin}枚/🌲木:${player.personal_wood_coin}枚/:rock:土:${player.personal_earth_coin}枚/⚡雷:${player.personal_thunder_coin}枚/💧水:${player.personal_water_coin}枚 \n`;
+  message += `-# >>> 個人コイン取得 →　🔥火:${player.personal_fire_coin}枚/🌲木:${player.personal_wood_coin}枚/:rock:土:${player.personal_earth_coin}枚/⚡雷:${player.personal_thunder_coin}枚/💧水:${player.personal_water_coin}枚 `;
   }
   
   // カスタムメッセージ
   if (customMessage) {
-    message += ` \`\`\`${customMessage}\`\`\`\n`;
+    message += ` \`\`\`${customMessage}\`\`\``;
   }
   
   await interaction.editReply(message);
