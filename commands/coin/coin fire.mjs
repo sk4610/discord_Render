@@ -83,12 +83,12 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 火属性スキル
     const damage = amount * 2;
     const eraseTarget = 'wood';
-    message += `　-# 🔥 燃え盛る炎: ${amount} × 2 = ${damage}ダメージ！\n`;
+    message += `-# 　🔥 燃え盛る炎: ${amount} × 2 = ${damage}ダメージ！\n`;
 
     // ダメージ処理
     if (army === 'A') {
@@ -103,7 +103,7 @@ export async function execute(interaction) {
     // 敵軍の木コイン消去
     const enemyEraseColumn = `${enemyArmy.toLowerCase()}_wood_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　-# 💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
+    message += `-# 　💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
        
@@ -209,10 +209,10 @@ export async function execute(interaction) {
         const enemyArmy = army === 'A' ? 'B' : 'A';
         const bobAmount = bobAfter;
 
-        bobMessage += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+        bobMessage += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
         const bobDamage = bobAmount * 2;
-        bobMessage += `　-# 🔥 燃え盛る炎: ${bobAmount} × 2 = ${bobDamage}ダメージ！\n`;
+        bobMessage += `-# 　🔥 燃え盛る炎: ${bobAmount} × 2 = ${bobDamage}ダメージ！\n`;
 
         // BOBのダメージ処理
         if (army === 'A') {
@@ -227,7 +227,7 @@ export async function execute(interaction) {
         // BOBの敵軍コイン消去
         const enemyEraseColumn = `${enemyArmy.toLowerCase()}_wood_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　-# 💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `-# 　💨 ${armyNames[enemyArmy]}の**【木】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 

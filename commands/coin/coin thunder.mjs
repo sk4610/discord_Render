@@ -83,7 +83,7 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 雷属性スキル（偶奇判定）
     const rand = Math.floor(Math.random() * 100) + 1;
@@ -92,10 +92,10 @@ export async function execute(interaction) {
     let damage = 0;
     if (rand % 2 === 0) {
       damage = amount * 4;
-      message += `　　-# 偶数 → ⚡ **成功！轟雷!: ${damage}ダメージ！**\n`;
+      message += `-# 　　偶数 → ⚡ **成功！轟雷!: ${damage}ダメージ！**\n`;
     } else {
       damage = 0;
-      message += `　　-# 奇数 → 発動失敗..（0ダメージ）\n`;
+      message += `-# 　　奇数 → 発動失敗..（0ダメージ）\n`;
     }
 
     // ダメージ処理
@@ -113,7 +113,7 @@ export async function execute(interaction) {
     // 敵軍の水コイン消去
     const enemyEraseColumn = `${enemyArmy.toLowerCase()}_water_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　-# 💨 ${armyNames[enemyArmy]}の**【水】コイン**を全て吹き飛ばした！\n`;
+    message += `-# 　💨 ${armyNames[enemyArmy]}の**【水】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
 
@@ -218,7 +218,7 @@ export async function execute(interaction) {
         const enemyArmy = army === 'A' ? 'B' : 'A';
         const bobAmount = bobAfter;
 
-        bobMessage += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+        bobMessage += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
         // BOBの雷属性スキル（偶奇判定）
         const bobRand = Math.floor(Math.random() * 100) + 1;
@@ -227,10 +227,10 @@ export async function execute(interaction) {
         let bobDamage = 0;
         if (bobRand % 2 === 0) {
           bobDamage = bobAmount * 4;
-          bobMessage += `　　-# 偶数 → ⚡ **成功！轟雷!: ${bobDamage}ダメージ！**\n`;
+          bobMessage += `-# 　　偶数 → ⚡ **成功！轟雷!: ${bobDamage}ダメージ！**\n`;
         } else {
           bobDamage = 0;
-          bobMessage += `　　-# 奇数 → 発動失敗..（0ダメージ）\n`;
+          bobMessage += `-# 　　奇数 → 発動失敗..（0ダメージ）\n`;
         }
 
         if (bobDamage > 0) {
@@ -246,7 +246,7 @@ export async function execute(interaction) {
 
         const enemyEraseColumn = `${enemyArmy.toLowerCase()}_water_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　-# 💨 ${armyNames[enemyArmy]}の**【水】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `-# 　💨 ${armyNames[enemyArmy]}の**【水】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 

@@ -83,7 +83,7 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 土属性スキル（兵力比較・木と逆）
     const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
@@ -93,13 +93,13 @@ export async function execute(interaction) {
     let damage;
     if (myHP > enemyHP) {
       multiplier = 3;
-      message += `　-# :rock: 優勢!怒れ大地!: ${amount} × 3 = `;
+      message += `-# 　:rock: 優勢!怒れ大地!: ${amount} × 3 = `;
     } else if (myHP < enemyHP) {
       multiplier = 1;
-      message += `　-# :rock: 劣勢!鎮まれ大地!: ${amount} × 1 = `;
+      message += `-# 　:rock: 劣勢!鎮まれ大地!: ${amount} × 1 = `;
     } else {
       multiplier = 2;
-      message += `　-# :rock: 均衡!唸れ大地!: ${amount} × 2 = `;
+      message += `-# 　:rock: 均衡!唸れ大地!: ${amount} × 2 = `;
     }
     damage = amount * multiplier;
     message += `${damage}ダメージ！\n`;
@@ -117,7 +117,7 @@ export async function execute(interaction) {
     // 敵軍の雷コイン消去
     const enemyEraseColumn = `${enemyArmy.toLowerCase()}_thunder_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　-# 💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
+    message += `-# 　💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
 
@@ -222,7 +222,7 @@ export async function execute(interaction) {
         const enemyArmy = army === 'A' ? 'B' : 'A';
         const bobAmount = bobAfter;
 
-        bobMessage += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+        bobMessage += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
         // BOBの土属性スキル（兵力比較）
         const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
@@ -232,13 +232,13 @@ export async function execute(interaction) {
         let bobDamage;
         if (myHP > enemyHP) {
           multiplier = 3;
-          bobMessage += `　-# :rock: 優勢!怒れ大地!: ${bobAmount} × 3 = `;
+          bobMessage += `-# 　:rock: 優勢!怒れ大地!: ${bobAmount} × 3 = `;
         } else if (myHP < enemyHP) {
           multiplier = 1;
-          bobMessage += `　-# :rock: 劣勢!鎮まれ大地!: ${bobAmount} × 1 = `;
+          bobMessage += `-# 　:rock: 劣勢!鎮まれ大地!: ${bobAmount} × 1 = `;
         } else {
           multiplier = 2;
-          bobMessage += `　-# :rock: 均衡!唸れ大地!: ${bobAmount} × 2 = `;
+          bobMessage += `-# 　:rock: 均衡!唸れ大地!: ${bobAmount} × 2 = `;
         }
         bobDamage = bobAmount * multiplier;
         bobMessage += `${bobDamage}ダメージ！\n`;
@@ -254,7 +254,7 @@ export async function execute(interaction) {
 
         const enemyEraseColumn = `${enemyArmy.toLowerCase()}_thunder_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　-# 💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `-# 　💨 ${armyNames[enemyArmy]}の**【雷】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 

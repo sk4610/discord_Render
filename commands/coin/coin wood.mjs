@@ -84,7 +84,7 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 木属性スキル（兵力比較）
     const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
@@ -94,13 +94,13 @@ export async function execute(interaction) {
     let damage;
     if (myHP < enemyHP) {
       multiplier = 3;
-      message += `　-# 🌲 劣勢!反撃の木!: ${amount} × 3 = `;
+      message += `-# 　🌲 劣勢!反撃の木!: ${amount} × 3 = `;
     } else if (myHP > enemyHP) {
       multiplier = 1;
-      message += `　-# 🌲 優勢!とどめの木!: ${amount} × 1 = `;
+      message += `-# 　🌲 優勢!とどめの木!: ${amount} × 1 = `;
     } else {
       multiplier = 2;
-      message += `　-# 🌲 均衡!加勢の木!: ${amount} × 2 = `;
+      message += `-# 　🌲 均衡!加勢の木!: ${amount} × 2 = `;
     }
     damage = amount * multiplier;
     message += `${damage}ダメージ！\n`;
@@ -118,7 +118,7 @@ export async function execute(interaction) {
     // 敵軍の土コイン消去
     const enemyEraseColumn = `${enemyArmy.toLowerCase()}_earth_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　-# 💨 ${armyNames[enemyArmy]}の**【土】コイン**を全て吹き飛ばした！\n`;
+    message += `-# 　💨 ${armyNames[enemyArmy]}の**【土】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
 
@@ -221,7 +221,7 @@ export async function execute(interaction) {
         const enemyArmy = army === 'A' ? 'B' : 'A';
         const bobAmount = bobAfter;
 
-        bobMessage += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+        bobMessage += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
         // BOBの木属性スキル（兵力比較）
         const myHP = gameState.initialArmyHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
@@ -231,13 +231,13 @@ export async function execute(interaction) {
         let bobDamage;
         if (myHP < enemyHP) {
           multiplier = 3;
-          bobMessage += `　-# 🌲 劣勢!反撃の木!: ${bobAmount} × 3 = `;
+          bobMessage += `-# 　🌲 劣勢!反撃の木!: ${bobAmount} × 3 = `;
         } else if (myHP > enemyHP) {
           multiplier = 1;
-          bobMessage += `　-# 🌲 優勢!とどめの木!: ${bobAmount} × 1 = `;
+          bobMessage += `-# 　🌲 優勢!とどめの木!: ${bobAmount} × 1 = `;
         } else {
           multiplier = 2;
-          bobMessage += `　-# 🌲 均衡!加勢の木!: ${bobAmount} × 2 = `;
+          bobMessage += `-# 　🌲 均衡!加勢の木!: ${bobAmount} × 2 = `;
         }
         bobDamage = bobAmount * multiplier;
         bobMessage += `${bobDamage}ダメージ！\n`;
@@ -253,7 +253,7 @@ export async function execute(interaction) {
 
         const enemyEraseColumn = `${enemyArmy.toLowerCase()}_earth_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　-# 💨 ${armyNames[enemyArmy]}の**【土】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `-# 　💨 ${armyNames[enemyArmy]}の**【土】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 

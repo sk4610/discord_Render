@@ -83,12 +83,12 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 水属性スキル（ダメージ + 回復）
     const damage = amount;
     const heal = amount;
-    message += `　-# 💧 水の治癒!: ${damage}ダメージ + ${heal}回復！\n`;
+    message += `-# 　💧 水の治癒!: ${damage}ダメージ + ${heal}回復！\n`;
 
     // ダメージ処理
     if (army === 'A') {
@@ -114,7 +114,7 @@ export async function execute(interaction) {
     // 敵軍の火コイン消去
     const enemyEraseColumn = `${enemyArmy.toLowerCase()}_fire_coin`;
     gameState[enemyEraseColumn] = 0;
-    message += `　-# 💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
+    message += `-# 　💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
 
     await gameState.save();
 
@@ -217,11 +217,11 @@ export async function execute(interaction) {
         const enemyArmy = army === 'A' ? 'B' : 'A';
         const bobAmount = bobAfter;
 
-        bobMessage += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
+        bobMessage += `### :boom: **${armyNames[army]}の${elementName}属性スキル発動！（BOB）** (${bobAmount}枚) :boom: \n`;
         
         const bobDamage = bobAmount;
         const bobHeal = bobAmount;
-        bobMessage += `　-# 💧 水の治癒!: ${bobDamage}ダメージ + ${bobHeal}回復！\n`;
+        bobMessage += `-# 　💧 水の治癒!: ${bobDamage}ダメージ + ${bobHeal}回復！\n`;
 
         if (army === 'A') {
           gameState.a_team_kills += bobDamage;
@@ -245,7 +245,7 @@ export async function execute(interaction) {
 
         const enemyEraseColumn = `${enemyArmy.toLowerCase()}_fire_coin`;
         gameState[enemyEraseColumn] = 0;
-        bobMessage += `　-# 💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
+        bobMessage += `-# 　💨 ${armyNames[enemyArmy]}の**【火】コイン**を全て吹き飛ばした！\n`;
 
         await gameState.save();
 
