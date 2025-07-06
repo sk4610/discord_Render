@@ -72,7 +72,7 @@ export async function execute(interaction) {
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
   message += displayMessage;
   if (acquired > 0) {
-    message += `** ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)**\n`;
+    message += `-# ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`;
   }
 
   // --- スキル発動チェック ---
@@ -112,7 +112,7 @@ export async function execute(interaction) {
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
     message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
-    message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
+    message += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
@@ -142,8 +142,8 @@ export async function execute(interaction) {
   
   // 個人戦績（獲得したら表示）
   if (acquired > 0){
-  message += `\n-# >>> 🏅戦績 → ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
-  message += `-# >>> 個人コイン取得 →　火:${player.personal_fire_coin}枚/木:${player.personal_wood_coin}枚/土:${player.personal_earth_coin}枚/雷:${player.personal_thunder_coin}枚/水:${player.personal_water_coin}枚 `;
+  message += `\n-# >>> 🏅戦績 : ${armyNames[army]} ${username}   行動数: **${player.gekiha_counts}回**　撃破数: **${player.total_kills}撃破**\n`;
+  message += `-# >>> 　個人コイン取得 →　火:${player.personal_fire_coin}枚/木:${player.personal_wood_coin}枚/土:${player.personal_earth_coin}枚/雷:${player.personal_thunder_coin}枚/水:${player.personal_water_coin}枚 `;
   }
   
   // カスタムメッセージ
