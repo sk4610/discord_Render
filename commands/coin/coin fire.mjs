@@ -42,7 +42,7 @@ export async function execute(interaction) {
   const randomStr = randomNum.toString().padStart(3, '0');
   
   let acquired = 0;
-  let displayMessage = `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__`;
+  let displayMessage = `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
   
   const firstDigit = Math.floor(randomNum / 100);
   const secondDigit = Math.floor((randomNum % 100) / 10);
@@ -50,13 +50,13 @@ export async function execute(interaction) {
   
   if (firstDigit === secondDigit && secondDigit === thirdDigit) {
     acquired = 5;
-    displayMessage += `\n### 🌟 **全桁ゾロ目！大量取得！** 🌟  **${acquired}枚GET!**\n`;
+    displayMessage += ` 🌟 **全桁ゾロ目！大量取得！** 🌟  **${acquired}枚GET!**\n`;
   } else if (secondDigit === thirdDigit) {
     acquired = 1;
-    displayMessage += `\n### ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
+    displayMessage += ` ➡️ **下2桁ゾロ目！**  **${acquired}枚GET!**\n`;
   } else {
     acquired = 0;
-    displayMessage += `** ➡️ ざんねん、GETならず…\n`;
+    displayMessage += ` ➡️ ざんねん、GETならず…\n`;
   }
     
   const before = gameState[coinColumn];
@@ -72,8 +72,8 @@ export async function execute(interaction) {
   let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【${elementName}】コイン獲得判定！\n`;
   message += displayMessage;
   message += acquired > 0
-    ? `### ${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)\n`
-    : ' ';
+    ? ` **${armyNames[army]}　${elementName}属性コイン ${acquired}枚獲得！(${before} → ${after}枚)**\n`
+    : '\n';
 
   // --- スキル発動チェック ---
   const beforeMultiple = Math.floor(before / 5);
@@ -83,7 +83,7 @@ export async function execute(interaction) {
     const enemyArmy = army === 'A' ? 'B' : 'A';
     const amount = after;
     
-    message += `\n\n## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
+    message += `## :boom: **${armyNames[army]}の${elementName}属性スキル発動！** (${amount}枚) :boom: \n`;
     
     // 火属性スキル
     const damage = amount * 2;
@@ -112,30 +112,13 @@ export async function execute(interaction) {
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
     
     message += `　　➡️ ${armyNames[enemyArmy]}に **${damage} ダメージ！**\n`;
-    message += `.\n-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
+    message += `-# >>> :crossed_swords:  現在の戦況:\n-# >>> :yellow_circle: ${armyNames.A} 兵力${aHP} 　|　 :green_circle: ${armyNames.B} 兵力${bHP}\n`;
 
     // 勝敗判定
     if (aHP <= 0 || bHP <= 0) {
       const winner = aHP <= 0 ? 'B' : 'A';
       message += `\n🎉 **${armyNames[winner]}が勝利しました！**\n`;
-    }
-    
-    // 軍全体のコイン状況表示（スキル発動時のみ）
-    const enemyArmyVar = army === 'A' ? 'B' : 'A';
-    message += `-# >>> :coin: 各軍のコイン取得状況:\n`;
-    message += `-# >>> 【${armyNames[army]}】`;
-    message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
-    message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
-    message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
-    message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
-    message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
-    
-    message += `-# >>> 【${armyNames[enemyArmyVar]}】`;
-    message += `🔥 火: ${gameState[`${enemyArmyVar.toLowerCase()}_fire_coin`]}枚 `;
-    message += `🌲 木: ${gameState[`${enemyArmyVar.toLowerCase()}_wood_coin`]}枚 `;
-    message += `:rock: 土: ${gameState[`${enemyArmyVar.toLowerCase()}_earth_coin`]}枚 `;
-    message += `⚡ 雷: ${gameState[`${enemyArmyVar.toLowerCase()}_thunder_coin`]}枚 `;
-    message += `💧 水: ${gameState[`${enemyArmyVar.toLowerCase()}_water_coin`]}枚\n`;
+    } 
   } else {
     // スキル発動なしの場合は保存のみ
     await gameState.save();
@@ -143,7 +126,7 @@ export async function execute(interaction) {
   
    // 軍全体のコイン状況表示（常時表示）
    const enemyArmyVar = army === 'A' ? 'B' : 'A';
-   message += `\n-# >>> 【${armyNames[army]}のコイン状況】`;
+   message += `-# >>> 【${armyNames[army]}のコイン状況】`;
    message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
    message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
    message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
@@ -213,7 +196,7 @@ export async function execute(interaction) {
       bobMessage += bobDisplayMessage;
       bobMessage += bobAcquired > 0
         ? `### ${armyNames[army]}　${elementName}属性コイン ${bobAcquired}枚獲得！(${bobBefore} → ${bobAfter}枚)\n`
-        : '### ざんねん！GETならず…\n';
+        : '\n';
 
       // BOBのスキル発動チェック
       const bobBeforeMultiple = Math.floor(bobBefore / 5);
@@ -255,7 +238,7 @@ export async function execute(interaction) {
         await gameState.save();
       }
       
-      // BOBの戦績表示（常時）
+      // BOBの戦績表示（獲得時）
       if (bobAcquired > 0){
         bobMessage += `-# >>> 🏅戦績（BOB）\n-# >>> ${armyNames[army]} ${bobUser.username}   行動数: **${bobUser.gekiha_counts}回**　撃破数: **${bobUser.total_kills}撃破**\n`;
         bobMessage += `-# >>> 個人コイン取得 →　🔥火:${bobUser.personal_fire_coin}枚/🌲木:${bobUser.personal_wood_coin}枚/:rock:土:${bobUser.personal_earth_coin}枚/⚡雷:${bobUser.personal_thunder_coin}枚/💧水:${bobUser.personal_water_coin}枚 \n`;
