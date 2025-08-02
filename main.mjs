@@ -18,7 +18,12 @@ const youtubei = new Youtubei();
 
 let postCount = 0;
 const app = express();
-app.listen(3000);
+// JSON リクエストのパースが必要な場合はミドルウェアを追加
+app.use(express.json());
+
+// Render 環境では process.env.PORT を利用
+const PORT = process.env.PORT || 3000;
+
 app.post('/', function(req, res) {
   console.log(`Received POST request.`);
   
@@ -28,11 +33,15 @@ app.post('/', function(req, res) {
     postCount = 0;
   }
   
-  res.send('POST response by glitch');
+  res.send('POST response by Render webhook');
 })
 app.get('/', function(req, res) {
   res.send('<a href="https://note.com/exteoi/n/n0ea64e258797</a> に解説があります。');
-})
+});
+// 指定されたポートでサーバを起動
+app.listen(PORT, () => {
+  console.log(`Express server is running on port ${PORT}`);
+});
 
 const client = new Client({
   intents: [
