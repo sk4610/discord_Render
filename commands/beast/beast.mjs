@@ -89,7 +89,7 @@ async function executeBeastDuel(interaction) {
   const armyA = eligibleBeasts.filter(b => b.army === 'A');
   const armyB = eligibleBeasts.filter(b => b.army === 'B');
   
-  let duelMessage = `🏟️ **第${currentRound + 1}回 ビースト決闘開始！** 🏟️\n`;
+  let duelMessage = ` **第${currentRound + 1}回 ビースト決闘開始！** \n`;
   duelMessage += `決闘開始！〇なら勝利、×なら敗北、△なら相打ち、☆なら直接攻撃だ！\n\n`;
   
   const minLength = Math.min(armyA.length, armyB.length);
@@ -266,11 +266,11 @@ export async function execute(interaction) {
     
     if (player.beast_name && !player.beast_is_active) {
       // 復活メッセージ
-      message += `\n### :dragon_face:  新しいビースト **${finalBeastName}** が復活！ATK: ${newATK}\n`;
-      message += `\n### :angel: 前のビースト "${player.beast_name}" は戦闘不能でした\n`;
+      message += `\n** :dragon_face:  新しいビースト "${finalBeastName}" が復活！ATK: ${newATK}**\n`;
+      message += `\n** :angel: 前のビースト "${player.beast_name}" は戦闘不能でした**\n`;
     } else {
       // 初回メッセージ
-      message += `\n### :dragon_face:  初のビースト **${finalBeastName}** が誕生！ATK: ${newATK}\n`;
+      message += `\n** :dragon_face:  初のビースト "${finalBeastName}" が誕生！ATK: ${newATK}**\n`;
     }
   } else {
     // 行動判定
@@ -283,7 +283,7 @@ export async function execute(interaction) {
     // ビーストブレイク処理
     if (action.type === 'beast_break') {
       breakResult = await executeBeastBreak(army);
-      message += `### ${breakResult}\n`;
+      message += `** ${breakResult}**\n`;
     }
     
     // ATKアップ処理（修正：変化前の値を保存）
@@ -294,7 +294,7 @@ export async function execute(interaction) {
         beast_atk: newATK,
         beast_has_fed: true 
       });
-      message += `** 🍖 ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！**\n`;
+      message += `** :up: ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！**\n`;
     }
     
     // 撃破処理
