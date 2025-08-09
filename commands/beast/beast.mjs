@@ -89,8 +89,8 @@ async function executeBeastDuel(interaction) {
   const armyA = eligibleBeasts.filter(b => b.army === 'A');
   const armyB = eligibleBeasts.filter(b => b.army === 'B');
   
-  let duelMessage = ` ### 🏟️*第${currentRound + 1}回 ビースト決闘開始！🏟️ \n`;
-  duelMessage += `決闘開始！⭕なら勝利、❌なら敗北、❗なら相打ち、⭐なら直接攻撃だ！\n⚔️ **決闘**\n`;
+  let duelMessage = ` ## 🏟️ 第${currentRound + 1}回 ビースト決闘開始！ \n`;
+  duelMessage += `-# 決闘開始！⭕なら勝利, ❌なら敗北, ❗なら相打ち, ⭐なら直接攻撃だ！\n\n⚔️ **決闘**\n`;
   
   const minLength = Math.min(armyA.length, armyB.length);
   let totalDamageA = 0;
@@ -115,19 +115,19 @@ async function executeBeastDuel(interaction) {
       totalDamageB += damage;
       beastB.beast_is_active = false;
       await beastB.save();
-      result = `⭕  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})❌ → ${armyNames.B}へ${damage}ダメージ`;
+      result = `⭕ :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk})  vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) ❌ → ${armyNames.A}勝利! ${damage}撃破!`;
     } else if (beastB.beast_atk > beastA.beast_atk) {
       const damage = beastB.beast_atk - beastA.beast_atk;
       totalDamageA += damage;
       beastA.beast_is_active = false;
       await beastA.save();
-      result = `❌  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})⭕ → ${armyNames.A}へ${damage}ダメージ`;
+      result = `❌ :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk})  vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) ⭕ → ${armyNames.B}勝利! ${damage}撃破!`;
     } else {
       beastA.beast_is_active = false;
       beastB.beast_is_active = false;
       await beastA.save();
       await beastB.save();
-      result = `❗  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})❗ → 相打ち！`;
+      result = `❗ :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk})  vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) ❗ → 相打ち！`;
     }
     
     duelMessage += result + '\n';
@@ -164,11 +164,11 @@ async function executeBeastDuel(interaction) {
   const bHP_after = gameState.initialArmyHP - gameState.a_team_kills;
   
   // 決闘結果サマリー
-  duelMessage += `\n 💥 **決闘結果**\n`;
+  duelMessage += `\n**・決闘結果**\n`;
   duelMessage += `${armyNames.A}への被害: ${totalDamageA}\n`;
   duelMessage += `${armyNames.B}への被害: ${totalDamageB}\n\n`;
-  duelMessage += `【:yellow_circle: ${armyNames.A} 兵力】${aHP_before}⇒${aHP_after}\n`;
-  duelMessage += `【:green_circle: ${armyNames.B} 兵力】${bHP_before}⇒${bHP_after}\n`;
+  duelMessage += `【 ${armyNames.A} 兵力】${aHP_before}⇒${aHP_after}\n`;
+  duelMessage += `【 ${armyNames.B} 兵力】${bHP_before}⇒${bHP_after}\n`;
   
   // 通知フラグリセット
   await gameState.update({
