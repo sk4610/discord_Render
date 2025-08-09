@@ -74,7 +74,7 @@ async function executeBeastBreak(playerArmy) {
   return `💀 ${armyNames[enemyArmy]}のATK${maxAtk}ビースト（${beastNames}）を全て戦闘不能にした！`;
 }
 
-// 決闘システム
+// 決闘システム（見やすい表示に改善）
 async function executeBeastDuel(interaction) {
   const gameState = await GameState.findOne();
   const totalActions = await User.sum('gekiha_counts');
@@ -89,16 +89,25 @@ async function executeBeastDuel(interaction) {
   const armyA = eligibleBeasts.filter(b => b.army === 'A');
   const armyB = eligibleBeasts.filter(b => b.army === 'B');
   
-  let duelMessage = `\n🏟️ **第${currentRound + 1}回 ビースト決闘開始！** 🏟️\n\n`;
+  let duelMessage = `🏟️ **第${currentRound + 1}回 ビースト決闘開始！** 🏟️\n`;
+  duelMessage += `決闘開始！〇なら勝利、×なら敗北、△なら相打ち、☆なら直接攻撃だ！\n\n`;
   
   const minLength = Math.min(armyA.length, armyB.length);
   let totalDamageA = 0;
   let totalDamageB = 0;
   
+  // 現在の兵力（決闘前）
+  const aHP_before = gameState.initialArmyHP - gameState.b_team_kills;
+  const bHP_before = gameState.initialArmyHP - gameState.a_team_kills;
+  
   // 1vs1マッチング
   for (let i = 0; i < minLength; i++) {
     const beastA = armyA[i];
     const beastB = armyB[i];
+    
+    // ユーザー名を取得
+    const ownerA = beastA.username;
+    const ownerB = beastB.username;
     
     let result;
     if (beastA.beast_atk > beastB.beast_atk) {
@@ -106,19 +115,19 @@ async function executeBeastDuel(interaction) {
       totalDamageB += damage;
       beastB.beast_is_active = false;
       await beastB.save();
-      result = `⚔️ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) → ${armyNames.A}勝利！ダメージ${damage}`;
+      result = `○ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})× → ${armyNames.B}軍へ${damage}ダメージ`;
     } else if (beastB.beast_atk > beastA.beast_atk) {
       const damage = beastB.beast_atk - beastA.beast_atk;
       totalDamageA += damage;
       beastA.beast_is_active = false;
       await beastA.save();
-      result = `⚔️ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) → ${armyNames.B}勝利！ダメージ${damage}`;
+      result = `× ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})○ → ${armyNames.A}軍へ${damage}ダメージ`;
     } else {
       beastA.beast_is_active = false;
       beastB.beast_is_active = false;
       await beastA.save();
       await beastB.save();
-      result = `⚔️ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}) → 相打ち！`;
+      result = `△ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})△ → 相打ち！`;
     }
     
     duelMessage += result + '\n';
@@ -130,12 +139,14 @@ async function executeBeastDuel(interaction) {
   
   for (const beast of remainingA) {
     totalDamageB += beast.beast_atk;
-    duelMessage += `🐾 ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}) → ${armyNames.B}に${beast.beast_atk}ダメージ\n`;
+    const owner = beast.username;
+    duelMessage += `☆ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}/${owner}) → ${armyNames.B}軍へ${beast.beast_atk}ダメージ\n`;
   }
   
   for (const beast of remainingB) {
     totalDamageA += beast.beast_atk;
-    duelMessage += `🐾 ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}) → ${armyNames.A}に${beast.beast_atk}ダメージ\n`;
+    const owner = beast.username;
+    duelMessage += `☆ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}/${owner}) → ${armyNames.A}軍へ${beast.beast_atk}ダメージ\n`;
   }
   
   // ダメージ適用
@@ -148,16 +159,16 @@ async function executeBeastDuel(interaction) {
   
   await gameState.save();
   
-  // 戦況表示
-  const aHP = gameState.initialArmyHP - gameState.b_team_kills;
-  const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+  // 決闘後の兵力
+  const aHP_after = gameState.initialArmyHP - gameState.b_team_kills;
+  const bHP_after = gameState.initialArmyHP - gameState.a_team_kills;
   
+  // 決闘結果サマリー
   duelMessage += `\n💥 **決闘結果**\n`;
-  duelMessage += `${armyNames.A}への被害: ${totalDamageA}\n`;
-  duelMessage += `${armyNames.B}への被害: ${totalDamageB}\n`;
-  duelMessage += `\n⚔️ **現在の戦況**\n`;
-  duelMessage += `${armyNames.A}: ${aHP} 兵力\n`;
-  duelMessage += `${armyNames.B}: ${bHP} 兵力\n`;
+  duelMessage += `${armyNames.A}軍への被害: ${totalDamageA}\n`;
+  duelMessage += `${armyNames.B}軍への被害: ${totalDamageB}\n`;
+  duelMessage += `【${armyNames.A}軍の残存兵力】${aHP_before}⇒${aHP_after}\n`;
+  duelMessage += `【${armyNames.B}軍の残存兵力】${bHP_before}⇒${bHP_after}\n`;
   
   // 通知フラグリセット
   await gameState.update({
@@ -209,7 +220,7 @@ export async function execute(interaction) {
   const beastName = interaction.options.getString('name') || null;
   const customMessage = interaction.options.getString("message") || "";
   
-  if (!player) return interaction.editReply('まず /kaikyu でチームに参加してください。');
+  if (!player) return interaction.editReply('まず /start でチームに参加してください。');
 
   const army = player.army;
   const gameState = await GameState.findOne();
@@ -227,8 +238,8 @@ export async function execute(interaction) {
   const randomStr = randomNum.toString().padStart(3, '0');
   const lastDigit = randomNum % 10;
   
-  let message = `-#  :military_helmet: ${armyNames[army]} ${username} の【ビースト】行動判定！\n`;
-  message += `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
+  let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
+  message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
   
   // ビースト初期化 or 復活
   if (!player.beast_name || !player.beast_is_active) {
@@ -264,7 +275,7 @@ export async function execute(interaction) {
   } else {
     // 行動判定
     const action = processBeastAction(randomNum);
-    message += `### ➡️ ${action.message}\n`;
+    message += ` → ${action.message}\n`;
     
     let kills = action.kills;
     let breakResult = '';
@@ -275,14 +286,15 @@ export async function execute(interaction) {
       message += `### ${breakResult}\n`;
     }
     
-    // ATKアップ処理
+    // ATKアップ処理（修正：変化前の値を保存）
     if (action.atkUp > 0) {
-      const newATK = player.beast_atk + action.atkUp;
+      const oldATK = player.beast_atk; // 変化前の値を保存
+      const newATK = oldATK + action.atkUp;
       await player.update({ 
         beast_atk: newATK,
         beast_has_fed: true 
       });
-      message += `### 🍖 ${player.beast_name} のATKが ${player.beast_atk} → ${newATK} にアップ！\n`;
+      message += `### 🍖 ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！\n`;
     }
     
     // 撃破処理
@@ -305,12 +317,7 @@ export async function execute(interaction) {
   await player.save();
   await gameState.save();
   
-  // 戦況表示
-  const aHP = gameState.initialArmyHP - gameState.b_team_kills;
-  const bHP = gameState.initialArmyHP - gameState.a_team_kills;
-  message += `\n-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
-  
-  // 決闘カウント表示
+  // 決闘カウント表示（常時表示）
   const totalActions = await User.sum('gekiha_counts');
   const nextDuel = Math.ceil(totalActions / gameState.duel_interval) * gameState.duel_interval;
   const remaining = nextDuel - totalActions;
@@ -319,7 +326,7 @@ export async function execute(interaction) {
     message += `-# >>> ⚔️ 次回ビースト決闘まで: **${remaining}行動**\n`;
   }
   
-  // 個人ビースト情報
+  // 個人ビースト情報（常時表示）
   message += `-# >>> 🐾 あなたのビースト: **${player.beast_name}** (ATK: ${player.beast_atk})`;
   if (!player.beast_is_active) {
     message += ` 💀戦闘不能`;
@@ -328,8 +335,17 @@ export async function execute(interaction) {
   }
   message += `\n`;
   
-  // 戦績表示
-  message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**`;
+  // 撃破時のみ表示する情報
+  const action = processBeastAction(randomNum);
+  if (action.kills > 0) {
+    // 戦況表示（撃破時のみ）
+    const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+    const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+    message += `-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
+    
+    // 戦績表示（撃破時のみ）
+    message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
+  }
   
   // カスタムメッセージ
   if (customMessage) {
