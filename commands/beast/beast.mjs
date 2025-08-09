@@ -191,11 +191,11 @@ async function manageDuelNotifications(interaction) {
   const remaining = nextDuel - totalActions;
   
   const notifications = [
-    { remaining: 40, flag: 'notification_40_sent', message: '🚨 ###【自動警報】 ビースト決闘まで残り __40行動__！\n ビーストを鍛え育てよ…' },
-    { remaining: 30, flag: 'notification_30_sent', message: '🚨 ###【自動警報】 ビースト決闘まで残り __30行動__！\n 準備を始めよ…' },
-    { remaining: 20, flag: 'notification_20_sent', message: '🚨 ###【自動警報】 ビースト決闘まで残り __20行動__！\n 戦いのときは近い…' },
-    { remaining: 10, flag: 'notification_10_sent', message: '🚨 ###【自動警報】 ビースト決闘まで残り __10行動__！\n 覚悟を決めよ！' },
-    { remaining: 5, flag: 'notification_5_sent', message: '🚨 ###【自動警報】 ビースト決闘まで残り __5行動__！\n ビーストを信じろ！' }
+    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __40行動__！\n ビーストを鍛え育てよ…' },
+    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __30行動__！\n 準備を始めよ…' },
+    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __20行動__！\n 戦いのときは近い…' },
+    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __10行動__！\n 覚悟を決めよ！' },
+    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __5行動__！\n ビーストを信じろ！' }
   ];
   
   for (const notif of notifications) {
