@@ -56,6 +56,34 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+
+// game.js に追加するフィールド
+
+// Userテーブルに追加
+const User = sequelize.define('User', {
+  // 既存のフィールド...
+  id: { type: DataTypes.STRING, primaryKey: true },
+  username: DataTypes.STRING,
+  army: DataTypes.STRING,
+  rank: DataTypes.STRING,
+  gekiha_counts: { type: DataTypes.INTEGER, defaultValue: 0 },
+  total_kills: { type: DataTypes.INTEGER, defaultValue: 0 },
+  bobEnabled: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+  
+  // 個人コイン取得履歴
+  personal_fire_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
+  personal_wood_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
+  personal_earth_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
+  personal_thunder_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
+  personal_water_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
+  
+  // ビースト関連フィールド（新規追加）
+  beast_name: { type: DataTypes.STRING, defaultValue: null },
+  beast_atk: { type: DataTypes.INTEGER, defaultValue: 0 },
+  beast_is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+  beast_has_fed: { type: DataTypes.BOOLEAN, defaultValue: false },
+  last_action_time: { type: DataTypes.DATE, defaultValue: null },
+
 });
 
 // ゲームの状態を格納する GamaState
@@ -139,9 +167,33 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
+ // ビースト決闘管理（新規追加）
+  duel_interval: { type: DataTypes.INTEGER, defaultValue: 50 }, // 決闘間隔
+  last_duel_round: { type: DataTypes.INTEGER, defaultValue: 0 },
+  notification_40_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_30_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_20_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_10_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_5_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+
+
 });
 
-
+// 決闘記録テーブル（ビースト制用）
+const BeastDuel = sequelize.define('BeastDuel', {
+  round_number: { type: DataTypes.INTEGER },
+  player1_id: { type: DataTypes.STRING },
+  player1_name: { type: DataTypes.STRING },
+  player1_beast_name: { type: DataTypes.STRING },
+  player1_atk: { type: DataTypes.INTEGER },
+  player2_id: { type: DataTypes.STRING },
+  player2_name: { type: DataTypes.STRING },
+  player2_beast_name: { type: DataTypes.STRING },
+  player2_atk: { type: DataTypes.INTEGER },
+  winner_id: { type: DataTypes.STRING },
+  damage_dealt: { type: DataTypes.INTEGER },
+  duel_time: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+});
 
 /**
  * 終戦かどうかをチェックする 終戦だった場合、isGameOverをtrueにしてフラグをON、その結果をgekiha.mjsで判定して自動通知させる
