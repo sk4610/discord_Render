@@ -9,11 +9,13 @@ export const data = new SlashCommandBuilder()
       .setDescription('ルールの種類')
       .setRequired(true)
       .addChoices(
-        // ルール選択　nameがDiscord上に表示される文字、valueが内部処理で使用する変数
+        // ルール選択 nameがDiscord上に表示される文字、valueが内部処理で使用する変数
         // 階級制の選択処理 
         { name: '階級制', value: 'ranked' },
         // 属性コイン制の選択処理 
-        { name: '属性コイン制', value: 'coin' }
+        { name: '属性コイン制', value: 'coin' },
+        // ビースト制
+        { name: 'ビースト制', value: 'beast' }
       ));
 
 export async function execute(interaction) {
@@ -36,6 +38,8 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
       await interaction.reply(`ルールを階級制に設定しました！ 参加者は /start コマンドで軍に参加してください。`); 
     }else if(mode === 'coin'){
       await interaction.reply(`ルールを属性コイン制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
+    }else if(mode === 'beast'){
+      await interaction.reply(`ルールをビースト制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }
     } catch (error) {
     console.error('ルール設定エラー:', error);

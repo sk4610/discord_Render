@@ -17,7 +17,7 @@ const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5 ]; // VIP 大文字の数の�
 //**階級制処理の流れ**
 // rule.mjs /ruleで rule_typeをname:階級制, value:rankedに設定
 // 次にkaikyu.mjs(ここ) /start userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
-// 次にgekiha.mjs /gekihaで　階級制の撃破判定処理を実行　ただし実際に階級制の処理をしているのはkaikyu_main.js
+// 次にgekiha.mjs /gekihaで 階級制の撃破判定処理を実行 ただし実際に階級制の処理をしているのはkaikyu_main.js
 // gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
 
 
@@ -33,7 +33,7 @@ export const data = new SlashCommandBuilder()
         { name: armyNames.B, value: 'B' }
       ));
 
-// gekiha.mjsで軍名を表示するためのグローバル関数の設定　変更をkaikyu.mjsだけで留める
+// gekiha.mjsで軍名を表示するためのグローバル関数の設定 変更をkaikyu.mjsだけで留める
 // 正直なところarmyNamesを使えばいいのだが、先にこのgetArymyNameを作ったので変更するのが面倒なため階級制ではこのまま運用する
 export const armyName_global = {A:armyNames.A,B:armyNames.B};
 export function getArmyName(army) {
@@ -115,10 +115,11 @@ export async function execute(interaction) {
     //各ルールで初期表示を変える
     if(gameState.rule_type === 'ranked'){ // 階級制のとき
       await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);    
-    }else{ // その他（属性コイン制）のとき
+    }else if(gameState.rule_type === 'coin'){ // 属性コイン制のとき
+      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+    }else if(gameState.rule_type === 'beast'){ // ビースト制のとき
       await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
     }
-
 
   } catch (error) {
     console.error('軍配属エラー:', error);
