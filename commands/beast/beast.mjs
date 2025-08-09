@@ -36,13 +36,13 @@ function processBeastAction(randomNum) {
   const isAllSame = (firstDigit === secondDigit && secondDigit === thirdDigit && randomNum !== 0);
   
   if (isAllSame) {
-    return { type: 'beast_break', kills: 0, atkUp: 0, message: '🌟 ビーストブレイク発動！' };
+    return { type: 'beast_break', kills: 0, atkUp: 0, message: '** :right_facing_fist: :left_facing_fist: ビーストブレイク発動！ **' };
   } else if (lastTwoDigits % 10 === 0 && lastTwoDigits !== 0) {
-    return { type: 'feed', kills: 0, atkUp: 1, message: '🍖 餌やり成功！ATK+1' };
+    return { type: 'feed', kills: 0, atkUp: 1, message: '** 🍖 餌やり成功！ATK+1 **' };
   } else if (secondDigit === thirdDigit) {
-    return { type: 'kill', kills: 1, atkUp: 0, message: '⚡ 下2桁ゾロ目！1撃破' };
+    return { type: 'kill', kills: 1, atkUp: 0, message: '** ⚡ 下2桁ゾロ目！1撃破 **' };
   } else {
-    return { type: 'miss', kills: 0, atkUp: 0, message: '💥 ハズレ...' };
+    return { type: 'miss', kills: 0, atkUp: 0, message: '残念、0撃破…' };
   }
 }
 
@@ -71,7 +71,7 @@ async function executeBeastBreak(playerArmy) {
   );
   
   const beastNames = affectedBeasts.map(b => b.beast_name || 'unnamed').join(', ');
-  return `💀 ${armyNames[enemyArmy]}のATK${maxAtk}ビースト（${beastNames}）を全て戦闘不能にした！`;
+  return ` 🌟 ${armyNames[enemyArmy]}のATK${maxAtk}ビースト（${beastNames}）を全て戦闘不能にした！`;
 }
 
 // 決闘システム（見やすい表示に改善）
@@ -245,7 +245,7 @@ export async function execute(interaction) {
   if (!player.beast_name || !player.beast_is_active) {
     // 戦闘不能からの復活時は名前を必須にする
     if (player.beast_name && !player.beast_is_active && !beastName) {
-      return interaction.editReply(`💀 あなたのビースト **${player.beast_name}** は戦闘不能です。\n🐾 新しいビーストを召喚するには名前を指定してください。\n\n使用例: \`/beast name:フェニックス\``);
+      return interaction.editReply(`:angel: あなたのビースト **${player.beast_name}** は戦闘不能です。\n🐾 新しいビーストを召喚するには名前を指定してください。\n\n使用例: \`/beast name:フェニックス\``);
     }
     
     // 完全に初回の場合も名前を推奨
@@ -266,11 +266,11 @@ export async function execute(interaction) {
     
     if (player.beast_name && !player.beast_is_active) {
       // 復活メッセージ
-      message += `### 🔥 新しいビースト **${finalBeastName}** が復活！ATK: ${newATK}\n`;
-      message += `### 💀 前のビースト "${player.beast_name}" は戦闘不能でした\n`;
+      message += `\n### :dragon_face:  新しいビースト **${finalBeastName}** が復活！ATK: ${newATK}\n`;
+      message += `\n### :angel: 前のビースト "${player.beast_name}" は戦闘不能でした\n`;
     } else {
       // 初回メッセージ
-      message += `### 🐾 初のビースト **${finalBeastName}** が誕生！ATK: ${newATK}\n`;
+      message += `\n### :dragon_face:  初のビースト **${finalBeastName}** が誕生！ATK: ${newATK}\n`;
     }
   } else {
     // 行動判定
@@ -294,7 +294,7 @@ export async function execute(interaction) {
         beast_atk: newATK,
         beast_has_fed: true 
       });
-      message += `### 🍖 ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！\n`;
+      message += `** 🍖 ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！**\n`;
     }
     
     // 撃破処理
@@ -306,7 +306,7 @@ export async function execute(interaction) {
       }
       
       player.total_kills += kills;
-      message += `### ⚔️ 敵軍に ${kills} ダメージ！\n`;
+      //message += `### ⚔️ 敵軍に ${kills} ダメージ！\n`;
     }
     
     await player.update({ last_action_time: new Date() });
@@ -322,14 +322,14 @@ export async function execute(interaction) {
   const nextDuel = Math.ceil(totalActions / gameState.duel_interval) * gameState.duel_interval;
   const remaining = nextDuel - totalActions;
   
-  if (remaining > 0) {
-    message += `-# >>> ⚔️ 次回ビースト決闘まで: **${remaining}行動**\n`;
-  }
+//  if (remaining > 0) {
+//    message += `-# >>> ⚔️ 次回ビースト決闘まで: **${remaining}行動**\n`;
+//  }
   
   // 個人ビースト情報（常時表示）
-  message += `-# >>> 🐾 あなたのビースト: **${player.beast_name}** (ATK: ${player.beast_atk})`;
+  message += `-# >>> :dragon_face: あなたのビースト: **${player.beast_name}** (ATK: ${player.beast_atk})`;
   if (!player.beast_is_active) {
-    message += ` 💀戦闘不能`;
+    message += ` :angel: 戦闘不能`;
   } else if (player.beast_has_fed) {
     message += ` 🍖強化済み`;
   }
