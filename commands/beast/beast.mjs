@@ -89,8 +89,8 @@ async function executeBeastDuel(interaction) {
   const armyA = eligibleBeasts.filter(b => b.army === 'A');
   const armyB = eligibleBeasts.filter(b => b.army === 'B');
   
-  let duelMessage = ` **第${currentRound + 1}回 ビースト決闘開始！** \n`;
-  duelMessage += `決闘開始！〇なら勝利、×なら敗北、△なら相打ち、☆なら直接攻撃だ！\n\n`;
+  let duelMessage = ` ### 🏟️*第${currentRound + 1}回 ビースト決闘開始！🏟️ \n`;
+  duelMessage += `決闘開始！⭕なら勝利、❌なら敗北、❗なら相打ち、⭐なら直接攻撃だ！\n⚔️ **決闘**\n`;
   
   const minLength = Math.min(armyA.length, armyB.length);
   let totalDamageA = 0;
@@ -115,19 +115,19 @@ async function executeBeastDuel(interaction) {
       totalDamageB += damage;
       beastB.beast_is_active = false;
       await beastB.save();
-      result = `○ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})× → ${armyNames.B}軍へ${damage}ダメージ`;
+      result = `⭕  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})❌ → ${armyNames.B}へ${damage}ダメージ`;
     } else if (beastB.beast_atk > beastA.beast_atk) {
       const damage = beastB.beast_atk - beastA.beast_atk;
       totalDamageA += damage;
       beastA.beast_is_active = false;
       await beastA.save();
-      result = `× ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})○ → ${armyNames.A}軍へ${damage}ダメージ`;
+      result = `❌  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})⭕ → ${armyNames.A}へ${damage}ダメージ`;
     } else {
       beastA.beast_is_active = false;
       beastB.beast_is_active = false;
       await beastA.save();
       await beastB.save();
-      result = `△ ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}/${ownerA}) vs ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk}/${ownerB})△ → 相打ち！`;
+      result = `❗  :dragon_face: ${beastA.beast_name || 'Unnamed'}(ATK${beastA.beast_atk}) vs  :dragon_face: ${beastB.beast_name || 'Unnamed'}(ATK${beastB.beast_atk})❗ → 相打ち！`;
     }
     
     duelMessage += result + '\n';
@@ -140,13 +140,13 @@ async function executeBeastDuel(interaction) {
   for (const beast of remainingA) {
     totalDamageB += beast.beast_atk;
     const owner = beast.username;
-    duelMessage += `☆ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}/${owner}) → ${armyNames.B}軍へ${beast.beast_atk}ダメージ\n`;
+    duelMessage += `⭐ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}) → ${armyNames.B}へ${beast.beast_atk}ダメージ\n`;
   }
   
   for (const beast of remainingB) {
     totalDamageA += beast.beast_atk;
     const owner = beast.username;
-    duelMessage += `☆ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}/${owner}) → ${armyNames.A}軍へ${beast.beast_atk}ダメージ\n`;
+    duelMessage += `⭐ ${beast.beast_name || 'Unnamed'}(ATK${beast.beast_atk}) → ${armyNames.A}へ${beast.beast_atk}ダメージ\n`;
   }
   
   // ダメージ適用
@@ -164,11 +164,11 @@ async function executeBeastDuel(interaction) {
   const bHP_after = gameState.initialArmyHP - gameState.a_team_kills;
   
   // 決闘結果サマリー
-  duelMessage += `\n⚔️ **決闘結果**\n`;
-  duelMessage += `${armyNames.A}軍への被害: ${totalDamageA}\n`;
-  duelMessage += `${armyNames.B}軍への被害: ${totalDamageB}\n`;
-  duelMessage += `【${armyNames.A}軍の残存兵力】${aHP_before}⇒${aHP_after}\n`;
-  duelMessage += `【${armyNames.B}軍の残存兵力】${bHP_before}⇒${bHP_after}\n`;
+  duelMessage += `\n 💥 **決闘結果**\n`;
+  duelMessage += `${armyNames.A}への被害: ${totalDamageA}\n`;
+  duelMessage += `${armyNames.B}への被害: ${totalDamageB}\n\n`;
+  duelMessage += `【:yellow_circle: ${armyNames.A} 兵力】${aHP_before}⇒${aHP_after}\n`;
+  duelMessage += `【:green_circle: ${armyNames.B} 兵力】${bHP_before}⇒${bHP_after}\n`;
   
   // 通知フラグリセット
   await gameState.update({
@@ -191,11 +191,11 @@ async function manageDuelNotifications(interaction) {
   const remaining = nextDuel - totalActions;
   
   const notifications = [
-    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__40回__！\n ビーストを鍛え育てよ…' },
-    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__30回__！\n 準備を始めよ…' },
-    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__20回__！\n 戦いのときは近い…' },
-    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__10回__！\n 覚悟を決めよ！' },
-    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__5回__！\n ビーストを信じろ！' }
+    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__40レス__！\n ビーストを鍛え育てよ…' },
+    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__30レス__！\n 準備を始めよ…' },
+    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__20レス__！\n 戦いのときは近い…' },
+    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__10レス__！\n 覚悟を決めよ！' },
+    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__5レス__！\n ビーストを信じろ！' }
   ];
   
   for (const notif of notifications) {
