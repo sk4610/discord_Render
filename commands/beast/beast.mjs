@@ -40,9 +40,9 @@ function processBeastAction(randomNum) {
   } else if (lastTwoDigits % 10 === 0 && lastTwoDigits !== 0) {
     return { type: 'feed', kills: 0, atkUp: 1, message: '** 🍖 餌やり成功！ATK+1 **' };
   } else if (secondDigit === thirdDigit) {
-    return { type: 'kill', kills: 1, atkUp: 0, message: '** ⚡ 下2桁ゾロ目！1撃破 **' };
+    return { type: 'kill', kills: 1, atkUp: 0, message: '**  下2桁ゾロ目！1撃破 **' };
   } else {
-    return { type: 'miss', kills: 0, atkUp: 0, message: '残念、0撃破…' };
+    return { type: 'miss', kills: 0, atkUp: 0, message: 'ざんねん、0撃破…' };
   }
 }
 
@@ -191,11 +191,11 @@ async function manageDuelNotifications(interaction) {
   const remaining = nextDuel - totalActions;
   
   const notifications = [
-    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __40行動__！\n ビーストを鍛え育てよ…' },
-    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __30行動__！\n 準備を始めよ…' },
-    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __20行動__！\n 戦いのときは近い…' },
-    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __10行動__！\n 覚悟を決めよ！' },
-    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで残り __5行動__！\n ビーストを信じろ！' }
+    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__40回__！\n ビーストを鍛え育てよ…' },
+    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__30回__！\n 準備を始めよ…' },
+    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__20行動__！\n 戦いのときは近い…' },
+    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__10行動__！\n 覚悟を決めよ！' },
+    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残りﾒｯｾｰｼﾞ：__5行動__！\n ビーストを信じろ！' }
   ];
   
   for (const notif of notifications) {
@@ -300,7 +300,7 @@ export async function execute(interaction) {
         beast_atk: newATK,
         beast_has_fed: true 
       });
-      message += `** :up: ${player.beast_name} のATKが ${oldATK} → ${newATK} にアップ！**\n`;
+      message += ` :up: "${player.beast_name}" のATKが **${oldATK} → ${newATK}** にアップ！\n`;
     }
     
     // 撃破処理
@@ -342,8 +342,8 @@ export async function execute(interaction) {
   message += `\n`;
   
   // 撃破時のみ表示する情報
-  const action = processBeastAction(randomNum);
-  if (action.kills > 0) {
+  //const action = processBeastAction(randomNum);
+  if (kills > 0) {
     // 戦況表示（撃破時のみ）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
