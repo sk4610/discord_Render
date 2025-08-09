@@ -56,34 +56,12 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-
-// game.js に追加するフィールド
-
-// Userテーブルに追加
-const User = sequelize.define('User', {
-  // 既存のフィールド...
-  id: { type: DataTypes.STRING, primaryKey: true },
-  username: DataTypes.STRING,
-  army: DataTypes.STRING,
-  rank: DataTypes.STRING,
-  gekiha_counts: { type: DataTypes.INTEGER, defaultValue: 0 },
-  total_kills: { type: DataTypes.INTEGER, defaultValue: 0 },
-  bobEnabled: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-  
-  // 個人コイン取得履歴
-  personal_fire_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
-  personal_wood_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
-  personal_earth_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
-  personal_thunder_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
-  personal_water_coin: { type: DataTypes.INTEGER, defaultValue: 0 },
-  
   // ビースト関連フィールド（新規追加）
   beast_name: { type: DataTypes.STRING, defaultValue: null },
   beast_atk: { type: DataTypes.INTEGER, defaultValue: 0 },
   beast_is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
   beast_has_fed: { type: DataTypes.BOOLEAN, defaultValue: false },
   last_action_time: { type: DataTypes.DATE, defaultValue: null },
-
 });
 
 // ゲームの状態を格納する GamaState
