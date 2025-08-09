@@ -242,6 +242,7 @@ export async function execute(interaction) {
   message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
   
   // ビースト初期化 or 復活
+  let isNewBeast = false;
   if (!player.beast_name || !player.beast_is_active) {
     // 戦闘不能からの復活時は名前を必須にする
     if (player.beast_name && !player.beast_is_active && !beastName) {
@@ -263,20 +264,25 @@ export async function execute(interaction) {
       beast_has_fed: false,
       last_action_time: new Date()
     });
+
+    isNewBeast = true;
     
     if (player.beast_name && !player.beast_is_active) {
       // 復活メッセージ
-      message += `\n** :dragon_face:  新しいビースト "${finalBeastName}" が復活！ATK: ${newATK}**\n`;
-      message += `\n** :angel: 前のビースト "${player.beast_name}" は戦闘不能でした**\n`;
+      message += `\n** :dragon_face:  新しいビースト **"${finalBeastName}"** が復活！ATK: ${newATK}\n`;
+      message += `\n** :angel: 前のビースト **"${player.beast_name}"** は戦闘不能でした\n`;
     } else {
       // 初回メッセージ
-      message += `\n** :dragon_face:  初のビースト "${finalBeastName}" が誕生！ATK: ${newATK}**\n`;
+      message += `\n :dragon_face:  初のビースト **"${finalBeastName}"** が誕生！ATK: ${newATK}\n`;
     }
   } else {
-    // 行動判定
+    // 行動判定（初回/復活時も含めて常に実行）
     const action = processBeastAction(randomNum);
-    message += ` → ${action.message}\n`;
-    
+    if (!isNewBeast) {
+      message += ` → ${action.message}\n`;
+    } else {
+      message += ` → さらに ${action.message}\n`;
+    }   
     let kills = action.kills;
     let breakResult = '';
     
