@@ -213,6 +213,7 @@ async function manageDuelNotifications(interaction) {
 }
 
 export async function execute(interaction) {
+  try {
   await interaction.deferReply();
 
   const userId = interaction.user.id;
@@ -221,17 +222,19 @@ export async function execute(interaction) {
   const beastName = interaction.options.getString('name') || null;
   const customMessage = interaction.options.getString("message") || "";
   
-  if (!player) return interaction.editReply('まず /start でチームに参加してください。');
+  if (!player) {
+    return await interaction.editReply('まず /start でチームに参加してください。');
+  }
 
   const army = player.army;
   const gameState = await GameState.findOne();
   
   if (gameState.rule_type !== 'beast') {
-    return interaction.editReply('現在はビースト制ルールではありません。');
+    return await interaction.editReply('現在はビースト制ルールではありません。');
   }
 
   if (gameState.isGameOver) {
-    return interaction.editReply("大戦はすでに終戦した！次回の号砲を待て！");
+    return await interaction.editReply("大戦はすでに終戦した！次回の号砲を待て！");
   }
   
   // ジャッジナンバー生成
@@ -475,13 +478,6 @@ await interaction.followUp(bobMessage);
 }
 }
 
-console.log('BOB有効フラグ:', player.bobEnabled);
-if (player.bobEnabled) {
-  console.log('BOB処理開始');
-  const bobId = `bob-${userId}`;
-  const bobUser = await User.findOne({ where: { id: bobId } });
-  console.log('BOBユーザー:', bobUser ? 'あり' : 'なし');
-}
 
 
   // 決闘通知チェック
