@@ -146,13 +146,13 @@ const GameState = sequelize.define('GameState', {
     defaultValue: 0
   },
  // ビースト決闘管理（新規追加）
-  duel_interval: { type: DataTypes.INTEGER, defaultValue: 50 }, // 決闘間隔
+  duel_interval: { type: DataTypes.INTEGER, defaultValue: 100 }, // 決闘間隔
   last_duel_round: { type: DataTypes.INTEGER, defaultValue: 0 },
-  notification_40_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
-  notification_30_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
-  notification_20_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_90_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_75_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_50_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+  notification_25_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
   notification_10_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
-  notification_5_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
 
 
 });

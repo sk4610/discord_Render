@@ -174,11 +174,11 @@ async function executeBeastDuel(interaction) {
   // 通知フラグリセット
   await gameState.update({
     last_duel_round: currentRound,
-    notification_40_sent: false,
-    notification_30_sent: false,
-    notification_20_sent: false,
+    notification_90_sent: false,
+    notification_75_sent: false,
+    notification_50_sent: false,
+    notification_25_sent: false,
     notification_10_sent: false,
-    notification_5_sent: false,
   });
   
   await interaction.followUp(duelMessage);
@@ -192,11 +192,11 @@ async function manageDuelNotifications(interaction) {
   const remaining = nextDuel - totalActions;
   
   const notifications = [
-    { remaining: 90, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__90レス__！\n ビーストを鍛え育てよ…' },
-    { remaining: 75, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__75レス__！\n 準備を始めよ…' },
-    { remaining: 50, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__50レス__！\n 戦いのときは近い…' },
-    { remaining: 25, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__25レス__！\n 覚悟を決めよ！' },
-    { remaining: 10, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__10レス__！\n ビーストを信じろ！' }
+    { remaining: 90, flag: 'notification_90_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__90レス__！\n ビーストを鍛え育てよ…' },
+    { remaining: 75, flag: 'notification_75_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__75レス__！\n 準備を始めよ…' },
+    { remaining: 50, flag: 'notification_50_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__50レス__！\n 戦いのときは近い…' },
+    { remaining: 25, flag: 'notification_25_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__25レス__！\n 覚悟を決めよ！' },
+    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__10レス__！\n ビーストを信じろ！' }
   ];
   
   for (const notif of notifications) {
