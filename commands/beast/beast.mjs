@@ -213,7 +213,7 @@ async function manageDuelNotifications(interaction) {
 }
 
 export async function execute(interaction) {
-  try {
+  //try {
   await interaction.deferReply();
 
   const userId = interaction.user.id;
