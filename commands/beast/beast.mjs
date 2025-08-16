@@ -19,10 +19,10 @@ export const data = new SlashCommandBuilder()
 
 // ATK判定関数
 function determineATK(lastDigit) {
-  if ([0, 1, 2, 3].includes(lastDigit)) return 0;
-  if ([4, 5, 6].includes(lastDigit)) return 1;
-  if ([7, 8].includes(lastDigit)) return 2;
-  if ([9].includes(lastDigit)) return 3;
+  if ([0, 1, 2, 3].includes(lastDigit)) return 1;
+  if ([4, 5, 6].includes(lastDigit)) return 2;
+  if ([7, 8].includes(lastDigit)) return 3;
+  if ([9].includes(lastDigit)) return 4;
 }
 
 // 行動判定関数
@@ -80,9 +80,10 @@ async function executeBeastDuel(interaction) {
   const totalActions = await User.sum('gekiha_counts');
   const currentRound = Math.floor(totalActions / gameState.duel_interval);
   
-  // 餌やり済みビーストを取得
+  // アクティブなビーストを取得（餌やり制限を廃止）
   const eligibleBeasts = await User.findAll({
-    where: { beast_has_fed: true, beast_is_active: true },
+    //where: { beast_has_fed: true, beast_is_active: true },
+    where: { beast_is_active: true }, 
     order: [['last_action_time', 'DESC']]
   });
   
@@ -191,11 +192,11 @@ async function manageDuelNotifications(interaction) {
   const remaining = nextDuel - totalActions;
   
   const notifications = [
-    { remaining: 40, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__40レス__！\n ビーストを鍛え育てよ…' },
-    { remaining: 30, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__30レス__！\n 準備を始めよ…' },
-    { remaining: 20, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__20レス__！\n 戦いのときは近い…' },
-    { remaining: 10, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__10レス__！\n 覚悟を決めよ！' },
-    { remaining: 5, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__5レス__！\n ビーストを信じろ！' }
+    { remaining: 90, flag: 'notification_40_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__90レス__！\n ビーストを鍛え育てよ…' },
+    { remaining: 75, flag: 'notification_30_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__75レス__！\n 準備を始めよ…' },
+    { remaining: 50, flag: 'notification_20_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__50レス__！\n 戦いのときは近い…' },
+    { remaining: 25, flag: 'notification_10_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__25レス__！\n 覚悟を決めよ！' },
+    { remaining: 10, flag: 'notification_5_sent', message: ' ### 🚨【自動警報】🚨 ビースト決闘まで 残り__10レス__！\n ビーストを信じろ！' }
   ];
   
   for (const notif of notifications) {
@@ -275,7 +276,8 @@ export async function execute(interaction) {
       // 初回メッセージ
       message += `\n :dragon_face:  初のビースト **"${finalBeastName}"** が誕生！ATK: ${newATK}\n`;
     }
-  } else {
+  } 
+  //else {
     // 行動判定（初回/復活時も含めて常に実行）
     const action = processBeastAction(randomNum);
     if (!isNewBeast) {
@@ -316,7 +318,7 @@ export async function execute(interaction) {
     }
     
     await player.update({ last_action_time: new Date() });
-  }
+  //}
   
   // 行動回数更新
   player.gekiha_counts += 1;
@@ -336,14 +338,13 @@ export async function execute(interaction) {
   message += `-# >>> :dragon_face: あなたのビースト: **${player.beast_name}** (ATK: ${player.beast_atk})`;
   if (!player.beast_is_active) {
     message += ` :angel: 戦闘不能`;
-  } else if (player.beast_has_fed) {
-    message += ` 🍖強化済み`;
-  }
+  } 
+
   message += `\n`;
   
   // 撃破時のみ表示する情報
-  const action = processBeastAction(randomNum);
-  if (action.kills > 0) {
+  //const action = processBeastAction(randomNum);
+  if (kills > 0) {
     // 戦況表示（撃破時のみ）
     const aHP = gameState.initialArmyHP - gameState.b_team_kills;
     const bHP = gameState.initialArmyHP - gameState.a_team_kills;
@@ -360,6 +361,100 @@ export async function execute(interaction) {
   
   await interaction.editReply(message);
   
+
+// BOB支援制度（ビースト制対応）
+if (player.bobEnabled) {
+const bobId = `bob-${userId}`;
+const bobUser = await User.findOne({ where: { id: bobId } });
+if (bobUser) {
+// BOB用のジャッジナンバー生成
+const bobRandomNum = Math.floor(Math.random() * 1000);
+const bobRandomStr = bobRandomNum.toString().padStart(3, '0');
+const bobLastDigit = bobRandomNum % 10;
+let bobMessage = `-# **BOB支援制度**が発動！\n`;
+const emoji = "<:custom_emoji:1350367513271341088>";
+bobMessage += `-# ${emoji} ${armyNames[army]} ${bobUser.username} の行動判定！\n`;
+bobMessage += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${bobRandomStr}__**`;
+// BOBビースト初期化 or 復活
+let isBobNewBeast = false;
+if (!bobUser.beast_name || !bobUser.beast_is_active) {
+const bobNewATK = determineATK(bobLastDigit);
+const bobBeastName = `BOB-${bobUser.username.replace('BOB - ', '').split('のパートナー')[0]}の相棒`;
+await bobUser.update({
+beast_name: bobBeastName,
+beast_atk: bobNewATK,
+beast_is_active: true,
+beast_has_fed: false,
+last_action_time: new Date()
+});
+isBobNewBeast = true;
+bobMessage += `\n :dragon_face: BOBの新ビースト **${bobBeastName}** が誕生！ATK: ${bobNewATK}\n`;
+}
+// BOB行動判定
+const bobAction = processBeastAction(bobRandomNum);
+if (!isBobNewBeast) {
+bobMessage += ` → ${bobAction.message}\n`;
+} else {
+bobMessage += ` → さらに ${bobAction.message}\n`;
+}
+let bobKills = bobAction.kills;
+// BOBビーストブレイク処理
+if (bobAction.type === 'beast_break') {
+const bobBreakResult = await executeBeastBreak(army);
+bobMessage += `** ${bobBreakResult}**\n`;
+}
+// BOB ATKアップ処理
+if (bobAction.atkUp > 0) {
+const bobOldATK = bobUser.beast_atk;
+const bobNewATK = bobOldATK + bobAction.atkUp;
+await bobUser.update({
+beast_atk: bobNewATK,
+beast_has_fed: true
+});
+bobMessage += ` :up: " ${bobUser.beast_name}" のATKが** ${bobOldATK} → ${bobNewATK} **にアップ！\n`;
+}
+// BOB撃破処理
+if (bobKills > 0) {
+if (army === 'A') {
+gameState.a_team_kills += bobKills;
+} else {
+gameState.b_team_kills += bobKills;
+}
+bobUser.total_kills += bobKills;
+//bobMessage += `### ⚔️ 敵軍に ${bobKills} ダメージ！\n`;
+}
+// BOB行動回数更新
+bobUser.gekiha_counts += 1;
+await bobUser.update({ last_action_time: new Date() });
+await bobUser.save();
+await gameState.save();
+// BOB決闘カウント表示（常時表示）
+const bobTotalActions = await User.sum('gekiha_counts');
+const bobNextDuel = Math.ceil(bobTotalActions / gameState.duel_interval) * gameState.duel_interval;
+const bobRemaining = bobNextDuel - bobTotalActions;
+//if (bobRemaining > 0) {
+//bobMessage += `-# >>> ⚔️ 次回ビースト決闘まで: **${bobRemaining}行動**\n`;
+//}
+
+// BOBビースト情報（常時表示）
+bobMessage += `-# >>> :dragon_face: BOBのビースト: **${bobUser.beast_name}** (ATK: ${bobUser.beast_atk})`;
+if (!bobUser.beast_is_active) {
+bobMessage += ` :angel: 戦闘不能`;
+}
+bobMessage += `\n`;
+// BOB撃破時のみ表示する情報
+if (bobKills > 0) {
+// 戦況表示（撃破時のみ）
+const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+bobMessage += `-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
+// 戦績表示（撃破時のみ）
+bobMessage += `-# >>> 🏅戦績: ${armyNames[army]} ${bobUser.username} 行動数: **${bobUser.gekiha_counts}回** 撃破数: **${bobUser.total_kills}撃破**\n`;
+}
+await interaction.followUp(bobMessage);
+}
+}
+
   // 決闘通知チェック
   await manageDuelNotifications(interaction);
   
