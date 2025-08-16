@@ -365,7 +365,27 @@ export async function execute(interaction) {
 // BOB支援制度（ビースト制対応）
 if (player.bobEnabled) {
 const bobId = `bob-${userId}`;
-const bobUser = await User.findOne({ where: { id: bobId } });
+let  bobUser = await User.findOne({ where: { id: bobId } });
+
+// BOBユーザーが存在しない場合は作成	if (bobUser) {
+if (!bobUser) {	
+const bobname = `BOB - ${username}のパートナー`;	
+bobUser = await User.create({	
+id: bobId,	
+username: bobname,	
+army: army,	
+rank: '二等兵🔸', // デフォルト階級	
+total_kills: 0,	
+beast_name: null,	
+beast_atk: 0,	
+beast_is_active: false,	
+beast_has_fed: false,	
+last_action_time: null	
+});	
+console.log('BOBユーザーを新規作成:', bobname);	
+}
+
+
 if (bobUser) {
 // BOB用のジャッジナンバー生成
 const bobRandomNum = Math.floor(Math.random() * 1000);
