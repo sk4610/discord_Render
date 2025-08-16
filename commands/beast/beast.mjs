@@ -455,6 +455,15 @@ await interaction.followUp(bobMessage);
 }
 }
 
+console.log('BOB有効フラグ:', player.bobEnabled);
+if (player.bobEnabled) {
+  console.log('BOB処理開始');
+  const bobId = `bob-${userId}`;
+  const bobUser = await User.findOne({ where: { id: bobId } });
+  console.log('BOBユーザー:', bobUser ? 'あり' : 'なし');
+}
+
+
   // 決闘通知チェック
   await manageDuelNotifications(interaction);
   
