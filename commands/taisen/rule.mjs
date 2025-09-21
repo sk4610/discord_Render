@@ -15,7 +15,9 @@ export const data = new SlashCommandBuilder()
         // 属性コイン制の選択処理 
         { name: '属性コイン制', value: 'coin' },
         // ビースト制
-        { name: 'ビースト制', value: 'beast' }
+        { name: 'ビースト制', value: 'beast' },
+        // パッシブスキル制
+        { name: 'パッシブスキル制', value: 'passive' }
       ));
 
 export async function execute(interaction) {
@@ -40,7 +42,10 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
       await interaction.reply(`ルールを属性コイン制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }else if(mode === 'beast'){
       await interaction.reply(`ルールをビースト制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
+    }else if(mode === 'passive'){
+      await interaction.reply(`ルールをパッシブスキル制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }
+    
     } catch (error) {
     console.error('ルール設定エラー:', error);
     await interaction.reply('エラー: ルールの設定に失敗しました');

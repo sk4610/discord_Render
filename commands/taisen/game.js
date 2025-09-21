@@ -19,7 +19,7 @@ const User = sequelize.define('User', {
   army: DataTypes.STRING,
   // ユーザ階級を保存（階級制で使用）
   rank: DataTypes.STRING,
-  // /gekihaを書き込む度にカウント　書き込み回数カウント
+  // /gekihaを書き込む度にカウント 書き込み回数カウント
   gekiha_counts: { 
     type: DataTypes.INTEGER,
     defaultValue: 0
@@ -35,7 +35,7 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: false
   },
-  // 属性コイン制　個人のコイン取得履歴（戦績表示用）
+  // 属性コイン制 個人のコイン取得履歴（戦績表示用）
   personal_fire_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
@@ -101,7 +101,7 @@ const GameState = sequelize.define('GameState', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
-  // ===== 属性コイン制で使用　軍全体のコイン管理 =====
+  // ===== 属性コイン制で使用 軍全体のコイン管理 =====
   // A軍のコイン
   a_fire_coin: {
     type: DataTypes.INTEGER,
@@ -154,6 +154,9 @@ const GameState = sequelize.define('GameState', {
   notification_25_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
   notification_10_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
 
+// パッシブスキル制用フィールド
+  a_passive_skills: { type: DataTypes.TEXT, defaultValue: '{}' },
+  b_passive_skills: { type: DataTypes.TEXT, defaultValue: '{}' },
 
 });
 
