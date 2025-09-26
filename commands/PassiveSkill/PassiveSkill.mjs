@@ -314,7 +314,7 @@ export async function execute(interaction) {
       } else {
         gameState.a_team_kills = Math.max(0, gameState.a_team_kills - totalHeal);
       }
-      message += `** 💚 自軍が${totalHeal}回復！\n`;
+      message += `### 💚 自軍が${totalHeal}回復！\n`;
     }
     
     // 行動回数更新

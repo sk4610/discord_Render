@@ -119,6 +119,8 @@ export async function execute(interaction) {
       await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
     }else if(gameState.rule_type === 'beast'){ // ビースト制のとき
       await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+    }else if(gameState.rule_type === 'passive'){ // パッシブスキル制のとき
+      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
     }
 
   } catch (error) {
