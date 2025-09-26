@@ -44,15 +44,15 @@ function generateRandomSkill() {
 // 行動判定関数
 function processPassiveAction(randomNum) {
   if (randomNum === 0) {
-    return { type: 'massive_kill', kills: 8, message: '🔥 大量撃破！8ダメージ' };
+    return { type: 'massive_kill', kills: 8, message: '🔥 大量撃破！8撃破' };
   } else if ([11, 22, 33, 44, 55, 66, 77, 88, 99].includes(randomNum)) {
-    return { type: 'normal_kill', kills: 1, message: '⚡ 通常撃破！1ダメージ' };
+    return { type: 'normal_kill', kills: 1, message: ' ゾロ目！1撃破' };
   } else if ([10, 20, 30, 40, 50].includes(randomNum)) {
-    return { type: 'skill_get', message: '🎯 スキルゲット！' };
+    return { type: 'skill_get', message: ':bulb: スキルゲット！' };
   } else if ([60, 70, 80, 90].includes(randomNum)) {
-    return { type: 'skill_break', message: '💥 スキルブレイク！' };
+    return { type: 'skill_break', message: ':smiling_imp: スキルブレイク！' };
   } else {
-    return { type: 'miss', kills: 0, message: '💨 ハズレ...' };
+    return { type: 'miss', kills: 0, message: 'ざんねん、ハズレ...' };
   }
 }
 
@@ -82,21 +82,21 @@ async function applySkillEffects(army, action, gameState) {
     if (armySkills['補給']) {
       const heal = armySkills['補給'];
       selfHeal += heal;
-      skillEffects.push(`💚 ${armyNames[army]}の補給Lv${heal}発動！自軍${heal}回復`);
+      skillEffects.push(`:helmet_with_cross: ${armyNames[army]}の補給Lv${heal}発動！自軍${heal}回復`);
     }
     
     // 先制スキル
     if (armySkills['先制'] && myHP > enemyHP) {
       const bonus = armySkills['先制'] * 2;
       additionalDamage += bonus;
-      skillEffects.push(`🎯 ${armyNames[army]}の先制Lv${armySkills['先制']}発動！追加${bonus}ダメージ`);
+      skillEffects.push(`:zap:  ${armyNames[army]}の先制Lv${armySkills['先制']}発動！追加${bonus}撃破`);
     }
     
     // 逆襲スキル
     if (armySkills['逆襲'] && myHP < enemyHP) {
       const bonus = armySkills['逆襲'] * 2;
       additionalDamage += bonus;
-      skillEffects.push(`🔥 ${armyNames[army]}の逆襲Lv${armySkills['逆襲']}発動！追加${bonus}ダメージ`);
+      skillEffects.push(`🔥 ${armyNames[army]}の逆襲Lv${armySkills['逆襲']}発動！追加${bonus}撃破`);
     }
   }
   
@@ -105,7 +105,7 @@ async function applySkillEffects(army, action, gameState) {
     if (armySkills['必殺']) {
       const bonus = armySkills['必殺'] * 8;
       additionalDamage += bonus;
-      skillEffects.push(`💀 ${armyNames[army]}の必殺Lv${armySkills['必殺']}発動！追加${bonus}ダメージ`);
+      skillEffects.push(`:citrus_sitorasu:  ${armyNames[army]}の必殺Lv${armySkills['必殺']}発動！追加${bonus}撃破`);
     }
     
     // 強奪スキル
@@ -113,7 +113,7 @@ async function applySkillEffects(army, action, gameState) {
       const bonus = armySkills['強奪'] * 4;
       additionalDamage += bonus;
       selfHeal += bonus;
-      skillEffects.push(`💰 ${armyNames[army]}の強奪Lv${armySkills['強奪']}発動！追加${bonus}ダメージ＆${bonus}回復`);
+      skillEffects.push(`💰 ${armyNames[army]}の強奪Lv${armySkills['強奪']}発動！追加${bonus}撃破＆${bonus}回復`);
     }
   }
   
@@ -144,7 +144,7 @@ async function processSkillGet(player, army, gameState) {
     if (currentSkills[skillKey]) {
       // 既に持っているスキル
       bonusDamage += 1;
-      message += `🔄 ${armyNames[army]}は${skillKey}Lv${newSkill.level}を既に所持！敵軍に1ダメージ\n`;
+      message += `🔄 ${armyNames[army]}は${skillKey}Lv${newSkill.level}を既に所持！敵軍を1撃破\n`;
     } else {
       // 新規スキル取得
       currentSkills[skillKey] = newSkill.level;
@@ -184,7 +184,7 @@ async function processSkillBreak(player, army, gameState) {
     
     if (skillKeys.length === 0) {
       bonusDamage += 1;
-      message += `💥 ${armyNames[enemyArmy]}にスキル無し！代わりに1ダメージ\n`;
+      message += `💥 ${armyNames[enemyArmy]}にスキル無し！代わりに1撃破\n`;
       continue;
     }
     
@@ -226,13 +226,13 @@ async function processPoisonEffect(interaction) {
           gameState.b_team_kills += poisonDamage;
         }
         
-        poisonMessage += `☠️ ${armyNames[army]}の猛毒Lv${armySkills['猛毒']}効果！${armyNames[enemyArmy]}に${poisonDamage}ダメージ！\n`;
+        poisonMessage += `☠️ ${armyNames[army]}の猛毒Lv${armySkills['猛毒']}効果！${armyNames[enemyArmy]}に${poisonDamage}撃破！\n`;
       }
     }
     
     if (poisonMessage) {
       await gameState.save();
-      await interaction.followUp(`### 🎯 **${totalActions}レス到達！猛毒タイム！**\n${poisonMessage}`);
+      await interaction.followUp(`### ☠️ **${totalActions}レス到達！猛毒発動！**\n${poisonMessage}`);
     }
   }
 }
@@ -266,11 +266,11 @@ export async function execute(interaction) {
     const randomStr = randomNum.toString().padStart(2, '0');
     
     let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
-    message += `### :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__\n`;
+    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
     
     // 行動判定
     const action = processPassiveAction(randomNum);
-    message += `### ➡️ ${action.message}\n`;
+    message += ` → ${action.message}\n`;
     
     let totalDamage = action.kills || 0;
     let totalHeal = 0;
@@ -293,7 +293,7 @@ export async function execute(interaction) {
       totalHeal += skillEffects.selfHeal;
       
       if (skillEffects.skillEffects.length > 0) {
-        message += skillEffects.skillEffects.map(effect => `### ${effect}`).join('\n') + '\n';
+        message += skillEffects.skillEffects.map(effect => `** ${effect}`).join('\n') + '\n';
       }
     }
     
@@ -314,7 +314,7 @@ export async function execute(interaction) {
       } else {
         gameState.a_team_kills = Math.max(0, gameState.a_team_kills - totalHeal);
       }
-      message += `### 💚 自軍が${totalHeal}回復！\n`;
+      message += `** 💚 自軍が${totalHeal}回復！\n`;
     }
     
     // 行動回数更新
@@ -334,7 +334,7 @@ export async function execute(interaction) {
     const armySkillsField = `${army.toLowerCase()}_passive_skills`;
     const armySkills = gameState[armySkillsField] ? JSON.parse(gameState[armySkillsField]) : {};
     const skillList = Object.entries(armySkills).map(([type, level]) => `${type}Lv${level}`).join(', ');
-    message += `-# >>> 🎯 ${armyNames[army]}のスキル: ${skillList || 'なし'}\n`;
+    message += `-# >>> :gear: ${armyNames[army]}のスキル: ${skillList || 'なし'}\n`;
     
     // カスタムメッセージ
     if (customMessage) {
