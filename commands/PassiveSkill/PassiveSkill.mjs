@@ -343,6 +343,91 @@ export async function execute(interaction) {
     
     await interaction.editReply(message);
     
+    // BOB支援制度（パッシブスキル制対応）
+if (player.bobEnabled) {
+const bobId = `bob-${userId}`;
+let bobUser = await User.findOne({ where: { id: bobId } });
+// BOBユーザーが存在しない場合は作成
+if (!bobUser) {
+const bobname = `BOB - ${username}のパートナー`;
+bobUser = await User.create({
+id: bobId,
+username: bobname,
+army: army,
+rank: '二等兵🔸',
+total_kills: 0
+});
+console.log('BOBユーザーを新規作成:', bobname);
+}
+if (bobUser) {
+// BOB用のジャッジナンバー生成
+const bobRandomNum = Math.floor(Math.random() * 100);
+const bobRandomStr = bobRandomNum.toString().padStart(2, '0');
+let bobMessage = `-# **BOB支援制度**が発動！\n`;
+const emoji = "<:custom_emoji:1350367513271341088>";
+bobMessage += `-# ${emoji} ${armyNames[army]} ${bobUser.username} の行動判定！\n`;
+bobMessage += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${bobRandomStr}__**`;
+// BOB行動判定
+const bobAction = processPassiveAction(bobRandomNum);
+bobMessage += `→ ${bobAction.message}\n`;
+let bobTotalDamage = bobAction.kills || 0;
+let bobTotalHeal = 0;
+// BOBスキル関連処理
+if (bobAction.type === 'skill_get') {
+const bobSkillResult = await processSkillGet(bobUser, army, gameState);
+bobMessage += bobSkillResult.message;
+bobTotalDamage += bobSkillResult.bonusDamage;
+} else if (bobAction.type === 'skill_break') {
+const bobBreakResult = await processSkillBreak(bobUser, army, gameState);
+bobMessage += bobBreakResult.message;
+bobTotalDamage += bobBreakResult.bonusDamage;
+}
+// BOBスキル効果適用
+if (bobAction.type === 'normal_kill' || bobAction.type === 'massive_kill') {
+const bobSkillEffects = await applySkillEffects(army, bobAction, gameState);
+bobTotalDamage += bobSkillEffects.additionalDamage;
+bobTotalHeal += bobSkillEffects.selfHeal;
+if (bobSkillEffects.skillEffects.length > 0) {
+bobMessage += bobSkillEffects.skillEffects.map(effect => `### ${effect}`).join('\n') + '\n';
+}
+}
+// BOBダメージ適用
+if (bobTotalDamage > 0) {
+if (army === 'A') {
+gameState.a_team_kills += bobTotalDamage;
+} else {
+gameState.b_team_kills += bobTotalDamage;
+}
+bobUser.total_kills += bobTotalDamage;
+}
+// BOB回復適用
+if (bobTotalHeal > 0) {
+if (army === 'A') {
+gameState.b_team_kills = Math.max(0, gameState.b_team_kills - bobTotalHeal);
+} else {
+gameState.a_team_kills = Math.max(0, gameState.a_team_kills - bobTotalHeal);
+}
+bobMessage += `### 💚 自軍が${bobTotalHeal}回復！\n`;
+}
+// BOB行動回数更新
+bobUser.gekiha_counts += 1;
+await bobUser.save();
+await gameState.save();
+// BOB戦況表示（ダメージ時のみ）
+if (bobTotalDamage > 0) {
+const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+bobMessage += `-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
+bobMessage += `-# >>> 🏅戦績: ${armyNames[army]} ${bobUser.username} 行動数: **${bobUser.gekiha_counts}回** 撃破数: **${bobUser.total_kills}撃破**\n`;
+}
+// BOB軍スキル一覧表示（常時）
+const armySkillsField = `${army.toLowerCase()}_passive_skills`;
+const armySkills = gameState[armySkillsField] ? JSON.parse(gameState[armySkillsField]) : {};
+const skillList = Object.entries(armySkills).map(([type, level]) => `${type}Lv${level}`).join(', ');
+bobMessage += `-# >>> 🎯 ${armyNames[army]}のスキル: ${skillList || 'なし'}\n`;
+await interaction.followUp(bobMessage);
+}
+}
     // 猛毒効果チェック
     await processPoisonEffect(interaction);
     
