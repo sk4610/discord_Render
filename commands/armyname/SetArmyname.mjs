@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState } from '../taisen/game.js';
-import { armyNames } from './armyname.js';
 
 export const data = new SlashCommandBuilder()
   .setName('setarmyname')
@@ -32,6 +31,7 @@ export async function execute(interaction) {
       return await interaction.reply('A軍とB軍は異なる名前にしてください。');
     }
 
+    
     // GameStateに軍名を保存/更新
     await GameState.upsert({ 
       id: 1,
@@ -39,18 +39,24 @@ export async function execute(interaction) {
       custom_army_b_name: armyB
     });
 
-    // 現在の設定を確認して表示
-    const gameState = await GameState.findByPk(1);
-    
     await interaction.reply(
       `🏷️ **軍名を設定しました！**\n` +
-      `📋 **A軍**: ${gameState.custom_army_a_name}\n` +
-      `📋 **B軍**: ${gameState.custom_army_b_name}\n\n` +
+      `📋 **A軍**: ${armyA}\n` +
+      `📋 **B軍**: ${armyB}\n\n` +
       `次回の大戦から新しい軍名が適用されます。`
     );
 
   } catch (error) {
     console.error('軍名設定エラー:', error);
-    await interaction.reply('エラー: 軍名の設定に失敗しました');
+    
+    if (error.message.includes('no such column')) {
+      await interaction.reply(
+        '⚠️ **データベース構造エラー**\n' +
+        'game.js のGameStateモデルに軍名フィールドが不足しています。\n' +
+        '`/reset force_recreate:True` で完全リセットを実行してください。'
+      );
+    } else {
+      await interaction.reply('エラー: 軍名の設定に失敗しました');
+    }
   }
 }

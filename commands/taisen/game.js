@@ -154,9 +154,13 @@ const GameState = sequelize.define('GameState', {
   notification_25_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
   notification_10_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
 
-// パッシブスキル制用フィールド
+ // パッシブスキル制用フィールド
   a_passive_skills: { type: DataTypes.TEXT, defaultValue: '{}' },
   b_passive_skills: { type: DataTypes.TEXT, defaultValue: '{}' },
+
+ // 軍名設定用フィールド（追加）
+  custom_army_a_name: { type: DataTypes.STRING, defaultValue: null },
+  custom_army_b_name: { type: DataTypes.STRING, defaultValue: null },
 
 });
 
