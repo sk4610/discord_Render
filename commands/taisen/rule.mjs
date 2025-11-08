@@ -18,6 +18,8 @@ export const data = new SlashCommandBuilder()
         { name: 'ビースト制', value: 'beast' },
         // パッシブスキル制
         { name: 'パッシブスキル制', value: 'passive' }
+        // ファイティング制
+        { name: 'ファイティング制', value: 'fighting' }
       ));
 
 export async function execute(interaction) {
@@ -44,6 +46,8 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
       await interaction.reply(`ルールをビースト制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }else if(mode === 'passive'){
       await interaction.reply(`ルールをパッシブスキル制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
+    }else if(mode === 'fighting'){
+      await interaction.reply(`ルールをファイティング制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }
     
     } catch (error) {

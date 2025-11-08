@@ -62,6 +62,10 @@ const User = sequelize.define('User', {
   beast_is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
   beast_has_fed: { type: DataTypes.BOOLEAN, defaultValue: false },
   last_action_time: { type: DataTypes.DATE, defaultValue: null },
+
+  // ファイティング制用フィールド
+  fight_value: { type: DataTypes.INTEGER, defaultValue: 1 },
+
 });
 
 // ゲームの状態を格納する GamaState
