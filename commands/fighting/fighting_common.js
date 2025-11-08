@@ -39,7 +39,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
     const randomStr = randomNum.toString().padStart(2, '0');
     
     let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
-    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
+    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__`;
     
     const isMultipleOf10 = randomNum % 10 === 0;
     const isZorome = Math.floor(randomNum / 10) === randomNum % 10;
@@ -50,7 +50,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
     // 10の倍数判定
     if (isMultipleOf10) {
       totalDamage += 1;
-      actionMessage += `** ⚡ 10の倍数！** 敵軍に1ダメージ！\n`;
+      actionMessage += ` → **10の倍数！** 敵軍に1ダメージ！\n`;
     }
     
     // ゾロ目判定
@@ -61,12 +61,12 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
           const oldFight = player.fight_value;
           const newFight = oldFight * 2;
           await player.update({ fight_value: newFight });
-          actionMessage += `** 🔥 チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**2倍！**\n`;
+          actionMessage += `** →  チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**2倍！**\n`;
         } else {
           const oldFight = player.fight_value;
           const newFight = oldFight + 1;
           await player.update({ fight_value: newFight });
-          actionMessage += `** 💪 チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**+1！**\n`;
+          actionMessage += `** →  チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**+1！**\n`;
         }
       } else if (actionType === 'punch') {
         // /punch のゾロ目処理
@@ -85,11 +85,11 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
           
           if (randomNum <= 22) {
             await targetPlayer.update({ fight_value: 1 });
-            actionMessage += `** 💥 クリティカルパンチ！** ${targetUsername}のファイト値を **1 にリセット！**\n`;
+            actionMessage += `** → 💥 クリティカルパンチ！** ${targetUsername}のファイト値を **1 にリセット！**\n`;
           } else {
             const newTargetFight = Math.max(1, oldTargetFight - 1);
             await targetPlayer.update({ fight_value: newTargetFight });
-            actionMessage += `** 👊 **パンチ成功！** ${targetUsername}のファイト値を ${oldTargetFight} → ${newTargetFight} に-1！\n`;
+            actionMessage += `** → 👊 **パンチ成功！** ${targetUsername}のファイト値を ${oldTargetFight} → ${newTargetFight} に-1！\n`;
           }
         }
       } else if (actionType === 'burst') {
@@ -97,11 +97,11 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
         if (randomNum === 0) {
           const burstDamage = player.fight_value * 2;
           totalDamage += burstDamage;
-          actionMessage += `** 💣 スーパーバースト！** 敵軍に **${burstDamage}ダメージ** (ファイト×2)！\n`;
+          actionMessage += `** → 💣 スーパーバースト！** 敵軍に **${burstDamage}ダメージ** (ファイト×2)！\n`;
         } else {
           const burstDamage = player.fight_value;
           totalDamage += burstDamage;
-          actionMessage += `** 🌟 バースト成功！** 敵軍に **${burstDamage}ダメージ** (ファイト×1)！\n`;
+          actionMessage += `** → 🌟 バースト成功！** 敵軍に **${burstDamage}ダメージ** (ファイト×1)！\n`;
         }
       }
     } else if (!isMultipleOf10) {
@@ -131,11 +131,11 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
       const aHP = gameState.initialArmyHP - gameState.b_team_kills;
       const bHP = gameState.initialArmyHP - gameState.a_team_kills;
       message += `-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
-      message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
+      message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**`;
     }
     
     // ファイト値表示（常時）
-    message += `-# >>> 💪 あなたのファイト値: **${player.fight_value}**\n`;
+    message += `-# >>>  あなたのファイト値: **${player.fight_value}**\n`;
     
     // カスタムメッセージ
     if (customMessage) {
