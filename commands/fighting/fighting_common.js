@@ -61,12 +61,12 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
           const oldFight = player.fight_value;
           const newFight = oldFight * 2;
           await player.update({ fight_value: newFight });
-          actionMessage += `** →  💪 チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**2倍！**\n`;
+          actionMessage += ` ** →  💪 チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**2倍！**\n`;
         } else {
           const oldFight = player.fight_value;
           const newFight = oldFight + 1;
           await player.update({ fight_value: newFight });
-          actionMessage += `** →  :thumbsup: チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**+1！**\n`;
+          actionMessage += ` ** →  :thumbsup: チャージ成功！** ファイト値が ${oldFight} → ${newFight} に**+1！**\n`;
         }
       } else if (actionType === 'punch') {
         // /punch のゾロ目処理
@@ -85,11 +85,11 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
           
           if (randomNum <= 22) {
             await targetPlayer.update({ fight_value: 1 });
-            actionMessage += `** → 💥 クリティカルパンチ！** ${targetUsername}のファイト値を **1 にリセット！**\n`;
+            actionMessage += ` ** → 💥 クリティカルパンチ！** ${targetUsername}のファイト値を **1 にリセット！**\n`;
           } else {
             const newTargetFight = Math.max(1, oldTargetFight - 1);
             await targetPlayer.update({ fight_value: newTargetFight });
-            actionMessage += `** → 👊 **パンチ成功！** ${targetUsername}のファイト値を ${oldTargetFight} → ${newTargetFight} に-1！\n`;
+            actionMessage += ` ** → 👊 **パンチ成功！** ${targetUsername}のファイト値を ${oldTargetFight} → ${newTargetFight} に-1！\n`;
           }
         }
       } else if (actionType === 'burst') {
@@ -97,11 +97,11 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
         if (randomNum === 0) {
           const burstDamage = player.fight_value * 2;
           totalDamage += burstDamage;
-          actionMessage += `** → :fireworks:  スーパーバースト！** 敵軍に **${burstDamage}ダメージ** (ファイト×2)！\n`;
+          actionMessage += ` ** → :fireworks:  スーパーバースト！** 敵軍に **${burstDamage}ダメージ** (ファイト×2)！\n`;
         } else {
           const burstDamage = player.fight_value;
           totalDamage += burstDamage;
-          actionMessage += `** → 🌟 バースト成功！** 敵軍に **${burstDamage}ダメージ** (ファイト×1)！\n`;
+          actionMessage += ` ** → 🌟 バースト成功！** 敵軍に **${burstDamage}ダメージ** (ファイト×1)！\n`;
         }
       }
     } else if (!isMultipleOf10) {
