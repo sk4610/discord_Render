@@ -130,6 +130,6 @@ export async function execute(interaction) {
 
   } catch (error) {
     console.error('軍配属エラー:', error);
-    await interaction.editreply('エラー: 軍の選択に失敗しました');
+    await interaction.editReply('エラー: 軍の選択に失敗しました');
   }
 }
