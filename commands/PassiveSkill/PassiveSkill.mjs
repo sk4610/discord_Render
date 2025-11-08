@@ -338,7 +338,7 @@ export async function execute(interaction) {
     
     // カスタムメッセージ
     if (customMessage) {
-      message += `\n\`\`\`${customMessage}\`\`\``;
+      message += `\`\`\`${customMessage}\`\`\`\n`;
     }
     
     await interaction.editReply(message);
