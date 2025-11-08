@@ -17,7 +17,7 @@ export const data = new SlashCommandBuilder()
         // ビースト制
         { name: 'ビースト制', value: 'beast' },
         // パッシブスキル制
-        { name: 'パッシブスキル制', value: 'passive' }
+        { name: 'パッシブスキル制', value: 'passive' },
         // ファイティング制
         { name: 'ファイティング制', value: 'fighting' }
       ));
