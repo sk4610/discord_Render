@@ -131,7 +131,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
       const aHP = gameState.initialArmyHP - gameState.b_team_kills;
       const bHP = gameState.initialArmyHP - gameState.a_team_kills;
       message += `-# >>> :crossed_swords: 現在の戦況: ${armyNames.A} ${aHP} vs ${armyNames.B} ${bHP}\n`;
-      message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**`;
+      message += `-# >>> 🏅戦績: ${armyNames[army]} ${username} 行動数: **${player.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
     }
     
     // ファイト値表示（常時）
