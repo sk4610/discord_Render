@@ -39,7 +39,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
     const randomStr = randomNum.toString().padStart(2, '0');
     
     let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
-    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__`;
+    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
     
     const isMultipleOf10 = randomNum % 10 === 0;
     const isZorome = Math.floor(randomNum / 10) === randomNum % 10;
@@ -135,7 +135,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
     }
     
     // ファイト値表示（常時）
-    message += `-# >>>  あなたのファイト値: **${player.fight_value}**\n`;
+    message += `-# >>>  あなたのファイト値: ${player.fight_value}\n`;
     
     // カスタムメッセージ
     if (customMessage) {
