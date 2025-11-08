@@ -41,6 +41,9 @@ export function getArmyName(army) {
 }
 
 export async function execute(interaction) {
+  //2025/11/08遅延対策で追加
+  await interaction.deferReply();
+
   const army = interaction.options.getString('army');
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
@@ -51,7 +54,7 @@ export async function execute(interaction) {
     // ルールが設定されているか確認
     const gameState = await GameState.findByPk(1);
     if (!gameState || !gameState.rule_set) {
-      return await interaction.reply('エラー: まず /rule コマンドでルールを設定してください。');
+      return await interaction.editReply('エラー: まず /rule コマンドでルールを設定してください。');
     }
 
     // すでに登録済みか確認
@@ -81,15 +84,15 @@ export async function execute(interaction) {
         await User.create({ id: bobId, username: bobname, army: army, rank: bobRank, total_kills: 0 });
         //各ルールで初期表示を変える
         if(gameState.rule_type === 'ranked'){// 階級制のとき          
-          await interaction.reply(` ⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！\nただし、あなたの支援兵士 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
+          await interaction.editReply(` ⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！\nただし、あなたの支援兵士 **BOB** も **${bobRank}** で **${armyName}** に配属されました！`);
         }else{
-          await interaction.reply(` ⚠️: あなたはすでに **${existingArmyName}**  です！\nただし、あなたの支援兵士 **BOB** も **${armyName}** に配属されました！`);
+          await interaction.editReply(` ⚠️: あなたはすでに **${existingArmyName}**  です！\nただし、あなたの支援兵士 **BOB** も **${armyName}** に配属されました！`);
         }
           
         return;
       }
     }
-      return await interaction.reply(`⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
+      return await interaction.editReply(`⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
     }
 
     // ランダムな階級を決定
@@ -114,17 +117,19 @@ export async function execute(interaction) {
     
     //各ルールで初期表示を変える
     if(gameState.rule_type === 'ranked'){ // 階級制のとき
-      await interaction.reply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);    
+      await interaction.editReply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);    
     }else if(gameState.rule_type === 'coin'){ // 属性コイン制のとき
-      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
     }else if(gameState.rule_type === 'beast'){ // ビースト制のとき
-      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
     }else if(gameState.rule_type === 'passive'){ // パッシブスキル制のとき
-      await interaction.reply(`${username} さんが **${armyName}** に配属されました！`);    
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
+    }else if(gameState.rule_type === 'fighting'){ // パッシブスキル制のとき
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
     }
 
   } catch (error) {
     console.error('軍配属エラー:', error);
-    await interaction.reply('エラー: 軍の選択に失敗しました');
+    await interaction.editreply('エラー: 軍の選択に失敗しました');
   }
 }
