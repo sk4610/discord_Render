@@ -122,7 +122,7 @@ async function applySkillEffects(army, action, gameState) {
 
 // スキル取得処理（軍ベース）- レベル上書き対応版
 async function processSkillGet(player, army, gameState) {
-  const armyNames = await getArmyNames();
+  //const armyNames = await getArmyNames();
   const armySkillsField = `${army.toLowerCase()}_passive_skills`;
   const currentSkills = gameState[armySkillsField] ? JSON.parse(gameState[armySkillsField]) : {};
   let message = '';
