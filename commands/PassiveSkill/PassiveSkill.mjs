@@ -120,8 +120,9 @@ async function applySkillEffects(army, action, gameState) {
   return { additionalDamage, selfHeal, skillEffects };
 }
 
-// スキル取得処理（軍ベース）
+// スキル取得処理（軍ベース）- レベル上書き対応版
 async function processSkillGet(player, army, gameState) {
+  const armyNames = await getArmyNames();
   const armySkillsField = `${army.toLowerCase()}_passive_skills`;
   const currentSkills = gameState[armySkillsField] ? JSON.parse(gameState[armySkillsField]) : {};
   let message = '';
@@ -133,22 +134,32 @@ async function processSkillGet(player, army, gameState) {
     const luckChance = currentSkills['幸運'] * 10;
     if (Math.floor(Math.random() * 100) < luckChance) {
       attempts = 2;
-      message += `🍀 ${armyNames[army]}の幸運Lv${currentSkills['幸運']}発動！追加でスキル取得！\n`;
+      message += `### 🍀 ${armyNames[army]}の幸運Lv${currentSkills['幸運']}発動！追加でスキル取得！\n`;
     }
   }
   
   for (let i = 0; i < attempts; i++) {
     const newSkill = generateRandomSkill();
     const skillKey = newSkill.type;
+    const newLevel = newSkill.level;
     
     if (currentSkills[skillKey]) {
-      // 既に持っているスキル
-      bonusDamage += 1;
-      message += `🔄 ${armyNames[army]}は${skillKey}Lv${newSkill.level}を既に所持！敵軍を1撃破\n`;
+      const currentLevel = currentSkills[skillKey];
+      
+      // ⭐ 上位レベル取得時は上書き
+      if (newLevel > currentLevel) {
+        currentSkills[skillKey] = newLevel;
+        message += `### ⬆️ ${armyNames[army]}の【${skillKey}】が Lv${currentLevel} → **Lv${newLevel}** にアップグレード！\n`;
+      } 
+      // ⭐ 下位または同レベル取得時は上書きせず1ダメージ
+      else {
+        bonusDamage += 1;
+        message += `### 🔄 ${armyNames[army]}は【${skillKey}】Lv${newLevel}を取得済み（現在Lv${currentLevel}）！敵軍に1ダメージ\n`;
+      }
     } else {
       // 新規スキル取得
-      currentSkills[skillKey] = newSkill.level;
-      message += `✨ ${armyNames[army]}が新スキル【${skillKey}】Lv${newSkill.level}を取得！\n`;
+      currentSkills[skillKey] = newLevel;
+      message += `### ✨ ${armyNames[army]}が新スキル【${skillKey}】Lv${newLevel}を取得！\n`;
     }
   }
   
