@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import fs from 'fs'; // ⭐ 追加
 
 // ⭐ 起動時にデータベースファイルを削除
 const dbPath = "./data/botdata.sqlite";
