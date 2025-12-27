@@ -1,13 +1,28 @@
 import { Sequelize } from "sequelize";
+import fs from 'fs';
+import path from 'path';
 
-// SQLite データベースの接続設定
+const dataDir = "./data";
+const dbPath = path.join(dataDir, "botdata.sqlite");
+
+// dataディレクトリがなければ作成
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  console.log('📁 data ディレクトリを作成しました');
+}
+
+// 既存のデータベースを削除（起動時に1回だけ）
+if (fs.existsSync(dbPath)) {
+  fs.unlinkSync(dbPath);
+  console.log('🗑️ 古いデータベースを削除しました');
+}
+
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "./data/botdata.sqlite", // ファイルを統一
-  logging: false, // ログ出力を抑制
+  storage: dbPath,
+  logging: false,
 });
 
-// データベース接続をテスト
 async function testConnection() {
   try {
     await sequelize.authenticate();
