@@ -11,12 +11,13 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
+  await interaction.deferReply(); // ⭐ この1行を追加
   try {
     const forceRecreate = interaction.options.getBoolean('force_recreate') || false;
     
     if (forceRecreate) {
       // 完全リセット（テーブル構造も含めて再作成）
-      await interaction.reply('🔄 **完全リセット開始中...**\nテーブル構造も含めて再作成します。');
+      await interaction.editReply('🔄 **完全リセット開始中...**\nテーブル構造も含めて再作成します。');
       
       console.log('🗑️ テーブルを完全削除中...');
       await sequelize.drop();
@@ -25,11 +26,11 @@ export async function execute(interaction) {
       await sequelize.sync({ force: true });
       
       console.log('✅ 完全リセット完了');
-      await interaction.followUp('✅ **完全リセット完了！**\n新しいテーブル構造で大戦データが初期化されました。');
+      await interaction.editReply('✅ **完全リセット完了！**\n新しいテーブル構造で大戦データが初期化されました。');
       
     } else {
       // 通常リセット（データのみ削除）
-      console.log('🗑️ データのみリセット中...');
+      await interaction.editReply('🗑️ データのみリセット中...');
       
       // プレイヤーデータ削除
       await User.destroy({ where: {} });
