@@ -11,7 +11,6 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
-  await interaction.deferReply();
   try {
     const forceRecreate = interaction.options.getBoolean('force_recreate') || false;
     
