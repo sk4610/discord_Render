@@ -2,8 +2,8 @@ import { GameState } from '../taisen/game.js';
 
 // デフォルト軍名（データベースに設定がない場合の fallback）
 const defaultArmyNames = {
-  A: 'おしゅし鍋軍',
-  B: 'すぎのこ軍'
+  A: 'クリスマス軍',
+  B: '師走軍'
 };
 
 // 動的軍名取得関数
