@@ -1,12 +1,6 @@
 import { Sequelize } from "sequelize";
-import fs from 'fs'; // ⭐ 追加
 
-// ⭐ 起動時にデータベースファイルを削除
-const dbPath = "./data/botdata.sqlite";
-if (fs.existsSync(dbPath)) {
-  fs.unlinkSync(dbPath);
-  console.log('🗑️ 古いデータベースを削除しました');
-}
+
 
 // SQLite データベースの接続設定
 const sequelize = new Sequelize({
