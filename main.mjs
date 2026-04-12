@@ -119,7 +119,7 @@ YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
 CommandsRegister();
-client.login(process.env.TOKEN); //元はTOKEN
+client.login(process.env.TOKEN);
 
 
 async function trigger() {
