@@ -124,7 +124,9 @@ export async function execute(interaction) {
       await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
     }else if(gameState.rule_type === 'passive'){ // パッシブスキル制のとき
       await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
-    }else if(gameState.rule_type === 'fighting'){ // パッシブスキル制のとき
+    }else if(gameState.rule_type === 'fighting'){ // ファイティング制のとき
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
+    }else if(gameState.rule_type === 'skillgein'){ // 技能習得制のとき
       await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
     }
 
