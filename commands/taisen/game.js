@@ -65,6 +65,13 @@ const User = sequelize.define('User', {
 
   // ファイティング制用フィールド
   fight_value: { type: DataTypes.INTEGER, defaultValue: 1 },
+  
+  // 技能習得制フィールド
+  skill_atk:    { type: DataTypes.INTEGER, defaultValue: 1 },
+  skill_magic:  { type: DataTypes.INTEGER, defaultValue: 1 },
+  skill_spirit: { type: DataTypes.INTEGER, defaultValue: 1 },
+  skill_snipe:  { type: DataTypes.INTEGER, defaultValue: 0 },
+  skills_data:  { type: DataTypes.TEXT,    defaultValue: '[]' },
 
 });
 

@@ -19,7 +19,9 @@ export const data = new SlashCommandBuilder()
         // パッシブスキル制
         { name: 'パッシブスキル制', value: 'passive' },
         // ファイティング制
-        { name: 'ファイティング制', value: 'fighting' }
+        { name: 'ファイティング制', value: 'fighting' },
+        //技能習得制
+        { name: '技能習得制', value: 'skillgein' }
       ));
 
 export async function execute(interaction) {
