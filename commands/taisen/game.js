@@ -173,6 +173,13 @@ const GameState = sequelize.define('GameState', {
   custom_army_a_name: { type: DataTypes.STRING, defaultValue: null },
   custom_army_b_name: { type: DataTypes.STRING, defaultValue: null },
 
+  // 軍BOBシステム用フィールド
+  armybob_enabled: { type: DataTypes.BOOLEAN, defaultValue: false },
+  armybob_interval: { type: DataTypes.INTEGER, defaultValue: 1 }, // 行動間隔（分）
+  armybob_target_size: { type: DataTypes.INTEGER, defaultValue: 5 }, // 軍あたり目標兵数（人間+BOB合計）
+  armybob_channel_id: { type: DataTypes.STRING, defaultValue: null }, // ログ投稿チャンネルID
+  armybob_last_action: { type: DataTypes.DATE, defaultValue: null }, // 最後にBOBが行動した時刻
+
 });
 
 // 決闘記録テーブル（ビースト制用）

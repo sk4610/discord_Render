@@ -18,7 +18,7 @@ async function getCountMode() {
 }
 
 // 撃破処理と昇格判定（乱数表示版）
-function processKillWithRandom(currentRank) {
+export function processKillWithRandom(currentRank) {
   let kills = 0;
   let rankUp = false;
   let displayMessage = "";

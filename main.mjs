@@ -6,6 +6,7 @@ import CommandsRegister from "./regist-commands.mjs";
 import Notification from "./models/notification.mjs";
 import YoutubeFeeds from "./models/youtubeFeeds.mjs";
 import YoutubeNotifications from "./models/youtubeNotifications.mjs";
+import { startArmyBobTimer } from "./commands/bob/armyBobManager.mjs";
 
 import Sequelize from "sequelize";
 import Parser from 'rss-parser';
@@ -112,6 +113,7 @@ client.on("messageCreate", async (message) => {
 client.on("ready", async () => {
   await client.user.setActivity('大戦');
   console.log(`${client.user.tag} がログインしました！`);
+  startArmyBobTimer(client);
 });
 
 Notification.sync({ alter: true });
