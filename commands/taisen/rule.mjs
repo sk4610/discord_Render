@@ -50,9 +50,10 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
       await interaction.reply(`ルールをパッシブスキル制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }else if(mode === 'fighting'){
       await interaction.reply(`ルールをファイティング制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
-    }else if(mode === 'skillgein'){
+    }else if(mode === 'skiigein'){
       await interaction.reply(`ルールを技能習得制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
-    
+    }
+
     } catch (error) {
     console.error('ルール設定エラー:', error);
     await interaction.reply('エラー: ルールの設定に失敗しました');
