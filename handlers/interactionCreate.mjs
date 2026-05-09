@@ -10,11 +10,13 @@ export default async(interaction) => {
 	try {
 		await command.execute(interaction);
 	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'コマンド実行中にエラーが発生しました。', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'コマンド実行中にエラーが発生しました。', ephemeral: true });
-		}
-	}
+  console.error(error);
+  if (interaction.deferred) {
+    await interaction.editReply('コマンド実行中にエラーが発生しました。');
+  } else if (interaction.replied) {
+    await interaction.followUp({ content: 'コマンド実行中にエラーが発生しました。', ephemeral: true });
+  } else {
+    await interaction.reply({ content: 'コマンド実行中にエラーが発生しました。', ephemeral: true });
+  }
+}
 };
