@@ -35,7 +35,7 @@ function rollFireMultiplier() {
 
 // ─── コマンド定義 ──────────────────────────────────────────────
 export const data = new SlashCommandBuilder()
-  .setName('action')
+  .setName('action2')
   .setDescription('技能習得制：行動する（00〜99の乱数を生成）');
 
 // ─── コマンド実行 ──────────────────────────────────────────────
