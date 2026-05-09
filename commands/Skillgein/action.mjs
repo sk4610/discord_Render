@@ -53,7 +53,7 @@ export async function execute(interaction) {
   const gameState = await GameState.findOne();
   const armyNames = await getArmyNames();
 
-  if (gameState.rule_type !== 'skill') {
+  if (gameState.rule_type !== 'skillgein') {
     return await interaction.editReply('現在は技能習得制ルールではありません。');
   }
   if (gameState.isGameOver) {
