@@ -1,42 +1,109 @@
-commands
-├armyname
-│　└armyname.js     // armyNamesの設定ファイル　軍名をきのこ軍、たけのこ軍以外も設定表示できるように
-├bob
-│　├bob.mjs            // "/bob"でBOBというという仮想兵士を自分に召喚　/gekihaでBOBも撃破を追加判定
-│　├Normal_bob.txt  // bobが撃破処理判定の度にtxtからランダムでセリフを喋るセリフテキスト
-│　└Start_bob.txt     // "/bob"で最初に書き込んだときの挨拶セリフテキスト
-├coin
-│　├coin earth.mjs           // "/coin"で属性コイン制というルールを処理させるプログラム
-│　├coin fire.mjs           // "/coin"で属性コイン制というルールを処理させるプログラム
-│　├coin thunder.mjs           // "/coin"で属性コイン制というルールを処理させるプログラム
-│　├coin water.mjs           // "/coin"で属性コイン制というルールを処理させるプログラム
-│　└coin wood.mjs           // "/coin"で属性コイン制というルールを処理させるプログラム
-├general
-│　└say.mjs            // "say"でコメントを打てるサンプルプログラム
-├kaikyu
-│　├kaikyu.mjs        // "/kaikyu"でuserの所属軍、階級をランダムに割当（所属軍はユーザ選択）
-│　└kaikyu_main.js   // "/gekiha"時にruleが階級制のときに書き込みから撃破数を判定実行するメインファイル
-├money
-│　└money.mjs        // "/money"で100Gを追加するだけのプログラム
-├shukei
-│　├CountMode.mjs // "/count"で終戦方式をカウントダウンかカウントアップに切り替える
-│　└shukeiNotice.js  // CountMode=downで兵力が0になった場合自動通知ができるように設定したが、現在はgekiha.mjs内でその処理があるため未使用
-├taisen
-│　├finish.mjs         // "/finish"で終戦表示をする、CountMode=Upでオート終戦じゃないときを想定
-│　├game.js           //データベース(sequelize)の設定格納ファイル
-│　├gekiha.mjs        // "/gekiha"で行動するときの処理部　複数のルールで使うことを想定
-│　├ranking.mjs      // "/ranking"で各軍戦績上位3名をランキングで公表する
-│　├reset.mjs         // "/reset"でデータベースのテーブルを全リセット　大戦終了後に使用を想定
-│　├rule.mjs           // "/rule"でどのルールで遊ぶかを決める　/ruleがないと/gekihaを押してもエラーになるように設定
-│　└show.mjs         // 大戦中の状況を表示するための途中戦況コマンド
-└utils
-　　├database.js      // データベース(sequelize)の接続設定ファイル
-　　├dice.mjs           // "/dice"でサイコロを振り結果表示
-　　├money.js          // 所持金の設定ファイルだが現在は未使用
-　　└notify.mjs         // 通知コマンドとのことだがサンプルで入っているため未使用
+================================================================
+ きのたけBot フォルダ構造・処理の流れ　2026/05/10更新
+================================================================
 
-//階級制処理の流れ
-// rule.mjs /ruleで rule_typeをname:階級制, value:rankedに設定
-// 次にkaikyu.mjs(ここ) /startで userの所属軍、階級をランダムに割当（所属軍はユーザ選択）
-// 次にgekiha.mjs /gekihaで　階級制の撃破判定処理を実行　ただし実際に階級制の処理をしているのはkaikyu_main.js
-// gekiha.mjs内で rule_typeが階級制の時に、kaikyu_main.jsの中身を実行する流れになっている
+commands
+├ armyname
+│　├ armyname.js          // 軍名管理　getArmyNames()でDB参照、armyNamesは静的デフォルト(後方互換)
+│　├ SetArmyname.mjs      // /setarmyname　軍名をDiscordから設定する
+│　└ ShowArmyname.mjs     // /showarmyname　現在の軍名設定を表示する
+│
+├ beast
+│　└ beast.mjs            // /beast　ビースト制の行動処理
+│
+├ bob
+│　├ ArmyBob.mjs          // /armybob　軍BOBシステムの設定コマンド
+│　├ armyBobManager.mjs   // 軍BOBのタイマー自動行動エンジン（コマンドではない）
+│　│                      //   startArmyBobTimer(client)をmain.mjsのreadyイベントで起動
+│　│                      //   60秒ごとに確認、armybob_intervalに基づいて行動
+│　│                      //   対応ルール：階級制・属性コイン制
+│　├ bob.mjs              // /bob　個人BOB有効化/無効化
+│　├ bob2.mjs             // /bob2　BOBにランダムセリフを言わせる
+│　├ Normal_bob.txt       // bob2用のBOBセリフ集
+│　└ Start_bob.txt        // /start時のBOB着任セリフ集（未使用化の可能性あり）
+│
+├ coin
+│　├ coin fire.mjs        // /coin-fire　火属性コイン行動
+│　├ coin wood.mjs        // /coin-wood　木属性コイン行動
+│　├ coin earth.mjs       // /coin-earth　土属性コイン行動
+│　├ coin thunder.mjs     // /coin-thunder　雷属性コイン行動
+│　├ coin water.mjs       // /coin-water　水属性コイン行動
+│　└ 属性コイン制.txt     // ルール解説テキスト
+│
+├ fighting
+│　├ punch.mjs            // /punch　ファイティング制：敵のファイト値を下げる
+│　├ charge.mjs           // /charge　ファイティング制：自分のファイト値を上昇
+│　├ burst.mjs            // /burst　ファイティング制：ファイト値でダメージ
+│　└ fighting_common.js   // ファイティング制の共通処理（終戦判定など）
+│
+├ general
+│　└ say.mjs              // 削除済み（サンプルコマンド）
+│
+├ kaikyu
+│　├ kaikyu.mjs           // /start　軍選択・階級割当（全ルール共通の初カキコ）
+│　└ kaikyu_main.js       // 階級制の撃破判定処理（/actionから呼び出し）
+│                         //   processKillWithRandom()をarmyBobManagerでも使用
+│
+├ money
+│　└ money.mjs            // /cent　所持金確認・追加（ほぼ未使用）
+│
+├ omikuji
+│　├ omikuji.mjs          // /omikuji　おみくじを引く
+│　└ comment*.txt         // おみくじコメントテキスト群
+│
+├ PassiveSkill
+│　├ PassiveSkill.mjs     // パッシブスキル制の行動処理（/actionから呼び出し）
+│　│                      //   export executePassive(interaction)
+│　└ パッシブスキル制.txt // ルール解説テキスト
+│
+├ samples
+│　└ janken.mjs           // 削除済み（サンプルコマンド）
+│
+├ shukei
+│　└ CountMode.mjs        // /count　終戦方式の切替（カウントアップ/ダウン・初期HP設定）
+│
+├ Skillgein
+│　├ action.mjs           // 技能習得制の行動処理（/actionから呼び出し）
+│　│                      //   export executeSkillgein(interaction)
+│　└ snipe.mjs            // /snipe　狙撃ポイント消費で敵技能封じ
+│
+├ taisen
+│　├ finish.mjs           // /finish　終戦通知・結果発表（カウントアップ方式用）
+│　├ game.js              // データベース定義（sequelize）User / GameState / BeastDuel
+│　│                      //   sync({ alter: true })で既存データ保持・新カラム自動追加
+│　├ gekiha.mjs           // /action　全ルール統合の行動コマンド
+│　│                      //   rule_typeに応じてkaikyu_main/executePassive/executeSkillgeinへ振り分け
+│　├ ranking.mjs          // /ranking　各軍戦績上位ランキング表示
+│　├ reset.mjs            // /reset　大戦データリセット（force_recreate:Trueで完全初期化）
+│　├ rule.mjs             // /rule　ルール設定（6種対応）
+│　└ show.mjs             // /show　現在の戦況表示
+│
+└ utils
+　　├ database.js         // データベース接続設定（SQLite）
+　　├ dice.mjs            // /dice　サイコロ（例：1d6形式）
+　　├ money.js            // 所持金設定ファイル（未使用）
+　　└ notify.mjs          // 削除済み（大戦と無関係）
+
+================================================================
+ 大戦の処理フロー
+================================================================
+
+【全ルール共通フロー】
+  /rule（ルール選択）
+  → /setarmyname（任意：軍名設定）
+  → /start（軍選択・初期化）
+  → /action（行動 ※ルール別に自動振り分け）
+  → 終戦判定（自動 or /finish）
+  → /reset（次の大戦へ）
+
+【/action の振り分け】
+  rule_type = ranked    → kaikyu_main.js   （階級制撃破判定）
+  rule_type = passive   → PassiveSkill.mjs （パッシブスキル制）
+  rule_type = skillgein → Skillgein/action.mjs（技能習得制）
+  rule_type = coin      → /coin-fire 等を案内
+  rule_type = beast     → /beast を案内
+  rule_type = fighting  → /punch /charge /burst を案内
+
+【/reset の使い方】
+  /reset                通常リセット（データのみ削除、構造保持）
+  /reset force_recreate:True  完全リセット（緊急用・通常は不要）
