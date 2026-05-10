@@ -13,6 +13,7 @@ export default async() => {
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
       await import(filePath).then(module => {
+        if (!module.data) return; // コマンドではないユーティリティファイルはスキップ
         commands.push(module.data.toJSON());
       });
     }
