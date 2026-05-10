@@ -1,16 +1,6 @@
-import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { armyNames } from '../armyname/armyname.js';
 import { checkShusen } from '../taisen/game.js';
-
-export const data = new SlashCommandBuilder()
-  .setName('action')
-  .setDescription('パッシブスキル制で行動します')
-  .addStringOption(option =>
-    option.setName("message")
-      .setDescription("一言添える")
-      .setRequired(false)
-  );
 
 // スキル定義
 const SKILL_TYPES = [
@@ -248,7 +238,7 @@ async function processPoisonEffect(interaction) {
   }
 }
 
-export async function execute(interaction) {
+export async function executePassive(interaction) {
   await interaction.deferReply();
 
   const userId = interaction.user.id;

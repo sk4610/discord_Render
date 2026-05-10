@@ -1,4 +1,3 @@
-import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyNames } from '../armyname/armyname.js';
 
@@ -33,13 +32,8 @@ function rollFireMultiplier() {
   return 4;
 }
 
-// ─── コマンド定義 ──────────────────────────────────────────────
-export const data = new SlashCommandBuilder()
-  .setName('action2')
-  .setDescription('技能習得制：行動する（00〜99の乱数を生成）');
-
 // ─── コマンド実行 ──────────────────────────────────────────────
-export async function execute(interaction) {
+export async function executeSkillgein(interaction) {
   await interaction.deferReply();
 
   const userId = interaction.user.id;
