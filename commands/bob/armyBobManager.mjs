@@ -140,7 +140,7 @@ async function adjustBobCounts(gameState, channel) {
               await channel.send(
                 `${BOB_EMOJI} **[軍BOB着任]** ${armyLabel} に **${bobName}** が着任しました！\n` +
                 rankLine +
-                `-# >>> 「${greeting}」\n.`
+                `-# >>> 「${greeting}」`
               );
             } catch (err) {
               console.error(`❌ BOB着任メッセージエラー (${bobId}):`, err);
@@ -157,7 +157,7 @@ async function adjustBobCounts(gameState, channel) {
           try {
             await channel.send(
               `${BOB_EMOJI} **[軍BOB撤退]** ${armyNames[army]} の **${bob.username}** が撤退しました。\n` +
-              `-# >>> 最終戦績: 行動 ${bob.gekiha_counts}回 / 撃破 ${bob.total_kills}\n.`
+              `-# >>> 最終戦績: 行動 ${bob.gekiha_counts}回 / 撃破 ${bob.total_kills}`
             );
           } catch (err) {
             console.error(`❌ BOB撤退メッセージエラー (${bob.id}):`, err);
@@ -220,7 +220,6 @@ async function executeRankedBobsForArmy(army, client, channel) {
       msg += `-# >>> 🏅 ${armyName} ${bob.username}  階級:${bob.rank}　|　行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
     }
 
-    msg += '.';
     try { await channel.send(msg); } catch (err) { console.error(`❌ BOB投稿エラー:`, err); }
 
     await gameState.reload();
@@ -287,7 +286,6 @@ async function executeCoinBobsForArmy(army, client, channel) {
     if (acquired > 0) {
       msg += `\n-# >>> 🏅 ${armyName} ${bob.username}　行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
     }
-    msg += '.';
 
     if (channel) {
       try { await channel.send(msg); } catch (err) { console.error(`❌ BOBコイン投稿エラー:`, err); }
