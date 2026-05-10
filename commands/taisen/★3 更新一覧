@@ -8,7 +8,7 @@
 /gekiha → /action（階級制）
 /action（パッシブスキル制）→ /action に統合
 /action2（技能習得制）→ /action に統合
-・
+・/setarmyname改良　設定後にDiscord上のチャット表示上は全て軍名変更へ　但し選択時の軍名は表示変更されない
 2026/05/09
 ・技能習得制を導入 rule:skillgein
 
