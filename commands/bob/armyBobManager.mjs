@@ -8,6 +8,33 @@ const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 const ranks = ['二等兵🔸', '一等兵🔺', '軍曹🔶', '曹長♦️', '大尉⚡', '大佐💠', '准将🔆', '大将🔱', '元帥🎖️'];
 const weight = [28, 24, 20, 13, 8, 4, 1.5, 1, 0.5];
 
+// BOBに使う名前リスト（日本語・洋名ミックス）
+const BOB_NAMES = [
+  // 和名
+  '太郎', '花子', '次郎', '三郎', '健一', '美咲', '翔', '愛',
+  '勇', '優', '誠', '恵', '剛', '葵', '蓮', '凛',
+  '大輔', '奈々', '真司', '沙織', '拓也', '由美', '賢二', '千夏',
+  // 洋名
+  'Tom', 'Helen', 'Jack', 'Emma', 'Mike', 'Sara', 'Bob', 'Alice',
+  'Chris', 'Anna', 'James', 'Lisa', 'Ben', 'Maria', 'Leo', 'Nina',
+  'Max', 'Luna', 'Rex', 'Ivy', 'Ace', 'Nova', 'Sam', 'Ruby',
+  'Zoe', 'Liam', 'Ella', 'Owen', 'Mia', 'Evan',
+];
+
+// 着任時の挨拶メッセージリスト
+const BOB_GREETINGS = [
+  'よろしくお願いします！必ず勝利をもたらします！',
+  'ただいま着任しました。全力で戦います！',
+  'お任せください！この戦、勝ちに行きます！',
+  '皆さんと戦えて光栄です。頑張ります！',
+  '微力ながら、共に戦い抜きましょう！',
+  '着任しました。最後まで粘ります！',
+  'この軍に命を預けます。突撃！',
+  'よし、やってやりましょう！',
+  '敵に情けは無用です。行きます！',
+  '一緒に勝利を掴みましょう！',
+];
+
 let bobTimerHandle = null;
 
 // main.mjsから呼び出してBOBタイマーを開始する
@@ -51,8 +78,8 @@ async function checkAndActBobs(client) {
       ? client.channels.cache.get(gameState.armybob_channel_id)
       : null;
 
-    // BOB数を参加者数に合わせて調整
-    await adjustBobCounts(gameState);
+    // BOB数を参加者数に合わせて調整（新規着任BOBがあれば着任メッセージを送る）
+    await adjustBobCounts(gameState, channel);
 
     // 各軍のBOBを行動させる
     await executeBobsForArmy('A', client, channel);
@@ -64,7 +91,8 @@ async function checkAndActBobs(client) {
 }
 
 // 軍ごとのBOB数を参加者数に合わせて自動調整
-async function adjustBobCounts(gameState) {
+// 新規着任したBOBがあれば着任メッセージをチャンネルに投稿する
+async function adjustBobCounts(gameState, channel) {
   const target = gameState.armybob_target_size;
   const armyNames = await getArmyNames();
 
@@ -82,25 +110,41 @@ async function adjustBobCounts(gameState) {
     const needed = Math.max(0, target - humanCount);
 
     if (currentBobs.length < needed) {
-      // BOBを追加作成
       for (let i = currentBobs.length + 1; i <= needed; i++) {
         const bobId = `armybob-${army}-${i}`;
         const exists = await User.findOne({ where: { id: bobId } });
         if (!exists) {
           const bobRank = weightedRandomRank();
+          const bobName = randomBobName();
           const armyLabel = armyNames[army];
+
           await User.create({
             id: bobId,
-            username: `${armyLabel}兵士${army}-${i}`,
+            username: bobName,
             army,
             rank: bobRank,
             total_kills: 0,
           });
-          console.log(`✅ 軍BOB配置: ${bobId} (${bobRank})`);
+          console.log(`✅ 軍BOB配置: ${bobId} "${bobName}" (${bobRank})`);
+
+          // 着任メッセージを投稿
+          if (channel) {
+            const greeting = BOB_GREETINGS[Math.floor(Math.random() * BOB_GREETINGS.length)];
+            const msg =
+              `${BOB_EMOJI} **[軍BOB着任]** ${armyLabel} に **${bobName}** が着任しました！\n` +
+              `-# >>> 🎖️ 初期階級: **${bobRank}**\n` +
+              `-# >>> 「${greeting}」\n` +
+              `.`;
+            try {
+              await channel.send(msg);
+            } catch (err) {
+              console.error(`❌ BOB着任メッセージ投稿エラー (${bobId}):`, err);
+            }
+          }
         }
       }
     } else if (currentBobs.length > needed) {
-      // 余剰BOBを削除（番号の大きいものから）
+      // 余剰BOBを撤退（番号の大きいものから）
       const excess = currentBobs
         .sort((a, b) => {
           const numA = parseInt(a.id.split('-').pop(), 10);
@@ -109,8 +153,19 @@ async function adjustBobCounts(gameState) {
         })
         .slice(0, currentBobs.length - needed);
       for (const bob of excess) {
+        if (channel) {
+          const armyLabel = armyNames[army];
+          try {
+            await channel.send(
+              `${BOB_EMOJI} **[軍BOB撤退]** ${armyLabel} の **${bob.username}** が撤退しました。\n` +
+              `-# >>> 最終戦績: 行動 ${bob.gekiha_counts}回 / 撃破 ${bob.total_kills}\n.`
+            );
+          } catch (err) {
+            console.error(`❌ BOB撤退メッセージ投稿エラー (${bob.id}):`, err);
+          }
+        }
         await bob.destroy();
-        console.log(`🗑️ 軍BOB撤退: ${bob.id}`);
+        console.log(`🗑️ 軍BOB撤退: ${bob.id} "${bob.username}"`);
       }
     }
   }
@@ -151,7 +206,7 @@ async function executeBobsForArmy(army, client, channel) {
     if (!channel) continue;
 
     // 投稿メッセージ作成
-    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} ${bob.username} が行動！\n`;
+    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}** が行動！\n`;
     msg += displayMessage;
 
     if (rankUp) {
@@ -169,7 +224,7 @@ async function executeBobsForArmy(army, client, channel) {
         const totalB = (await User.sum('total_kills', { where: { army: 'B' } })) || 0;
         msg += `-# >>> ⚔️ 現在の戦況: 🟡 ${armyNameA} 兵力${totalA} | 🟢 ${armyNameB} 兵力${totalB}\n`;
       }
-      msg += `-# >>> 🏅 ${armyName} ${bob.username} 行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
+      msg += `-# >>> 🏅 ${armyName} ${bob.username}  階級:${bob.rank}　|　行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
     }
 
     msg += '.';
@@ -195,4 +250,9 @@ function weightedRandomRank() {
     rand -= weight[i];
   }
   return ranks[0];
+}
+
+// 名前リストからランダムに選択
+function randomBobName() {
+  return BOB_NAMES[Math.floor(Math.random() * BOB_NAMES.length)];
 }
