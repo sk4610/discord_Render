@@ -378,14 +378,42 @@ function applyElementSkill(army, element, amount, gameState, armyNames) {
 // ユーティリティ
 // ─────────────────────────────────────────────
 
-// スキル発動に近い属性を優先した加重ランダム選択
+// 戦局を読んだ属性選択（加重ランダム）
 function selectElement(army, gameState) {
+  const enemyArmy = army === 'A' ? 'B' : 'A';
+
+  // HP計算
+  const myKillsReceived   = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
+  const enemyKillsReceived = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
+  const myHP    = gameState.initialArmyHP - myKillsReceived;
+  const enemyHP = gameState.initialArmyHP - enemyKillsReceived;
+  const myHPRatio = myHP / gameState.initialArmyHP;
+
   const weights = ELEMENTS.map(el => {
-    const count = gameState[`${army.toLowerCase()}_${el.key}_coin`] || 0;
-    const mod = count % 5;
-    // あと1枚(mod=4)→重み5, あと2枚(mod=3)→重み4, ..., ちょうど(mod=0)→重み1
-    return mod === 0 ? 1 : mod + 1;
+    const myCoinCount = gameState[`${army.toLowerCase()}_${el.key}_coin`] || 0;
+    const myMod = myCoinCount % 5;
+
+    // 基本重み：自分のスキル発動に近いほど高い
+    let w = myMod === 0 ? 1 : myMod + 1;
+
+    // 🚨 瀕死（HP30%以下）：水を強く優先（回復スキル狙い）
+    if (myHPRatio <= 0.3 && el.key === 'water') w += 8;
+
+    // ⚔️ 敵スキル阻止：敵がスキル発動間近の属性を消せる属性を優先
+    // el のスキルが発動すると enemyArmy の el.erases コインが消える
+    const erasedEnemyCoins = gameState[`${enemyArmy.toLowerCase()}_${el.erases}_coin`] || 0;
+    const erasedEnemyMod   = erasedEnemyCoins % 5;
+    if (erasedEnemyMod >= 3) w += 3; // 敵が3〜4枚 → 消去を急ぐ
+
+    // 💪 優勢時（自HP > 敵HP + 20）：土を優先（優勢×3倍スキル狙い）
+    if (myHP > enemyHP + 20 && el.key === 'earth') w += 3;
+
+    // 📉 劣勢時（敵HP > 自HP + 20）：木を優先（劣勢×3倍スキル狙い）
+    if (enemyHP > myHP + 20 && el.key === 'wood') w += 3;
+
+    return w;
   });
+
   const total = weights.reduce((a, b) => a + b, 0);
   let rand = Math.random() * total;
   for (let i = 0; i < weights.length; i++) {
