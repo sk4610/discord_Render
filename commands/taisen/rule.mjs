@@ -3,7 +3,7 @@ import { GameState } from '../taisen/game.js';
 
 export const data = new SlashCommandBuilder()
   .setName('rule')
-  .setDescription('ゲームのルールを設定します')
+  .setDescription('大戦のルールを設定します *軍名を/setarmynameで事前設定すること')
   .addStringOption(option =>
     option.setName('mode')
       .setDescription('ルールの種類')
