@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../utils/database.js';
-import { armyNames } from '../armyname/armyname.js';
+import { getArmyNames } from '../armyname/armyname.js';
 
 //大戦の源となるデータベースファイル
 //sequelizeのデータベースを呼び出しUser,GameStateを始めとした値に情報を格納している
@@ -217,6 +217,7 @@ export async function checkShusen() {
 //    console.log(`🛡️ 兵力状況 - A軍: ${remainingHP_A}, B軍: ${remainingHP_B}`);
   // どちらかの軍のHPが0以下になったら終戦
   if (remainingHP_A <= 0 || remainingHP_B <= 0) {
+    const armyNames = await getArmyNames();
     const loserTeam = remainingHP_A <= 0 ? armyNames.A : armyNames.B ; // 敗北軍
     const winnerTeam = loserTeam === armyNames.A ? armyNames.B : armyNames.A; // 勝利軍
 
@@ -237,7 +238,7 @@ export async function checkShusen() {
 
 // テーブルの同期（テーブルが存在しない場合は作成されます）
 // 新しいコマンドを作成したときなど一度trueにしてからfalseにすると作成されエラーを回避できる
-sequelize.sync({ force: true  }) // force: false にすると、テーブルが存在していれば再作成されません
+sequelize.sync({ alter: true }) // alter: true にすると既存データを保持しつつ新カラムを追加
   .then(() => {
     console.log('✅ Models synced successfully.');
   })

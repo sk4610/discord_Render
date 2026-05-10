@@ -1,5 +1,5 @@
 import { GameState, User } from '../taisen/game.js';
-import { armyNames } from '../armyname/armyname.js';
+import { getArmyNames } from '../armyname/armyname.js';
 import { checkShusen } from '../taisen/game.js';
 
 // スキル定義
@@ -245,13 +245,14 @@ export async function executePassive(interaction) {
   const username = interaction.member.displayName;
   const player = await User.findOne({ where: { id: userId } });
   const customMessage = interaction.options.getString("message") || "";
-  
+
   if (!player) {
     return await interaction.editReply('まず /start でチームに参加してください。');
   }
 
   const army = player.army;
   const gameState = await GameState.findOne();
+  const armyNames = await getArmyNames();
   
   if (gameState.rule_type !== 'passive') {
     return await interaction.editReply('現在はパッシブスキル制ルールではありません。');

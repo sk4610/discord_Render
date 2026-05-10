@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
-import { getArmyName } from './kaikyu.mjs';
+import { getArmyNames } from '../armyname/armyname.js';
 
 const ranks = ['二等兵🔸', '一等兵🔺', '軍曹🔶', '曹長♦️', '大尉⚡', '大佐💠', '准将🔆', '大将🔱', '元帥🎖️'];
 const specialRank = '軍神🌟';
@@ -117,9 +117,10 @@ export async function kaikyu_main(interaction) {
     const totalKillsB = await User.sum('total_kills', { where: { army: 'B' } }) || 0;
 
     // 軍名を取得
-    const armyNameA = getArmyName('A');
-    const armyNameB = getArmyName('B');
-    
+    const armyNames = await getArmyNames();
+    const armyNameA = armyNames.A;
+    const armyNameB = armyNames.B;
+
     const UserArmy = await User.findOne({ where: { id: userId }, raw: true});
     const UserArmyName = UserArmy.army === 'A' ? armyNameA : armyNameB;
 
@@ -181,7 +182,7 @@ export async function kaikyu_main(interaction) {
 
         let bobMessage = `-#  **BOB支援制度**が発動！\n`;
         const emoji = "<:custom_emoji:1350367513271341088>";
-        bobMessage += `-# ${emoji} ${getArmyName(bobUser.army)} ${bobUser.username} の攻撃！\n`;
+        bobMessage += `-# ${emoji} ${armyNames[bobUser.army]} ${bobUser.username} の攻撃！\n`;
         
         // BOBの乱数判定結果
         bobMessage += bobDisplayMessage;
@@ -204,7 +205,7 @@ export async function kaikyu_main(interaction) {
           } else if (countMode === 'up') {
             bobMessage += `-# >>> :crossed_swords:  現在の戦況: :yellow_circle: ${armyNameA} 兵力${totalKillsA} 　|　 :green_circle: ${armyNameB} 兵力${totalKillsB}\n`;
           }
-          bobMessage += `-# >>> 🏅戦績 : ${getArmyName(bobUser.army)} ${bobUser.username}  階級:${bobUser.rank}　　|　行動数: **${bobUser.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
+          bobMessage += `-# >>> 🏅戦績 : ${armyNames[bobUser.army]} ${bobUser.username}  階級:${bobUser.rank}　　|　行動数: **${bobUser.gekiha_counts}回** 撃破数: **${player.total_kills}撃破**\n`;
         }
           await interaction.followUp(bobMessage);
       }
