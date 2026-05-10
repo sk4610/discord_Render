@@ -4,6 +4,10 @@
 
 2026/05/10
 ・BOBを改良　/armybob 軍BOBシステムの設定（軍全体のNPC自動行動兵士）
+・ /action へのコマンド統合：
+/gekiha → /action（階級制）
+/action（パッシブスキル制）→ /action に統合
+/action2（技能習得制）→ /action に統合
 2026/05/09
 ・技能習得制を導入 rule:skillgein
 
