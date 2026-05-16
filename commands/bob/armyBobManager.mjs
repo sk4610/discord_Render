@@ -52,6 +52,13 @@ const BOB_TYPES = {
 const BOB_TYPE_KEYS = Object.keys(BOB_TYPES);
 export { BOB_TYPES };
 
+// BOB投稿間隔（秒）：Discordレート制限対策＋視認性向上
+const BOB_ACTION_DELAY_MS = 4000;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 let bobTimerHandle = null;
 
 // ─────────────────────────────────────────────
@@ -237,6 +244,8 @@ async function executeRankedBobsForArmy(army, client, channel) {
 
     try { await channel.send(msg); } catch (err) { console.error(`❌ BOB投稿エラー:`, err); }
 
+    await sleep(BOB_ACTION_DELAY_MS);
+
     await gameState.reload();
     if (gameState.isGameOver) break;
   }
@@ -307,6 +316,7 @@ async function executeCoinBobsForArmy(army, client, channel) {
 
     if (channel) {
       try { await channel.send(msg); } catch (err) { console.error(`❌ BOBコイン投稿エラー:`, err); }
+      await sleep(BOB_ACTION_DELAY_MS);
     }
   }
 }
