@@ -42,6 +42,16 @@ const BOB_GREETINGS = [
   '一緒に勝利を掴みましょう！',
 ];
 
+// BOB性格タイプ定義
+const BOB_TYPES = {
+  assault:   { key: 'assault',   name: '猪突型', emoji: '🔥', greeting: '突撃あるのみ！遠慮はいらない！' },
+  guardian:  { key: 'guardian',  name: '守護型', emoji: '💧', greeting: '仲間を守ることが私の使命です。' },
+  tactician: { key: 'tactician', name: '策士型', emoji: '🧠', greeting: '状況を見極めて動きます。' },
+  ambush:    { key: 'ambush',    name: '奇襲型', emoji: '⚡', greeting: '敵の戦略を崩すのが私の仕事です！' },
+};
+const BOB_TYPE_KEYS = Object.keys(BOB_TYPES);
+export { BOB_TYPES };
+
 let bobTimerHandle = null;
 
 // ─────────────────────────────────────────────
@@ -128,19 +138,24 @@ async function adjustBobCounts(gameState, channel) {
         if (!exists) {
           const bobRank = weightedRandomRank();
           const bobName = randomBobName();
+          const bobTypeKey = randomBobType();
+          const bobTypeInfo = BOB_TYPES[bobTypeKey];
           const armyLabel = armyNames[army];
-          await User.create({ id: bobId, username: bobName, army, rank: bobRank, total_kills: 0 });
-          console.log(`✅ 軍BOB配置: ${bobId} "${bobName}" (${bobRank})`);
+          await User.create({
+            id: bobId, username: bobName, army, rank: bobRank, total_kills: 0,
+            skills_data: JSON.stringify({ bobtype: bobTypeKey })
+          });
+          console.log(`✅ 軍BOB配置: ${bobId} "${bobName}" (${bobRank}) [${bobTypeInfo.name}]`);
 
           if (channel) {
-            const greeting = BOB_GREETINGS[Math.floor(Math.random() * BOB_GREETINGS.length)];
             const rule = gameState.rule_type;
             const rankLine = rule === 'ranked' ? `-# >>> 🎖️ 初期階級: **${bobRank}**\n` : '';
             try {
               await channel.send(
                 `${BOB_EMOJI} **[軍BOB着任]** ${armyLabel} に **${bobName}** が着任しました！\n` +
                 rankLine +
-                `-# >>> 「${greeting}」`
+                `-# >>> 🧬 性格タイプ: **${bobTypeInfo.name}${bobTypeInfo.emoji}**\n` +
+                `-# >>> 「${bobTypeInfo.greeting}」`
               );
             } catch (err) {
               console.error(`❌ BOB着任メッセージエラー (${bobId}):`, err);
@@ -246,8 +261,10 @@ async function executeCoinBobsForArmy(army, client, channel) {
     await gameState.reload();
     if (gameState.isGameOver) break;
 
-    // スキル発動に近い属性を優先して選択
-    const element = selectElement(army, gameState);
+    // 性格タイプに応じた属性選択
+    const bobTypeKey = getBobType(bob);
+    const bobTypeInfo = BOB_TYPES[bobTypeKey] || BOB_TYPES.tactician;
+    const { element, reason } = selectElement(army, gameState, bobTypeKey);
 
     const { acquired, displayMessage } = rollCoin();
 
@@ -260,7 +277,8 @@ async function executeCoinBobsForArmy(army, client, channel) {
     bob[`personal_${element.key}_coin`] = (bob[`personal_${element.key}_coin`] || 0) + acquired;
     bob.gekiha_counts += 1;
 
-    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}** が【${element.name}】コインを狙う！\n`;
+    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}**【${bobTypeInfo.name}${bobTypeInfo.emoji}】が【${element.name}】コインを狙う！\n`;
+    msg += `-# 　（${reason}）\n`;
     msg += displayMessage;
 
     if (acquired > 0) {
@@ -376,49 +394,71 @@ function applyElementSkill(army, element, amount, gameState, armyNames) {
 // ユーティリティ
 // ─────────────────────────────────────────────
 
-// 戦局を読んだ属性選択（加重ランダム）
-function selectElement(army, gameState) {
+// 性格タイプ別・戦局を読んだ属性選択（{ element, reason } を返す）
+function selectElement(army, gameState, bobType = 'tactician') {
   const enemyArmy = army === 'A' ? 'B' : 'A';
 
-  // HP計算
-  const myKillsReceived   = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
+  const myKillsReceived    = army === 'A' ? gameState.b_team_kills : gameState.a_team_kills;
   const enemyKillsReceived = army === 'A' ? gameState.a_team_kills : gameState.b_team_kills;
   const myHP    = gameState.initialArmyHP - myKillsReceived;
   const enemyHP = gameState.initialArmyHP - enemyKillsReceived;
   const myHPRatio = myHP / gameState.initialArmyHP;
 
+  const reasonMap = {};
   const weights = ELEMENTS.map(el => {
-    const myCoinCount = gameState[`${army.toLowerCase()}_${el.key}_coin`] || 0;
-    const myMod = myCoinCount % 5;
+    const myCoinCount    = gameState[`${army.toLowerCase()}_${el.key}_coin`] || 0;
+    const myMod          = myCoinCount % 5;
+    const erasedEnemyCnt = gameState[`${enemyArmy.toLowerCase()}_${el.erases}_coin`] || 0;
+    const erasedEnemyMod = erasedEnemyCnt % 5;
+    const erasedName     = ELEMENTS.find(e => e.key === el.erases).name;
 
-    // 基本重み：自分のスキル発動に近いほど高い
+    // 基本重み（スキル発動に近いほど高い）
     let w = myMod === 0 ? 1 : myMod + 1;
+    let reason = myMod >= 3
+      ? `${el.name}スキルまであと${5 - myMod}枚`
+      : `${el.name}コイン蓄積中`;
 
-    // 🚨 瀕死（HP30%以下）：水を強く優先（回復スキル狙い）
-    if (myHPRatio <= 0.3 && el.key === 'water') w += 8;
+    switch (bobType) {
 
-    // ⚔️ 敵スキル阻止：敵がスキル発動間近の属性を消せる属性を優先
-    // el のスキルが発動すると enemyArmy の el.erases コインが消える
-    const erasedEnemyCoins = gameState[`${enemyArmy.toLowerCase()}_${el.erases}_coin`] || 0;
-    const erasedEnemyMod   = erasedEnemyCoins % 5;
-    if (erasedEnemyMod >= 3) w += 3; // 敵が3〜4枚 → 消去を急ぐ
+      case 'assault': // 猪突型：火・雷を常に高重み、HP状況を無視して攻撃
+        if (el.key === 'fire')    { w += 5; reason = '猪突本能（火力重視）'; }
+        if (el.key === 'thunder') { w += 4; reason = '猪突本能（雷撃重視）'; }
+        break;
 
-    // 💪 優勢時（自HP > 敵HP + 20）：土を優先（優勢×3倍スキル狙い）
-    if (myHP > enemyHP + 20 && el.key === 'earth') w += 3;
+      case 'guardian': // 守護型：水を常に高重み、HP50%以下で木も強化
+        if (el.key === 'water') {
+          w += 8;
+          reason = myHPRatio <= 0.5 ? '守護本能（危機！回復最優先）' : '守護本能（水の癒し）';
+        }
+        if (myHPRatio <= 0.5 && el.key === 'wood') { w += 3; reason = '守護本能（劣勢フォロー）'; }
+        break;
 
-    // 📉 劣勢時（敵HP > 自HP + 20）：木を優先（劣勢×3倍スキル狙い）
-    if (enemyHP > myHP + 20 && el.key === 'wood') w += 3;
+      case 'ambush': // 奇襲型：敵コイン消去量に比例して重みを大幅増加
+        if (erasedEnemyMod >= 1) {
+          w += erasedEnemyMod * 2;
+          reason = `奇襲本能（敵の${erasedName}コイン${erasedEnemyCnt}枚を消す）`;
+        }
+        break;
 
+      default: // 策士型：全戦局を総合判断（旧ロジック踏襲）
+        if (myHPRatio <= 0.3 && el.key === 'water') { w += 8; reason = '危機回避（回復優先）'; }
+        if (erasedEnemyMod >= 3) { w += 3; reason = `敵スキル阻止（敵${erasedName}${erasedEnemyCnt}枚）`; }
+        if (myHP > enemyHP + 20 && el.key === 'earth') { w += 3; reason = '優勢維持（土×3狙い）'; }
+        if (enemyHP > myHP + 20 && el.key === 'wood')  { w += 3; reason = '逆転狙い（木×3狙い）'; }
+        break;
+    }
+
+    reasonMap[el.key] = reason;
     return w;
   });
 
   const total = weights.reduce((a, b) => a + b, 0);
   let rand = Math.random() * total;
   for (let i = 0; i < weights.length; i++) {
-    if (rand < weights[i]) return ELEMENTS[i];
+    if (rand < weights[i]) return { element: ELEMENTS[i], reason: reasonMap[ELEMENTS[i].key] };
     rand -= weights[i];
   }
-  return ELEMENTS[0];
+  return { element: ELEMENTS[0], reason: reasonMap[ELEMENTS[0].key] };
 }
 
 // コイン判定ロール
@@ -472,4 +512,19 @@ function weightedRandomRank() {
 // ランダム名前
 function randomBobName() {
   return BOB_NAMES[Math.floor(Math.random() * BOB_NAMES.length)];
+}
+
+// ランダムタイプ
+function randomBobType() {
+  return BOB_TYPE_KEYS[Math.floor(Math.random() * BOB_TYPE_KEYS.length)];
+}
+
+// BOBのタイプキー取得（skills_dataから）
+function getBobType(bob) {
+  try {
+    const data = JSON.parse(bob.skills_data || '{}');
+    return data.bobtype || 'tactician';
+  } catch {
+    return 'tactician';
+  }
 }
