@@ -133,7 +133,10 @@ export async function execute(interaction) {
     const updateData = { armybob_enabled: mode === 'on' };
     if (interval !== null) updateData.armybob_interval = interval;
     if (target !== null) updateData.armybob_target_size = target;
-    if (channel !== null) updateData.armybob_channel_id = channel.id;
+    if (mode === 'on') {
+      // channel未指定の場合はコマンドを打ったチャンネルをデフォルトに使う
+      updateData.armybob_channel_id = channel ? channel.id : interaction.channelId;
+    }
 
     await gameState.update(updateData);
     await gameState.reload();
