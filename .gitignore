@@ -2,3 +2,12 @@
 .node-gyp
 node_modules
 .data/
+
+# 秘匿情報（絶対にGitHubに上げない）
+.env
+.env.local
+.env.*.local
+
+# DB（Renderのものはサーバー上で管理）
+*.db
+*.sqlite
