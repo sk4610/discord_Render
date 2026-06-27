@@ -121,7 +121,8 @@ YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
 CommandsRegister();
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN)
+  .catch(err => console.error('❌ Discord login エラー:', err.message));
 
 
 async function trigger() {
