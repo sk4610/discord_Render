@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
@@ -122,8 +121,16 @@ Notification.sync({ alter: true });
 YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
+// ローカル開発時のみ .env を読み込む（Renderは環境変数を直接設定）
+if (!process.env.TOKEN) {
+  const { default: dotenv } = await import('dotenv');
+  dotenv.config();
+}
+
 CommandsRegister();
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN)
+  .then(() => console.log('✅ Discord login 成功'))
+  .catch(err => console.error('❌ Discord login 失敗:', err));
 
 
 async function trigger() {
