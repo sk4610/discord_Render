@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { pathToFileURL } from "url";
 import express from "express";
 import { Client, Collection, Events, GatewayIntentBits, ActivityType, EmbedBuilder } from "discord.js";
 import CommandsRegister from "./regist-commands.mjs";
@@ -69,7 +68,7 @@ for (const folder of commandFolders) {
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   
-  import(pathToFileURL(filePath).href).then((module) => {
+  import(filePath).then((module) => {
     console.log(`✅ 読み込んだコマンド: ${file}`);
     console.log(module); // モジュールの内容を確認
 
@@ -93,7 +92,7 @@ const handlerFiles = fs.readdirSync(handlersPath).filter((file) => file.endsWith
 
 for (const file of handlerFiles) {
   const filePath = path.join(handlersPath, file);
-  import(pathToFileURL(filePath).href).then((module) => {
+  import(filePath).then((module) => {
     handlers.set(file.slice(0, -4), module);
   });
 }
@@ -121,18 +120,8 @@ Notification.sync({ alter: true });
 YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
-// ローカル開発時のみ .env を読み込む（Renderは環境変数を直接設定）
-if (!process.env.TOKEN) {
-  const { default: dotenv } = await import('dotenv');
-  dotenv.config();
-}
-
 CommandsRegister();
-console.log('🔑 TOKEN確認:', process.env.TOKEN ? '設定済み' : '未設定（空）');
-console.log('🚀 client.login() 呼び出し開始');
-client.login(process.env.TOKEN)
-  .then(() => console.log('✅ Discord login 成功'))
-  .catch(err => console.error('❌ Discord login 失敗:', err));
+client.login(process.env.TOKEN);
 
 
 async function trigger() {

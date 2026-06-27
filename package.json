@@ -9,7 +9,6 @@
   "dependencies": {
     "@gonetone/get-youtube-id-by-url": "^1.0.1",
     "discord.js": "^14.14.1",
-    "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "rss-parser": "^3.13.0",
     "sequelize": "^6.37.6",
