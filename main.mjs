@@ -120,6 +120,11 @@ Notification.sync({ alter: true });
 YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
+fetch('https://discord.com/api/v10/gateway')
+  .then(r => r.json())
+  .then(d => console.log('✅ Discord API到達確認:', JSON.stringify(d)))
+  .catch(e => console.error('❌ Discord API到達不可:', e.message));
+
 CommandsRegister();
 client.login(process.env.TOKEN)
   .catch(err => console.error('❌ Discord login エラー:', err.message));
