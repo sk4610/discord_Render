@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 import { REST, Routes } from 'discord.js';
 
 const commands = [];
@@ -12,7 +13,7 @@ export default async() => {
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.mjs'));
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
-      await import(filePath).then(module => {
+      await import(pathToFileURL(filePath).href).then(module => {
         if (!module.data) return; // コマンドではないユーティリティファイルはスキップ
         commands.push(module.data.toJSON());
       });

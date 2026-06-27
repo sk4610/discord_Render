@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import fs from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 import express from "express";
 import { Client, Collection, Events, GatewayIntentBits, ActivityType, EmbedBuilder } from "discord.js";
 import CommandsRegister from "./regist-commands.mjs";
@@ -68,7 +70,7 @@ for (const folder of commandFolders) {
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   
-  import(filePath).then((module) => {
+  import(pathToFileURL(filePath).href).then((module) => {
     console.log(`✅ 読み込んだコマンド: ${file}`);
     console.log(module); // モジュールの内容を確認
 
@@ -92,7 +94,7 @@ const handlerFiles = fs.readdirSync(handlersPath).filter((file) => file.endsWith
 
 for (const file of handlerFiles) {
   const filePath = path.join(handlersPath, file);
-  import(filePath).then((module) => {
+  import(pathToFileURL(filePath).href).then((module) => {
     handlers.set(file.slice(0, -4), module);
   });
 }
