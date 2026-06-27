@@ -121,8 +121,8 @@ YoutubeFeeds.sync({ alter: true });
 YoutubeNotifications.sync({ alter: true });
 
 fetch('https://discord.com/api/v10/gateway')
-  .then(r => r.json())
-  .then(d => console.log('✅ Discord API到達確認:', JSON.stringify(d)))
+  .then(r => { console.log('Discord APIステータス:', r.status); return r.text(); })
+  .then(d => console.log('Discord APIレスポンス:', d.substring(0, 300)))
   .catch(e => console.error('❌ Discord API到達不可:', e.message));
 
 CommandsRegister();
