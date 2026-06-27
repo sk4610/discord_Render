@@ -128,6 +128,8 @@ if (!process.env.TOKEN) {
 }
 
 CommandsRegister();
+console.log('🔑 TOKEN確認:', process.env.TOKEN ? '設定済み' : '未設定（空）');
+console.log('🚀 client.login() 呼び出し開始');
 client.login(process.env.TOKEN)
   .then(() => console.log('✅ Discord login 成功'))
   .catch(err => console.error('❌ Discord login 失敗:', err));
