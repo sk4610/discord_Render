@@ -3,6 +3,9 @@
 node_modules
 .data/
 
+# ローカルのnvm一式（リポジトリに含めない）
+.nvm/
+
 # 秘匿情報（絶対にGitHubに上げない）
 .env
 .env.local
