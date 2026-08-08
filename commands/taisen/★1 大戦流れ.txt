@@ -104,6 +104,8 @@ commands
 │　├ gekiha.mjs           // /action　全ルール統合の行動コマンド
 │　│                      //   rule_typeに応じて各ルールの処理へ振り分け（下記フロー参照）
 │　├ ranking.mjs          // /ranking　各軍戦績上位ランキング表示
+│　│                      //   BOBはDiscordに存在しないIDなのでDBのusernameで表示
+│　│                      //   人間/軍BOB/個人BOBの内訳も表示する
 │　├ reset.mjs            // /reset　大戦データリセット（force_recreate:Trueで完全初期化）
 │　├ rule.mjs             // /rule　ルール設定（7種対応）
 │　└ show.mjs             // /show　現在の戦況表示（ルール名・戦友の部隊編成も表示）
