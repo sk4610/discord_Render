@@ -92,7 +92,12 @@ export async function execute(interaction) {
         return;
       }
     }
-      return await interaction.editReply(`⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`);
+      // 階級は階級制のときだけ意味を持つ
+      return await interaction.editReply(
+        gameState.rule_type === 'ranked'
+          ? `⚠️: あなたはすでに **${existingArmyName}** の **${existingPlayer.rank}** です！`
+          : `⚠️: あなたはすでに **${existingArmyName}** に参加しています！`
+      );
     }
 
     // ランダムな階級を決定
@@ -116,18 +121,14 @@ export async function execute(interaction) {
     await User.create({ id: userId, username, army, rank: randomRank, total_kills: 0 });
     
     //各ルールで初期表示を変える
-    if(gameState.rule_type === 'ranked'){ // 階級制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);    
-    }else if(gameState.rule_type === 'coin'){ // 属性コイン制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
-    }else if(gameState.rule_type === 'beast'){ // ビースト制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
-    }else if(gameState.rule_type === 'passive'){ // パッシブスキル制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
-    }else if(gameState.rule_type === 'fighting'){ // ファイティング制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
-    }else if(gameState.rule_type === 'skillgein'){ // 技能習得制のとき
-      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);    
+    // ⚠️ 必ず else で受けること。
+    //   ルールごとに else if を並べる書き方だと、新ルールを追加したときに
+    //   どの分岐にも入らず editReply が呼ばれないまま終わり、
+    //   Discord上で「考え中」のまま固まってしまう（戦友制で実際に発生した）
+    if (gameState.rule_type === 'ranked') { // 階級制のとき
+      await interaction.editReply(`${username} さんが **${armyName}** に配属され、**${randomRank}** になりました！`);
+    } else { // 階級制以外は共通メッセージ
+      await interaction.editReply(`${username} さんが **${armyName}** に配属されました！`);
     }
 
   } catch (error) {
