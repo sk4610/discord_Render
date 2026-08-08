@@ -3,6 +3,7 @@ import { GameState } from '../taisen/game.js';
 import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 import { executePassive } from '../PassiveSkill/PassiveSkill.mjs';
 import { executeSkillgein } from '../Skillgein/action.mjs';
+import { executeSenyuu } from '../senyuu/senyuu_main.js';
 
 export const data = new SlashCommandBuilder()
   .setName('action')
@@ -33,6 +34,9 @@ export async function execute(interaction) {
       break;
     case 'skillgein':
       await executeSkillgein(interaction);
+      break;
+    case 'senyuu':
+      await executeSenyuu(interaction);
       break;
     case 'coin':
       await interaction.reply('属性コイン制では `/coin-fire` などのコインコマンドを使ってください。');
