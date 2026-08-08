@@ -1,5 +1,5 @@
 ================================================================
- きのたけBot フォルダ構造・処理の流れ　2026/05/10更新
+ きのたけBot フォルダ構造・処理の流れ　2026/08/08更新
 ================================================================
 
 commands
@@ -10,13 +10,17 @@ commands
 │
 ├ beast
 │　└ beast.mjs            // /beast　ビースト制の行動処理
+│                         //   determineATK / processBeastAction / executeBeastBreak /
+│                         //   manageDuelNotifications をexportし軍BOBからも使用
+│                         //   決闘・通知は送信関数(send)を受け取る形で人間/BOB共用
 │
 ├ bob
 │　├ ArmyBob.mjs          // /armybob　軍BOBシステムの設定コマンド
 │　├ armyBobManager.mjs   // 軍BOBのタイマー自動行動エンジン（コマンドではない）
 │　│                      //   startArmyBobTimer(client)をmain.mjsのreadyイベントで起動
 │　│                      //   60秒ごとに確認、armybob_intervalに基づいて行動
-│　│                      //   対応ルール：階級制・属性コイン制
+│　│                      //   対応ルール：全7ルール（2026/08/08〜）
+│　│                      //   checkAndActBobs(client)をexport（1回分の手動実行・テスト用）
 │　├ bob.mjs              // /bob　個人BOB有効化/無効化
 │　├ bob2.mjs             // /bob2　BOBにランダムセリフを言わせる
 │　├ Normal_bob.txt       // bob2用のBOBセリフ集
@@ -35,6 +39,8 @@ commands
 │　├ charge.mjs           // /charge　ファイティング制：自分のファイト値を上昇
 │　├ burst.mjs            // /burst　ファイティング制：ファイト値でダメージ
 │　└ fighting_common.js   // ファイティング制の共通処理（終戦判定など）
+│                         //   resolveFightingRoll / applyPunchEffect をexportし
+│                         //   人間・軍BOBで同じ判定ロジックを共有
 │
 ├ general
 │　└ say.mjs              // 削除済み（サンプルコマンド）
@@ -54,29 +60,46 @@ commands
 ├ PassiveSkill
 │　├ PassiveSkill.mjs     // パッシブスキル制の行動処理（/actionから呼び出し）
 │　│                      //   export executePassive(interaction)
+│　│                      //   processPassiveAction / applySkillEffects /
+│　│                      //   processSkillGet / processSkillBreak / processPoisonEffect
+│　│                      //   もexportし軍BOBと共用（armyNamesは引数で受け取る）
 │　└ パッシブスキル制.txt // ルール解説テキスト
 │
 ├ samples
 │　└ janken.mjs           // 削除済み（サンプルコマンド）
 │
+├ senyuu                  ← 2026/08/08追加
+│　└ senyuu_main.js       // 戦友制の行動処理（/actionから呼び出し）
+│                         //   export executeSenyuu(interaction)
+│                         //   前衛/中衛/後衛の3枠に戦友を編成して戦う
+│                         //   判定は純粋関数として切り出し、人間・軍BOBで共有
+│                         //   （performSenyuuTurn / computeComradeDamage /
+│                         //     parseComrades / applySenyuuResult など）
+│                         //   ※.jsのためコマンド自動登録の対象外
+│
 ├ shukei
-│　└ CountMode.mjs        // /count　終戦方式の切替（カウントアップ/ダウン・初期HP設定）
+│　├ CountMode.mjs        // /count　終戦方式の切替（カウントアップ/ダウン・初期HP設定）
+│　└ shukeiNotice.js      // 集計通知の補助処理
 │
 ├ Skillgein
 │　├ action.mjs           // 技能習得制の行動処理（/actionから呼び出し）
 │　│                      //   export executeSkillgein(interaction)
+│　│                      //   SKILL_MAP / rollPower / resolveSkillActivations も
+│　│                      //   exportし軍BOBと共用
 │　└ snipe.mjs            // /snipe　狙撃ポイント消費で敵技能封じ
 │
 ├ taisen
 │　├ finish.mjs           // /finish　終戦通知・結果発表（カウントアップ方式用）
 │　├ game.js              // データベース定義（sequelize）User / GameState / BeastDuel
 │　│                      //   sync({ alter: true })で既存データ保持・新カラム自動追加
+│　│                      //   ※sync は await されていないため、起動直後に
+│　│                      //     別処理が同時にsyncすると競合しうる（既知の注意点）
 │　├ gekiha.mjs           // /action　全ルール統合の行動コマンド
-│　│                      //   rule_typeに応じてkaikyu_main/executePassive/executeSkillgeinへ振り分け
+│　│                      //   rule_typeに応じて各ルールの処理へ振り分け（下記フロー参照）
 │　├ ranking.mjs          // /ranking　各軍戦績上位ランキング表示
 │　├ reset.mjs            // /reset　大戦データリセット（force_recreate:Trueで完全初期化）
-│　├ rule.mjs             // /rule　ルール設定（6種対応）
-│　└ show.mjs             // /show　現在の戦況表示
+│　├ rule.mjs             // /rule　ルール設定（7種対応）
+│　└ show.mjs             // /show　現在の戦況表示（ルール名・戦友の部隊編成も表示）
 │
 └ utils
 　　├ database.js         // データベース接続設定（SQLite）
@@ -97,13 +120,32 @@ commands
   → /reset（次の大戦へ）
 
 【/action の振り分け】
-  rule_type = ranked    → kaikyu_main.js   （階級制撃破判定）
-  rule_type = passive   → PassiveSkill.mjs （パッシブスキル制）
-  rule_type = skillgein → Skillgein/action.mjs（技能習得制）
+  rule_type = ranked    → kaikyu_main.js       （階級制撃破判定）
+  rule_type = passive   → PassiveSkill.mjs     （パッシブスキル制）
+  rule_type = skillgein → Skillgein/action.mjs （技能習得制）
+  rule_type = senyuu    → senyuu/senyuu_main.js（戦友制）
   rule_type = coin      → /coin-fire 等を案内
   rule_type = beast     → /beast を案内
   rule_type = fighting  → /punch /charge /burst を案内
 
+【軍BOBの流れ】
+  main.mjs の ready イベント → startArmyBobTimer(client)
+  → 60秒ごとに checkAndActBobs()
+  → armybob_enabled / 終戦 / armybob_interval を確認
+  → adjustBobCounts()で人間の人数に応じてBOBを着任・撤退
+  → rule_typeごとの execute○○BobsForArmy() を A軍・B軍の順に実行
+  → 各BOBの投稿は4秒間隔（BOB_ACTION_DELAY_MS）
+
+【ルール別のDBカラム（Userテーブル）】
+  階級制          rank
+  属性コイン制    personal_○○_coin（5属性）
+  ビースト制      beast_name / beast_atk / beast_is_active / beast_has_fed
+  ファイティング制 fight_value
+  技能習得制      skill_atk / skill_magic / skill_spirit / skill_snipe / skills_data
+  戦友制          comrades_data（前衛・中衛・後衛の3枠をJSONで保持）
+  軍BOB共通       bob_type（性格タイプ。skills_dataとの衝突を避けるため専用カラム）
+
 【/reset の使い方】
   /reset                通常リセット（データのみ削除、構造保持）
   /reset force_recreate:True  完全リセット（緊急用・通常は不要）
+  ※新カラム追加後に「no such column」が出た場合のみ force_recreate を使う
