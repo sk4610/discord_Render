@@ -102,7 +102,7 @@ async function executeFightingAction(interaction, actionType, targetUsername = n
     const randomStr = randomNum.toString().padStart(2, '0');
 
     let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
-    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__ **`;
+    message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
 
     // 判定（共通ロジック）
     const roll = resolveFightingRoll(actionType, randomNum, player.fight_value);

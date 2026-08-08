@@ -147,6 +147,7 @@ export async function executeSkillgein(interaction) {
   const userId = interaction.user.id;
   const username = interaction.member.displayName;
   const player = await User.findOne({ where: { id: userId } });
+  const customMessage = interaction.options.getString('message') || '';
 
   if (!player) {
     return await interaction.editReply('まず /start でチームに参加してください。');
@@ -189,8 +190,8 @@ export async function executeSkillgein(interaction) {
   const curSpirit0 = player.skill_spirit ?? 1;
 
   // ─── 出力メッセージ構築 ────────────────────────────────────
-  let message = `-# 🪖 ${armyNames[army]} **${username}** の行動！\n`;
-  message += `### 🎲 ジャッジナンバー: __${randomStr}__\n\n`;
+  let message = `-#  :military_helmet: ${armyNames[army]} ${username} の行動判定！\n`;
+  message += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**\n`;
 
   // 累積効果
   let totalDamage = 0;
@@ -293,6 +294,11 @@ export async function executeSkillgein(interaction) {
       message += `# 🎖 ${winnerTeam}の勝利だ！\n`;
       message += `**今次大戦は終戦した！次の大戦でまた会おう！**`;
     }
+  }
+
+  // カスタムメッセージ（他ルールと同じ表示）
+  if (customMessage) {
+    message += `\`\`\`${customMessage}\`\`\`\n`;
   }
 
   await interaction.editReply(message);

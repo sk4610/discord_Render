@@ -714,7 +714,7 @@ async function executeFightingBobsForArmy(army, client, channel) {
     const randomStr = randomNum.toString().padStart(2, '0');
 
     let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}**【${typeInfo.name}${typeInfo.emoji}】が **${ACTION_LABEL[actionType]}** を選択！\n`;
-    msg += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__ **`;
+    msg += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
 
     const roll = resolveFightingRoll(actionType, randomNum, bob.fight_value);
     let totalDamage = roll.damage;
@@ -870,7 +870,7 @@ async function executeSkillgeinBobsForArmy(army, client, channel) {
     const curSpirit0 = bob.skill_spirit ?? 1;
 
     let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}**【${typeInfo.name}${typeInfo.emoji}】の行動！\n`;
-    msg += `### 🎲 ジャッジナンバー: __${randomStr}__\n\n`;
+    msg += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**\n`;
 
     let totalDamage = 0, totalHeal = 0;
     let totalAtkUp = 0, totalMagicUp = 0, totalSpiritUp = 0;
