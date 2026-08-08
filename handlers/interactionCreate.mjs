@@ -1,3 +1,5 @@
+import { checkAutoStatus } from '../commands/taisen/autostatus.mjs';
+
 export default async(interaction) => {
   if (!interaction.isChatInputCommand()) return;
 	const command = interaction.client.commands.get(interaction.commandName);
@@ -9,6 +11,9 @@ export default async(interaction) => {
 
 	try {
 		await command.execute(interaction);
+		// どのコマンドでも行動後に戦況の自動表示を判定する
+		// （内部で例外を処理するのでコマンド本体には影響しない）
+		await checkAutoStatus(interaction.client);
 	} catch (error) {
   console.error(error);
   if (interaction.deferred) {

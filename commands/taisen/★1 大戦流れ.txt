@@ -32,6 +32,8 @@ commands
 │　├ coin earth.mjs       // /coin-earth　土属性コイン行動
 │　├ coin thunder.mjs     // /coin-thunder　雷属性コイン行動
 │　├ coin water.mjs       // /coin-water　水属性コイン行動
+│　├ coin_common.js       // コイン状況の共通表示（A軍→B軍の固定順）
+│　│                      //   5つのコインコマンドと軍BOBで共用
 │　└ 属性コイン制.txt     // ルール解説テキスト
 │
 ├ fighting
@@ -89,6 +91,11 @@ commands
 │　└ snipe.mjs            // /snipe　狙撃ポイント消費で敵技能封じ
 │
 ├ taisen
+│　├ autostatus.mjs       // /autostatus　戦況のAUTO表示設定 ← 2026/08/08追加
+│　│                      //   checkAutoStatus(client)をexportし、
+│　│                      //   handlers/interactionCreate.mjs（人間の全コマンド後）と
+│　│                      //   armyBobManager.mjs（BOBの行動後）の2か所から呼ばれる
+│　│                      //   一定レス数ごとの定期表示＋兵力節目の臨時表示
 │　├ finish.mjs           // /finish　終戦通知・結果発表（カウントアップ方式用）
 │　├ game.js              // データベース定義（sequelize）User / GameState / BeastDuel
 │　│                      //   sync({ alter: true })で既存データ保持・新カラム自動追加

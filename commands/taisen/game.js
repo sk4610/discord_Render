@@ -181,6 +181,14 @@ const GameState = sequelize.define('GameState', {
   custom_army_a_name: { type: DataTypes.STRING, defaultValue: null },
   custom_army_b_name: { type: DataTypes.STRING, defaultValue: null },
 
+  // AUTO戦況表示用フィールド
+  autostatus_enabled:    { type: DataTypes.BOOLEAN, defaultValue: false },
+  autostatus_interval:   { type: DataTypes.INTEGER, defaultValue: 50 },   // 何レスごとに表示するか
+  autostatus_channel_id: { type: DataTypes.STRING,  defaultValue: null },
+  autostatus_last_shown: { type: DataTypes.INTEGER, defaultValue: 0 },    // 最後に表示した時点の総レス数
+  autostatus_alerts:     { type: DataTypes.BOOLEAN, defaultValue: true }, // 兵力の節目での臨時表示
+  autostatus_flags:      { type: DataTypes.TEXT,    defaultValue: '{}' }, // 節目の通知済みフラグ
+
   // 軍BOBシステム用フィールド
   armybob_enabled: { type: DataTypes.BOOLEAN, defaultValue: false },
   armybob_interval: { type: DataTypes.INTEGER, defaultValue: 1 }, // 行動間隔（分）

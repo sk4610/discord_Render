@@ -13,6 +13,7 @@ import {
   parseComrades, serializeComrades, performSenyuuTurn, applySenyuuResult, formatComradeLine
 } from '../senyuu/senyuu_main.js';
 import { buildCoinStatusFixed } from '../coin/coin_common.js';
+import { checkAutoStatus } from '../taisen/autostatus.mjs';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 
@@ -134,6 +135,9 @@ export async function checkAndActBobs(client) {
         case 'senyuu':   await executeSenyuuBobsForArmy(army, client, channel); break;
       }
     }
+
+    // BOBの行動でもレス数・兵力が動くので戦況の自動表示を判定する
+    await checkAutoStatus(client);
 
   } catch (error) {
     console.error('❌ 軍BOBタイマーエラー:', error);
