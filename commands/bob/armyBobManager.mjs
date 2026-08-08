@@ -91,7 +91,8 @@ export function stopArmyBobTimer() {
 // メインループ
 // ─────────────────────────────────────────────
 
-async function checkAndActBobs(client) {
+// タイマー1回分の処理。テストや手動トリガーからも呼べるよう公開している
+export async function checkAndActBobs(client) {
   try {
     const gameState = await GameState.findOne({ where: { id: 1 } });
     if (!gameState) return;
