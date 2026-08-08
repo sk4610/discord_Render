@@ -8,7 +8,9 @@ import {
   processPassiveAction, applySkillEffects, processSkillGet, processSkillBreak, processPoisonEffect
 } from '../PassiveSkill/PassiveSkill.mjs';
 import { resolveFightingRoll, applyPunchEffect } from '../fighting/fighting_common.js';
-import { SKILL_MAP, rollPower, resolveSkillActivations } from '../Skillgein/action.mjs';
+import {
+  SKILL_MAP, rollPower, resolveSkillActivations, parseSkills, buildSkillStatusLines
+} from '../Skillgein/action.mjs';
 import {
   parseComrades, serializeComrades, performSenyuuTurn, applySenyuuResult, formatComradeLine
 } from '../senyuu/senyuu_main.js';
@@ -766,15 +768,6 @@ async function executeFightingBobsForArmy(army, client, channel) {
 // ※ 判定は人間と同一。性格タイプは狙撃を撃つ判断と対象選びに反映する
 // ─────────────────────────────────────────────
 
-function parseSkills(user) {
-  try {
-    const data = JSON.parse(user.skills_data || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
 // 最も脅威の高い敵（技能数優先、次いでステータス合計）
 function pickSnipeTarget(enemies) {
   let best = null;
@@ -936,11 +929,6 @@ async function executeSkillgeinBobsForArmy(army, client, channel) {
       msg += `\n**📊 戦況**\n`;
       msg += `🟡 ${armyNames.A}: **${newHP_A}** / ${initialHP}　　🟢 ${armyNames.B}: **${newHP_B}** / ${initialHP}\n`;
 
-      if (totalAtkUp > 0 || totalMagicUp > 0 || totalSpiritUp > 0) {
-        msg += `\n**⚡ ${bob.username} のステータス**\n`;
-        msg += `攻撃: **${bob.skill_atk}**　魔力: **${bob.skill_magic}**　精神: **${bob.skill_spirit}**\n`;
-      }
-
       // 終戦判定
       if (newHP_A <= 0 || newHP_B <= 0) {
         const winnerTeam = newHP_A > newHP_B ? armyNames.A : armyNames.B;
@@ -951,6 +939,9 @@ async function executeSkillgeinBobsForArmy(army, client, channel) {
         msg += `**今次大戦は終戦した！次の大戦でまた会おう！**`;
       }
     }
+
+    // ステータス欄（常時表示）BOBも狙撃対象になるので技能を見えるようにする
+    msg += buildSkillStatusLines(bob, bob.username, newSkillsData);
 
     if (!channel) continue;
     try { await channel.send(msg); } catch (err) { console.error('❌ BOB技能習得投稿エラー:', err); }

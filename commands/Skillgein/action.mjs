@@ -32,6 +32,57 @@ function rollFireMultiplier() {
   return 4;
 }
 
+// ─── 技能リストの取得 ─────────────────────────────────────────
+export function parseSkills(user) {
+  try {
+    const data = JSON.parse(user.skills_data || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 所持技能を1行に収まる短さでまとめる
+ * 同名はまとめて威力を並べる（例: バンブーランス4,1）
+ * 多すぎる場合は威力合計の高い順に絞って「他N種」と省略する
+ */
+export function formatSkillSummary(skills, limit = 5) {
+  if (!skills || skills.length === 0) return 'なし';
+
+  const grouped = new Map();
+  for (const s of skills) {
+    if (!grouped.has(s.name)) grouped.set(s.name, []);
+    grouped.get(s.name).push(s.power);
+  }
+
+  const entries = [...grouped.entries()].map(([name, powers]) => {
+    powers.sort((a, b) => b - a);
+    return { name, powers, total: powers.reduce((a, b) => a + b, 0) };
+  });
+  entries.sort((a, b) => b.total - a.total);
+
+  const shown = entries.slice(0, limit).map(e => `${e.name}${e.powers.join(',')}`);
+  const rest = entries.length - limit;
+  return shown.join(' / ') + (rest > 0 ? ` 他${rest}種` : '');
+}
+
+/**
+ * レス下段に出すステータス行（技能習得制）
+ * 誰がどの技能を持っているか分かるよう、常に表示する
+ */
+export function buildSkillStatusLines(actor, displayName, skills = null) {
+  const list = skills || parseSkills(actor);
+  const atk = actor.skill_atk ?? 1;
+  const mag = actor.skill_magic ?? 1;
+  const spi = actor.skill_spirit ?? 1;
+  const snipe = actor.skill_snipe ?? 0;
+
+  let s = `-# >>> ⚡ ${displayName}　攻${atk} / 魔${mag} / 精${spi}　🎯狙撃${snipe}\n`;
+  s += `-# >>> 📘 技能${list.length}個: ${formatSkillSummary(list)}\n`;
+  return s;
+}
+
 // ─── 技能発動処理（人間・軍BOB共通） ──────────────────────────
 // 習得技能を順に20%で発動し、累積効果とメッセージを返す
 export function resolveSkillActivations(skills, ctx) {
@@ -278,13 +329,6 @@ export async function executeSkillgein(interaction) {
     message += `\n**📊 戦況**\n`;
     message += `🟡 ${armyNames.A}: **${newHP_A}** / ${initialHP}　　🟢 ${armyNames.B}: **${newHP_B}** / ${initialHP}\n`;
 
-    // ステータス変化があった場合のみ表示
-    if (totalAtkUp > 0 || totalMagicUp > 0 || totalSpiritUp > 0) {
-      const latestPlayer = await User.findOne({ where: { id: userId } });
-      message += `\n**⚡ ${username} のステータス**\n`;
-      message += `攻撃: **${latestPlayer.skill_atk}**　魔力: **${latestPlayer.skill_magic}**　精神: **${latestPlayer.skill_spirit}**\n`;
-    }
-
     // 終戦判定
     if (newHP_A <= 0 || newHP_B <= 0) {
       const winnerTeam = newHP_A > newHP_B ? armyNames.A : armyNames.B;
@@ -295,6 +339,10 @@ export async function executeSkillgein(interaction) {
       message += `**今次大戦は終戦した！次の大戦でまた会おう！**`;
     }
   }
+
+  // ステータス欄（常時表示）
+  // 誰がどの技能を持っているかが見えないと狙撃の判断ができないため
+  message += buildSkillStatusLines(player, username, newSkillsData);
 
   // カスタムメッセージ（他ルールと同じ表示）
   if (customMessage) {
