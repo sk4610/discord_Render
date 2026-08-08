@@ -2,7 +2,7 @@ import { GameState, User } from '../taisen/game.js';
 import { getArmyNames } from '../armyname/armyname.js';
 
 // ─── 技能マスターデータ ───────────────────────────────────────
-const SKILL_MAP = {
+export const SKILL_MAP = {
   10: 'バンブーランス',
   20: 'マッシュラッシュ',
   30: 'アチアチファイア',
@@ -15,7 +15,7 @@ const SKILL_MAP = {
 };
 
 // 威力抽選: 52%→1 / 27%→2 / 14%→4 / 7%→8
-function rollPower() {
+export function rollPower() {
   const r = Math.random() * 100;
   if (r < 52) return 1;
   if (r < 79) return 2;
@@ -30,6 +30,114 @@ function rollFireMultiplier() {
   if (r < 70) return 2;
   if (r < 90) return 3;
   return 4;
+}
+
+// ─── 技能発動処理（人間・軍BOB共通） ──────────────────────────
+// 習得技能を順に20%で発動し、累積効果とメッセージを返す
+export function resolveSkillActivations(skills, ctx) {
+  const { initialHP } = ctx;
+
+  // 発動中に変化する一時変数（HPとステータスは順に更新）
+  let curMyHP = ctx.myHP;
+  let curEnemyHP = ctx.enemyHP;
+  let curAtk = ctx.atk;
+  let curMagic = ctx.magic;
+  let curSpirit = ctx.spirit;
+
+  let totalDamage = 0;
+  let totalHeal = 0;
+  let totalAtkUp = 0;
+  let totalMagicUp = 0;
+  let totalSpiritUp = 0;
+  let message = '';
+
+  for (const skill of skills) {
+    const activated = Math.random() < 0.2;
+
+    if (!activated) {
+      message += `❌ 【${skill.name}（威力${skill.power}）】 不発…\n`;
+      continue;
+    }
+
+    let dmg = 0, hl = 0, atk = 0, mag = 0, spi = 0;
+    let desc = '';
+
+    switch (skill.type) {
+      case 10: // バンブーランス
+        dmg = skill.power * curAtk * 2;
+        desc = `【バンブーランス（威力${skill.power}）】 敵軍に **${dmg}** ダメージ！`;
+        break;
+
+      case 20: // マッシュラッシュ（自軍優勢条件）
+        if (curMyHP > curEnemyHP) {
+          dmg = skill.power * curAtk * 2 + skill.power * curAtk; // ×2 + ×1 = ×3
+          desc = `【マッシュラッシュ（威力${skill.power}）】 自軍優勢！敵軍に **${dmg}** ダメージ！`;
+        } else {
+          desc = `【マッシュラッシュ（威力${skill.power}）】 自軍が優勢でないため効果なし…`;
+        }
+        break;
+
+      case 30: { // アチアチファイア（確率倍率）
+        const mult = rollFireMultiplier();
+        dmg = skill.power * curMagic * mult;
+        desc = `【アチアチファイア（威力${skill.power}）】 ${mult}倍の炎！敵軍に **${dmg}** ダメージ！`;
+        break;
+      }
+
+      case 40: // ネクロマンシー（自軍劣勢条件）
+        if (curMyHP < curEnemyHP) {
+          dmg = skill.power * curMagic * 2 + skill.power * curMagic; // ×2 + ×1 = ×3
+          desc = `【ネクロマンシー（威力${skill.power}）】 逆境の魔力！敵軍に **${dmg}** ダメージ！`;
+        } else {
+          desc = `【ネクロマンシー（威力${skill.power}）】 逆境でないため効果なし…`;
+        }
+        break;
+
+      case 50: // キュンキュア（回復）
+        hl = skill.power * curSpirit * 2;
+        desc = `【キュンキュア（威力${skill.power}）】 自軍を **${hl}** 回復！`;
+        break;
+
+      case 60: // モギモギヘルス（ダメージ＋回復）
+        dmg = skill.power * curSpirit;
+        hl = skill.power * curSpirit;
+        desc = `【モギモギヘルス（威力${skill.power}）】 敵軍に **${dmg}** ダメージ ＆ 自軍 **${hl}** 回復！`;
+        break;
+
+      case 70: // アタックアップ
+        atk = skill.power;
+        desc = `【アタックアップ（威力${skill.power}）】 攻撃が **+${atk}**！`;
+        break;
+
+      case 80: // マジックアップ
+        mag = skill.power;
+        desc = `【マジックアップ（威力${skill.power}）】 魔力が **+${mag}**！`;
+        break;
+
+      case 90: // メンタルアップ
+        spi = skill.power;
+        desc = `【メンタルアップ（威力${skill.power}）】 精神が **+${spi}**！`;
+        break;
+    }
+
+    message += `✅ ${desc}\n`;
+
+    // 一時変数を更新（次の技能発動判定に影響）
+    curEnemyHP = Math.max(0, curEnemyHP - dmg);
+    curMyHP = Math.min(initialHP, curMyHP + hl);
+    curAtk += atk;
+    curMagic += mag;
+    curSpirit += spi;
+
+    // 累積値に加算
+    totalDamage += dmg;
+    totalHeal += hl;
+    totalAtkUp += atk;
+    totalMagicUp += mag;
+    totalSpiritUp += spi;
+  }
+
+  return { totalDamage, totalHeal, totalAtkUp, totalMagicUp, totalSpiritUp, message };
 }
 
 // ─── コマンド実行 ──────────────────────────────────────────────
@@ -123,98 +231,17 @@ export async function executeSkillgein(interaction) {
     } else {
       message += `⚡ **ゾロ目！ 習得技能が順番に発動チャンス！**\n\n`;
 
-      // 発動中に変化する一時変数（HPとステータスは順に更新）
-      let curMyHP = myHP;
-      let curEnemyHP = enemyHP;
-      let curAtk = curAtk0;
-      let curMagic = curMagic0;
-      let curSpirit = curSpirit0;
+      const result = resolveSkillActivations(skills, {
+        myHP, enemyHP, initialHP,
+        atk: curAtk0, magic: curMagic0, spirit: curSpirit0,
+      });
 
-      for (const skill of skills) {
-        const activated = Math.random() < 0.2;
-
-        if (!activated) {
-          message += `❌ 【${skill.name}（威力${skill.power}）】 不発…\n`;
-          continue;
-        }
-
-        let dmg = 0, hl = 0, atk = 0, mag = 0, spi = 0;
-        let desc = '';
-
-        switch (skill.type) {
-          case 10: // バンブーランス
-            dmg = skill.power * curAtk * 2;
-            desc = `【バンブーランス（威力${skill.power}）】 敵軍に **${dmg}** ダメージ！`;
-            break;
-
-          case 20: // マッシュラッシュ（自軍優勢条件）
-            if (curMyHP > curEnemyHP) {
-              dmg = skill.power * curAtk * 2 + skill.power * curAtk; // ×2 + ×1 = ×3
-              desc = `【マッシュラッシュ（威力${skill.power}）】 自軍優勢！敵軍に **${dmg}** ダメージ！`;
-            } else {
-              desc = `【マッシュラッシュ（威力${skill.power}）】 自軍が優勢でないため効果なし…`;
-            }
-            break;
-
-          case 30: { // アチアチファイア（確率倍率）
-            const mult = rollFireMultiplier();
-            dmg = skill.power * curMagic * mult;
-            desc = `【アチアチファイア（威力${skill.power}）】 ${mult}倍の炎！敵軍に **${dmg}** ダメージ！`;
-            break;
-          }
-
-          case 40: // ネクロマンシー（自軍劣勢条件）
-            if (curMyHP < curEnemyHP) {
-              dmg = skill.power * curMagic * 2 + skill.power * curMagic; // ×2 + ×1 = ×3
-              desc = `【ネクロマンシー（威力${skill.power}）】 逆境の魔力！敵軍に **${dmg}** ダメージ！`;
-            } else {
-              desc = `【ネクロマンシー（威力${skill.power}）】 逆境でないため効果なし…`;
-            }
-            break;
-
-          case 50: // キュンキュア（回復）
-            hl = skill.power * curSpirit * 2;
-            desc = `【キュンキュア（威力${skill.power}）】 自軍を **${hl}** 回復！`;
-            break;
-
-          case 60: // モギモギヘルス（ダメージ＋回復）
-            dmg = skill.power * curSpirit;
-            hl = skill.power * curSpirit;
-            desc = `【モギモギヘルス（威力${skill.power}）】 敵軍に **${dmg}** ダメージ ＆ 自軍 **${hl}** 回復！`;
-            break;
-
-          case 70: // アタックアップ
-            atk = skill.power;
-            desc = `【アタックアップ（威力${skill.power}）】 攻撃が **+${atk}**！`;
-            break;
-
-          case 80: // マジックアップ
-            mag = skill.power;
-            desc = `【マジックアップ（威力${skill.power}）】 魔力が **+${mag}**！`;
-            break;
-
-          case 90: // メンタルアップ
-            spi = skill.power;
-            desc = `【メンタルアップ（威力${skill.power}）】 精神が **+${spi}**！`;
-            break;
-        }
-
-        message += `✅ ${desc}\n`;
-
-        // 一時変数を更新（次の技能発動判定に影響）
-        curEnemyHP = Math.max(0, curEnemyHP - dmg);
-        curMyHP = Math.min(initialHP, curMyHP + hl);
-        curAtk += atk;
-        curMagic += mag;
-        curSpirit += spi;
-
-        // 累積値に加算
-        totalDamage += dmg;
-        totalHeal += hl;
-        totalAtkUp += atk;
-        totalMagicUp += mag;
-        totalSpiritUp += spi;
-      } // end for skills
+      message += result.message;
+      totalDamage = result.totalDamage;
+      totalHeal = result.totalHeal;
+      totalAtkUp = result.totalAtkUp;
+      totalMagicUp = result.totalMagicUp;
+      totalSpiritUp = result.totalSpiritUp;
     }
   }
   // ④ それ以外: 何も起きない（メッセージ変化なし）

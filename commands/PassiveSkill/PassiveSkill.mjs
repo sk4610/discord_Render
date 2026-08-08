@@ -32,7 +32,7 @@ function generateRandomSkill() {
 }
 
 // 行動判定関数
-function processPassiveAction(randomNum) {
+export function processPassiveAction(randomNum) {
   if (randomNum === 0) {
     return { type: 'massive_kill', kills: 8, message: '🔥 大量撃破！8撃破' };
   } else if ([11, 22, 33, 44, 55, 66, 77, 88, 99].includes(randomNum)) {
@@ -47,7 +47,7 @@ function processPassiveAction(randomNum) {
 }
 
 // スキル効果適用（軍ベース）
-async function applySkillEffects(army, action, gameState) {
+export async function applySkillEffects(army, action, gameState, armyNames) {
   let additionalDamage = 0;
   let selfHeal = 0;
   let skillEffects = [];
@@ -111,8 +111,7 @@ async function applySkillEffects(army, action, gameState) {
 }
 
 // スキル取得処理（軍ベース）- レベル上書き対応版
-async function processSkillGet(player, army, gameState) {
-  //const armyNames = await getArmyNames();
+export async function processSkillGet(player, army, gameState, armyNames) {
   const armySkillsField = `${army.toLowerCase()}_passive_skills`;
   const currentSkills = gameState[armySkillsField] ? JSON.parse(gameState[armySkillsField]) : {};
   let message = '';
@@ -160,7 +159,7 @@ async function processSkillGet(player, army, gameState) {
 }
 
 // スキルブレイク処理（軍ベース）
-async function processSkillBreak(player, army, gameState) {
+export async function processSkillBreak(player, army, gameState, armyNames) {
   const enemyArmy = army === 'A' ? 'B' : 'A';
   
   // 破壊スキルで追加ブレイク判定
@@ -205,7 +204,8 @@ async function processSkillBreak(player, army, gameState) {
 }
 
 // 猛毒効果処理（100の倍数レス時）- 軍ベース
-async function processPoisonEffect(interaction) {
+// send: メッセージ投稿関数（人間は interaction.followUp / 軍BOBは channel.send）
+export async function processPoisonEffect(send, armyNames) {
   const totalActions = await User.sum('gekiha_counts');
   
   if (totalActions % 100 === 0) {
@@ -233,7 +233,7 @@ async function processPoisonEffect(interaction) {
     
     if (poisonMessage) {
       await gameState.save();
-      await interaction.followUp(`### ☠️ **${totalActions}レス到達！猛毒発動！**\n${poisonMessage}`);
+      await send(`### ☠️ **${totalActions}レス到達！猛毒発動！**\n${poisonMessage}`);
     }
   }
 }
@@ -279,18 +279,18 @@ export async function executePassive(interaction) {
     
     // スキル関連処理
     if (action.type === 'skill_get') {
-      const skillResult = await processSkillGet(player, army, gameState);
+      const skillResult = await processSkillGet(player, army, gameState, armyNames);
       message += skillResult.message;
       totalDamage += skillResult.bonusDamage;
     } else if (action.type === 'skill_break') {
-      const breakResult = await processSkillBreak(player, army, gameState);
+      const breakResult = await processSkillBreak(player, army, gameState, armyNames);
       message += breakResult.message;
       totalDamage += breakResult.bonusDamage;
     }
-    
+
     // スキル効果適用
     if (action.type === 'normal_kill' || action.type === 'massive_kill') {
-      const skillEffects = await applySkillEffects(army, action, gameState);
+      const skillEffects = await applySkillEffects(army, action, gameState, armyNames);
       totalDamage += skillEffects.additionalDamage;
       totalHeal += skillEffects.selfHeal;
       
@@ -376,17 +376,17 @@ let bobTotalDamage = bobAction.kills || 0;
 let bobTotalHeal = 0;
 // BOBスキル関連処理
 if (bobAction.type === 'skill_get') {
-const bobSkillResult = await processSkillGet(bobUser, army, gameState);
+const bobSkillResult = await processSkillGet(bobUser, army, gameState, armyNames);
 bobMessage += bobSkillResult.message;
 bobTotalDamage += bobSkillResult.bonusDamage;
 } else if (bobAction.type === 'skill_break') {
-const bobBreakResult = await processSkillBreak(bobUser, army, gameState);
+const bobBreakResult = await processSkillBreak(bobUser, army, gameState, armyNames);
 bobMessage += bobBreakResult.message;
 bobTotalDamage += bobBreakResult.bonusDamage;
 }
 // BOBスキル効果適用
 if (bobAction.type === 'normal_kill' || bobAction.type === 'massive_kill') {
-const bobSkillEffects = await applySkillEffects(army, bobAction, gameState);
+const bobSkillEffects = await applySkillEffects(army, bobAction, gameState, armyNames);
 bobTotalDamage += bobSkillEffects.additionalDamage;
 bobTotalHeal += bobSkillEffects.selfHeal;
 if (bobSkillEffects.skillEffects.length > 0) {
@@ -431,7 +431,7 @@ await interaction.followUp(bobMessage);
 }
 }
     // 猛毒効果チェック
-    await processPoisonEffect(interaction);
+    await processPoisonEffect(msg => interaction.followUp(msg), armyNames);
     
     // 終戦判定
     const loserTeam = await checkShusen();

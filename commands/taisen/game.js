@@ -73,6 +73,10 @@ const User = sequelize.define('User', {
   skill_snipe:  { type: DataTypes.INTEGER, defaultValue: 0 },
   skills_data:  { type: DataTypes.TEXT,    defaultValue: '[]' },
 
+  // 軍BOBの性格タイプ（assault/guardian/tactician/ambush）
+  // ※ skills_data は技能習得制が配列として使うため、専用カラムに分離している
+  bob_type:     { type: DataTypes.STRING,  defaultValue: null },
+
 });
 
 // ゲームの状態を格納する GamaState

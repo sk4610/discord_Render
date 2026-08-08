@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChannelType } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { getArmyNames } from '../armyname/armyname.js';
-import { BOB_TYPES } from './armyBobManager.mjs';
+import { BOB_TYPES, getBobType } from './armyBobManager.mjs';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 
@@ -49,21 +49,12 @@ export const data = new SlashCommandBuilder()
       .setDescription('【settype用】変更後の性格タイプ')
       .setRequired(false)
       .addChoices(
-        { name: '猪突型🔥（火・雷を常に優先）',     value: 'assault' },
-        { name: '守護型💧（水・回復を常に優先）',     value: 'guardian' },
+        { name: '猪突型🔥（攻撃を最優先）',           value: 'assault' },
+        { name: '守護型💧（回復・蓄積を優先）',       value: 'guardian' },
         { name: '策士型🧠（戦局を読んで判断）',       value: 'tactician' },
-        { name: '奇襲型⚡（敵コイン消去に特化）',     value: 'ambush' }
+        { name: '奇襲型⚡（敵の妨害に特化）',         value: 'ambush' }
       )
   );
-
-function getBobTypeFromSkillsData(bob) {
-  try {
-    const data = JSON.parse(bob.skills_data || '{}');
-    return data.bobtype || 'tactician';
-  } catch {
-    return 'tactician';
-  }
-}
 
 export async function execute(interaction) {
   const mode = interaction.options.getString('mode');
@@ -87,7 +78,7 @@ export async function execute(interaction) {
       const formatBobs = (bobs, armyKey) => {
         if (bobs.length === 0) return `-# 　（BOBなし）\n`;
         return bobs.map(b => {
-          const typeKey = getBobTypeFromSkillsData(b);
+          const typeKey = getBobType(b);
           const typeInfo = BOB_TYPES[typeKey] || BOB_TYPES.tactician;
           const shortId = b.id.replace('armybob-', '');
           return `-# 　• **${b.username}**【${typeInfo.name}${typeInfo.emoji}】 ID:${shortId}　行動:${b.gekiha_counts}回 / 撃破:${b.total_kills}`;
@@ -116,11 +107,12 @@ export async function execute(interaction) {
         return await interaction.reply(`⚠️ BOB「${bobId}」が見つかりません。\n/armybob mode:listbobs でIDを確認してください。`);
       }
 
-      const oldTypeKey = getBobTypeFromSkillsData(bob);
+      const oldTypeKey = getBobType(bob);
       const oldTypeInfo = BOB_TYPES[oldTypeKey] || BOB_TYPES.tactician;
       const newTypeInfo = BOB_TYPES[newTypeKey] || BOB_TYPES.tactician;
 
-      await bob.update({ skills_data: JSON.stringify({ bobtype: newTypeKey }) });
+      // skills_data は技能習得制の技能保存に使うため触らない
+      await bob.update({ bob_type: newTypeKey });
 
       return await interaction.reply(
         `✅ **${bob.username}** の性格タイプを変更しました！\n` +
