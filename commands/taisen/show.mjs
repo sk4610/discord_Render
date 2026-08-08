@@ -1,7 +1,38 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
-import { armyNames } from '../armyname/armyname.js';
+import { getArmyNames } from '../armyname/armyname.js';
 import { parseComrades, formatComradeLine } from '../senyuu/senyuu_main.js';
+import { parseSkills, formatSkillSummary } from '../Skillgein/action.mjs';
+
+const BOB_EMOJI = '<:custom_emoji:1350367513271341088>';
+
+// 狙撃の判断材料として、脅威度の高い順に並べた一覧を作る
+function buildSkillRoster(members, limitPerArmy = 8) {
+  if (members.length === 0) return `-# 　（参加者なし）\n`;
+
+  const rows = members.map(u => {
+    const skills = parseSkills(u);
+    const atk = u.skill_atk ?? 1;
+    const mag = u.skill_magic ?? 1;
+    const spi = u.skill_spirit ?? 1;
+    const stat = atk + mag + spi;
+    return {
+      user: u, skills,
+      // 技能数を優先し、次にステータス合計で並べる（軍BOBの狙撃判断と同じ考え方）
+      score: skills.length * 10 + stat,
+      text: `-# 　${u.id.startsWith('armybob-') || u.id.startsWith('bob-') ? BOB_EMOJI + ' ' : ''}` +
+            `**${u.username}** 攻${atk}/魔${mag}/精${spi} 🎯${u.skill_snipe ?? 0}` +
+            ` ─ ${formatSkillSummary(skills, 3)}\n`,
+    };
+  });
+
+  rows.sort((a, b) => b.score - a.score);
+
+  let out = rows.slice(0, limitPerArmy).map(r => r.text).join('');
+  const rest = rows.length - limitPerArmy;
+  if (rest > 0) out += `-# 　…他${rest}名\n`;
+  return out;
+}
 
 export const data = new SlashCommandBuilder()
   .setName('show')
@@ -21,10 +52,13 @@ export async function execute(interaction) {
 
     const army = player.army;
     const gameState = await GameState.findOne();
-    
+
     if (!gameState) {
       return interaction.editReply('エラー: ゲームデータが見つかりません。');
     }
+
+    // カスタム軍名に対応（従来は既定名のA軍/B軍しか出なかった）
+    const armyNames = await getArmyNames();
 
     let message = `**現在の戦況**\n`;
 
@@ -159,6 +193,17 @@ export async function execute(interaction) {
         }
         message += `\n`;
       }
+
+    } else if (gameState.rule_type === 'skillgein') {
+      // 技能習得制：両軍の技能保有状況（狙撃の相手を選ぶための一覧）
+      const allUsers = await User.findAll();
+
+      message += `:sparkles: **両軍の技能状況**（脅威度の高い順・狙撃の参考に）\n`;
+      message += `**🟡 ${armyNames.A}**\n`;
+      message += buildSkillRoster(allUsers.filter(u => u.army === 'A'));
+      message += `**🟢 ${armyNames.B}**\n`;
+      message += buildSkillRoster(allUsers.filter(u => u.army === 'B'));
+      message += `-# 狙撃: \`/snipe target:名前\`（狙撃ポイント🎯が1以上必要）\n`;
     }
 
 
