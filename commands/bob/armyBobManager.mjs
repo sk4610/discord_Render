@@ -12,6 +12,8 @@ import { SKILL_MAP, rollPower, resolveSkillActivations } from '../Skillgein/acti
 import {
   parseComrades, serializeComrades, performSenyuuTurn, applySenyuuResult, formatComradeLine
 } from '../senyuu/senyuu_main.js';
+import { buildCoinStatusFixed } from '../coin/coin_common.js';
+import { checkAutoStatus } from '../taisen/autostatus.mjs';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 
@@ -133,6 +135,9 @@ export async function checkAndActBobs(client) {
         case 'senyuu':   await executeSenyuuBobsForArmy(army, client, channel); break;
       }
     }
+
+    // BOBの行動でもレス数・兵力が動くので戦況の自動表示を判定する
+    await checkAutoStatus(client);
 
   } catch (error) {
     console.error('❌ 軍BOBタイマーエラー:', error);
@@ -1124,16 +1129,9 @@ function rollCoin() {
 }
 
 // 両軍コイン状況テキスト生成
+// 表示順は誰の行動でも A軍 → B軍 で固定（人間側の表示と統一）
 function buildCoinStatus(army, gameState, armyNames) {
-  const enemyArmy = army === 'A' ? 'B' : 'A';
-  const fmt = (a) =>
-    `-# >>> 【${armyNames[a]}のコイン状況】` +
-    `🔥 火:${gameState[`${a.toLowerCase()}_fire_coin`]}枚 ` +
-    `🌲 木:${gameState[`${a.toLowerCase()}_wood_coin`]}枚 ` +
-    `:rock: 土:${gameState[`${a.toLowerCase()}_earth_coin`]}枚 ` +
-    `⚡ 雷:${gameState[`${a.toLowerCase()}_thunder_coin`]}枚 ` +
-    `💧 水:${gameState[`${a.toLowerCase()}_water_coin`]}枚\n`;
-  return fmt(army) + fmt(enemyArmy);
+  return buildCoinStatusFixed(gameState, armyNames);
 }
 
 // 加重ランダム階級

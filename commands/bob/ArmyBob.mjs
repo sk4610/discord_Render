@@ -35,7 +35,7 @@ export const data = new SlashCommandBuilder()
   )
   .addChannelOption(option =>
     option.setName('channel')
-      .setDescription('BOBの行動ログを投稿するチャンネル（省略すると投稿なし）')
+      .setDescription('BOBのログ投稿先（省略時はこのコマンドを打ったチャンネル）')
       .setRequired(false)
       .addChannelTypes(ChannelType.GuildText)
   )
@@ -138,7 +138,7 @@ export async function execute(interaction) {
       const currentTarget = gameState.armybob_target_size;
       const channelMention = gameState.armybob_channel_id
         ? `<#${gameState.armybob_channel_id}>`
-        : '未設定（投稿なし）';
+        : 'このチャンネル';
 
       // 現在の参加者数を表示
       const allUsers = await User.findAll();

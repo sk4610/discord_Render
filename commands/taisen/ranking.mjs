@@ -1,6 +1,15 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { User } from '../taisen/game.js';
-import { getArmyName } from '../kaikyu/kaikyu.mjs';
+import { User, GameState } from '../taisen/game.js';
+import { getArmyNames } from '../armyname/armyname.js';
+
+const BOB_EMOJI = '<:custom_emoji:1350367513271341088>';
+
+// BOBの種別判定
+function bobKind(id) {
+  if (id.startsWith('armybob-')) return 'army';   // 軍BOB
+  if (id.startsWith('bob-')) return 'personal';   // 個人BOB
+  return null;                                    // 人間
+}
 
 
 export const data = new SlashCommandBuilder()
@@ -25,14 +34,17 @@ export async function execute(interaction) {
       limit: 3
     });
 
-     // ユーザーIDからサーバーニックネームを取得
-    async function getUsername(guild, userId) {
+    // 表示名を取得（BOBはDiscordユーザーではないのでDBのusernameを使う）
+    async function getDisplayName(guild, player) {
+      const kind = bobKind(player.id);
+      if (kind === 'army')     return `${BOB_EMOJI} ${player.username}`;
+      if (kind === 'personal') return `${BOB_EMOJI} ${player.username}`;
       try {
-        const member = await guild.members.fetch(userId);
-        return member.displayName; // サーバーニックネームを取得
-      } catch (error) {
-        console.error(`ユーザー取得エラー: ${userId}`, error);
-        return '不明なユーザー'; // 取得に失敗した場合のデフォルト
+        const member = await guild.members.fetch(player.id);
+        return member.displayName;
+      } catch {
+        // 退出済みなどで取得できない場合はDBに残っている名前で代替
+        return player.username || '不明なユーザー';
       }
     }
 
@@ -46,28 +58,49 @@ export async function execute(interaction) {
     const totalActionsB = await User.sum('gekiha_counts', { where: { army: 'B' } }) || 0;
     const totalActions = totalActionsA + totalActionsB;
     
-    // A軍とB軍の名前を取得
-    const armyNameA = getArmyName('A');
-    const armyNameB = getArmyName('B');
-    
+    // A軍とB軍の名前を取得（カスタム軍名に対応）
+    const armyNames = await getArmyNames();
+    const armyNameA = armyNames.A;
+    const armyNameB = armyNames.B;
+
+    // 階級は階級制のときだけ意味を持つ
+    const gameState = await GameState.findByPk(1);
+    const showRank = gameState && gameState.rule_type === 'ranked';
+
+    // 人間 / BOB の内訳
+    const allUsers = await User.findAll();
+    const countBy = (army, pred) => allUsers.filter(u => u.army === army && pred(u)).length;
+    const humansA  = countBy('A', u => !bobKind(u.id));
+    const humansB  = countBy('B', u => !bobKind(u.id));
+    const armyBobA = countBy('A', u => bobKind(u.id) === 'army');
+    const armyBobB = countBy('B', u => bobKind(u.id) === 'army');
+    const persBobA = countBy('A', u => bobKind(u.id) === 'personal');
+    const persBobB = countBy('B', u => bobKind(u.id) === 'personal');
+
     // ランキング表示用のメッセージを作成
     let message = '🏆 **戦績ランキング (上位3名)** 🏆\n\n';
-    // A軍（きのこ）表示
+
+    const renderRow = async (player) => {
+      const name = await getDisplayName(guild, player);
+      const rankPart = showRank ? `（${player.rank}）` : '';
+      return `**${name}**${rankPart} - ${player.total_kills} 撃破\n`;
+    };
+
+    // A軍表示
     message += `:yellow_circle:  **${armyNameA}:**\n`;
-    for (const player of topA) {
-      const username = await getUsername(guild, player.id);
-      message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
-    }
-    // B軍（たけのこ）表示
+    for (const player of topA) message += await renderRow(player);
+    if (topA.length === 0) message += `-# （まだ参加者がいません）\n`;
+
+    // B軍表示
     message += `\n:green_circle:  **${armyNameB}:**\n`;
-    for (const player of topB) {
-      const username = await getUsername(guild, player.id);
-      message += `**${username}**（${player.rank}） - ${player.total_kills} 撃破\n`;
-    }
-    
+    for (const player of topB) message += await renderRow(player);
+    if (topB.length === 0) message += `-# （まだ参加者がいません）\n`;
+
     // **追加情報**
     message += `\n\n 📊 **戦況データ:**\n`;
     message += `・総ID数: **${totalUniquePlayers}**\n　${armyNameA} : ${armyNameB} = ${uniquePlayersA} : ${uniquePlayersB}\n`;
+    message += `　└ 内訳 ${armyNameA} 人間${humansA} / ${BOB_EMOJI}軍BOB${armyBobA} / 個人BOB${persBobA}\n`;
+    message += `　└ 内訳 ${armyNameB} 人間${humansB} / ${BOB_EMOJI}軍BOB${armyBobB} / 個人BOB${persBobB}\n`;
     message += `・総合計 **${totalActions}** レス（攻撃回数）\n　${armyNameA} : ${armyNameB} = ${totalActionsA} : ${totalActionsB}`;
 
     

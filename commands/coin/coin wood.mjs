@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { armyNames } from '../armyname/armyname.js';
 import { checkShusen } from '../taisen/game.js';
+import { buildCoinStatusFixed } from './coin_common.js';
 
 export const data = new SlashCommandBuilder()
   .setName('coin-wood')
@@ -141,20 +142,8 @@ export async function execute(interaction) {
   }
   
    // 軍全体のコイン状況表示（常時表示）
-   const enemyArmyVar = army === 'A' ? 'B' : 'A';
-   message += `-# >>> 【${armyNames[army]}のコイン状況】`;
-   message += `🔥 火: ${gameState[`${army.toLowerCase()}_fire_coin`]}枚 `;
-   message += `🌲 木: ${gameState[`${army.toLowerCase()}_wood_coin`]}枚 `;
-   message += `:rock: 土: ${gameState[`${army.toLowerCase()}_earth_coin`]}枚 `;
-   message += `⚡ 雷: ${gameState[`${army.toLowerCase()}_thunder_coin`]}枚 `;
-   message += `💧 水: ${gameState[`${army.toLowerCase()}_water_coin`]}枚\n`;
-    
-   message += `-# >>> 【${armyNames[enemyArmyVar]}のコイン状況】`;
-   message += `🔥 火: ${gameState[`${enemyArmyVar.toLowerCase()}_fire_coin`]}枚 `;
-   message += `🌲 木: ${gameState[`${enemyArmyVar.toLowerCase()}_wood_coin`]}枚 `;
-   message += `:rock: 土: ${gameState[`${enemyArmyVar.toLowerCase()}_earth_coin`]}枚 `;
-   message += `⚡ 雷: ${gameState[`${enemyArmyVar.toLowerCase()}_thunder_coin`]}枚 `;
-   message += `💧 水: ${gameState[`${enemyArmyVar.toLowerCase()}_water_coin`]}枚`;
+   // 表示順は誰が書き込んでも A軍 → B軍 で固定する
+   message += buildCoinStatusFixed(gameState, armyNames).trimEnd();
   
   // 個人戦績（獲得したら表示）
   if (acquired > 0){
