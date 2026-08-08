@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { GameState, User } from '../taisen/game.js';
 import { armyNames } from '../armyname/armyname.js';
+import { parseComrades, formatComradeLine } from '../senyuu/senyuu_main.js';
 
 export const data = new SlashCommandBuilder()
   .setName('show')
@@ -28,13 +29,16 @@ export async function execute(interaction) {
     let message = `**現在の戦況**\n`;
 
     // ゲームルール表示
-    if (gameState.rule_type === 'ranked') {
-      message += `-# >>> **ルール**: :military_helmet: 階級制\n`;
-    } else if (gameState.rule_type === 'coin') {
-      message += `-# >>> **ルール**: :coin: 属性コイン制\n`;
-    } else {
-      message += `-# >>> **ルール**: 未設定\n`;
-    }
+    const RULE_LABELS = {
+      ranked:    ':military_helmet: 階級制',
+      coin:      ':coin: 属性コイン制',
+      beast:     ':dragon_face: ビースト制',
+      passive:   ':gear: パッシブスキル制',
+      fighting:  ':fire: ファイティング制',
+      skillgein: ':sparkles: 技能習得制',
+      senyuu:    ':handshake: 戦友制',
+    };
+    message += `-# >>> **ルール**: ${RULE_LABELS[gameState.rule_type] || '未設定'}\n`;
 
     // 終戦状態チェック
     if (gameState.isGameOver) {
@@ -61,6 +65,11 @@ export async function execute(interaction) {
     
     if (gameState.rule_type === 'coin') {
       message += `-# >>> 個人コイン取得: 🔥${player.personal_fire_coin}枚　🌲${player.personal_wood_coin}枚　:rock:${player.personal_earth_coin}枚　⚡${player.personal_thunder_coin}枚　💧${player.personal_water_coin}枚\n\n`;
+    }
+
+    if (gameState.rule_type === 'senyuu') {
+      message += `-# >>> 🪖 **あなたの部隊**\n`;
+      message += formatComradeLine(parseComrades(player.comrades_data));
     }
     
     // === BOB情報 ===

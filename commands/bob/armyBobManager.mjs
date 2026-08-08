@@ -9,6 +9,9 @@ import {
 } from '../PassiveSkill/PassiveSkill.mjs';
 import { resolveFightingRoll, applyPunchEffect } from '../fighting/fighting_common.js';
 import { SKILL_MAP, rollPower, resolveSkillActivations } from '../Skillgein/action.mjs';
+import {
+  parseComrades, serializeComrades, performSenyuuTurn, applySenyuuResult, formatComradeLine
+} from '../senyuu/senyuu_main.js';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 
@@ -103,7 +106,7 @@ export async function checkAndActBobs(client) {
     if (!rule || rule === 'none') return;
 
     // 対応ルールチェック
-    const SUPPORTED_RULES = ['ranked', 'coin', 'beast', 'passive', 'fighting', 'skillgein'];
+    const SUPPORTED_RULES = ['ranked', 'coin', 'beast', 'passive', 'fighting', 'skillgein', 'senyuu'];
     if (!SUPPORTED_RULES.includes(rule)) return;
 
     const now = new Date();
@@ -127,6 +130,7 @@ export async function checkAndActBobs(client) {
         case 'passive':  await executePassiveBobsForArmy(army, client, channel); break;
         case 'fighting': await executeFightingBobsForArmy(army, client, channel); break;
         case 'skillgein':await executeSkillgeinBobsForArmy(army, client, channel); break;
+        case 'senyuu':   await executeSenyuuBobsForArmy(army, client, channel); break;
       }
     }
 
@@ -945,6 +949,81 @@ async function executeSkillgeinBobsForArmy(army, client, channel) {
 
     if (!channel) continue;
     try { await channel.send(msg); } catch (err) { console.error('❌ BOB技能習得投稿エラー:', err); }
+    await sleep(BOB_ACTION_DELAY_MS);
+  }
+}
+
+// ─────────────────────────────────────────────
+// 戦友制 BOB行動
+// ※ 行動が乱数のみで決まるルールのため、人間と同じ確率で動く
+//    （性格タイプは表示上の味付けのみ。BOBだけ有利にならないようにするため）
+// ─────────────────────────────────────────────
+
+async function executeSenyuuBobsForArmy(army, client, channel) {
+  const gameState = await GameState.findOne({ where: { id: 1 } });
+  if (!gameState || gameState.isGameOver) return;
+
+  const allInArmy = await User.findAll({ where: { army } });
+  const armyBobs = allInArmy.filter(u => u.id.startsWith(`armybob-${army}-`));
+  if (armyBobs.length === 0) return;
+
+  const armyNames = await getArmyNames();
+  const armyName = armyNames[army];
+
+  for (const bob of armyBobs) {
+    await gameState.reload();
+    if (gameState.isGameOver) break;
+
+    const typeKey = getBobType(bob);
+    const typeInfo = BOB_TYPES[typeKey] || BOB_TYPES.tactician;
+
+    const initialHP = gameState.initialArmyHP;
+    const myHP    = initialHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+    const enemyHP = initialHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+
+    const randomNum = Math.floor(Math.random() * 100);
+    const randomStr = randomNum.toString().padStart(2, '0');
+
+    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}**【${typeInfo.name}${typeInfo.emoji}】の行動！\n`;
+    msg += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**\n`;
+
+    const comrades = parseComrades(bob.comrades_data);
+    const result = performSenyuuTurn({ comrades, randomNum, myHP, enemyHP, initialHP });
+    msg += result.message;
+
+    // BOB更新
+    bob.comrades_data = serializeComrades(result.comrades);
+    bob.gekiha_counts += 1;
+    bob.total_kills += result.totalDamage;
+    await bob.save();
+
+    // 戦況反映
+    await applySenyuuResult(gameState, army, result.totalDamage, result.totalHeal);
+    await gameState.reload();
+
+    // 部隊編成（常時表示）
+    msg += `-# >>> 🪖 **${bob.username} の部隊**\n`;
+    msg += formatComradeLine(result.comrades);
+
+    if (result.totalDamage > 0 || result.totalHeal > 0) {
+      const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+      const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+      msg += `-# >>> ⚔️ 戦況: 🟡 ${armyNames.A} 兵力${aHP} | 🟢 ${armyNames.B} 兵力${bHP}\n`;
+      msg += `-# >>> 🏅 ${armyName} ${bob.username}　行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
+
+      // 終戦判定
+      if (aHP <= 0 || bHP <= 0) {
+        const winnerTeam = aHP > bHP ? armyNames.A : armyNames.B;
+        const loserTeam  = aHP > bHP ? armyNames.B : armyNames.A;
+        await gameState.update({ isGameOver: true });
+        msg += `\n**📢 ${loserTeam}の兵力が0になった！**\n`;
+        msg += `# 🎖 ${winnerTeam}の勝利だ！\n`;
+        msg += `**今次大戦は終戦した！次の大戦でまた会おう！**`;
+      }
+    }
+
+    if (!channel) continue;
+    try { await channel.send(msg); } catch (err) { console.error('❌ BOB戦友投稿エラー:', err); }
     await sleep(BOB_ACTION_DELAY_MS);
   }
 }

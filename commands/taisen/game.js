@@ -77,6 +77,10 @@ const User = sequelize.define('User', {
   // ※ skills_data は技能習得制が配列として使うため、専用カラムに分離している
   bob_type:     { type: DataTypes.STRING,  defaultValue: null },
 
+  // 戦友制フィールド
+  // {"front":{"name":"疾風のゲンジ","atk":2,"skill":"連撃"},"mid":null,"rear":null}
+  comrades_data: { type: DataTypes.TEXT, defaultValue: '{}' },
+
 });
 
 // ゲームの状態を格納する GamaState
