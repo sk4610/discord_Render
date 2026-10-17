@@ -1168,7 +1168,8 @@ async function executeSpellcardBobsForArmy(army, client, channel) {
     }
 
     // ステータス欄（常時表示）
-    msg += buildSpellStatusLines(bob.username, result.newHand, result.lv, result.myRates, armyName);
+    // BOBは投稿数が多いので手札は名前だけの1行にする（人間の書き込みが流れないように）
+    msg += buildSpellStatusLines(bob.username, result.newHand, result.lv, result.myRates, armyName, { detailed: false });
 
     if (!channel) continue;
     try { await channel.send(msg); } catch (err) { console.error('❌ BOBスペルカード投稿エラー:', err); }

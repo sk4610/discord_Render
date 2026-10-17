@@ -4,7 +4,7 @@ import { getArmyNames } from '../armyname/armyname.js';
 import { parseComrades, formatComradeLine } from '../senyuu/senyuu_main.js';
 import { parseSkills, formatSkillSummary } from '../Skillgein/action.mjs';
 import {
-  ELEMENTS, ELEMENT_KEYS, parseLevels, ensureHand, getArmyRates, formatHand
+  ELEMENTS, ELEMENT_KEYS, parseLevels, ensureHand, getArmyRates, formatHandDetailed
 } from '../spellcard/spellcard_main.js';
 
 const BOB_EMOJI = '<:custom_emoji:1350367513271341088>';
@@ -113,7 +113,8 @@ export async function execute(interaction) {
     if (gameState.rule_type === 'spellcard') {
       const hand = await ensureHand(player);
       const lv = parseLevels(player.spell_levels);
-      message += `-# >>> 🃏 手札: ${formatHand(hand)}\n`;
+      message += `-# >>> 🃏 手札\n`;
+      message += formatHandDetailed(hand, lv, getArmyRates(gameState, player.army));
       message += `-# >>> 📈 Lv: ${ELEMENT_KEYS.map(k => `${ELEMENTS[k].name}${lv[k]}`).join(' ')}\n`;
     }
     
