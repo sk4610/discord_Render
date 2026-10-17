@@ -102,11 +102,44 @@ export function formatHand(hand) {
   return hand.map((k, i) => `**${SLOT_LABELS[i]}** ${cardLabel(k)}`).join(' / ');
 }
 
-// レス下段のステータス欄（3行で簡潔に）
-export function buildSpellStatusLines(displayName, hand, lv, myRates, armyName) {
+// カード1枚の効果を、今のLvと成功率で計算した数値で1行にまとめる
+// 例: 🔥ファイア〔成功66%〕4ダメージ ／ 敵の木成功率→33%
+export function describeCard(key, lv, myRates) {
+  const card = CARDS[key];
+  const el = ELEMENTS[card.element];
+  const L = lv[card.element];
+
+  let effect;
+  switch (card.element) {
+    case 'fire':    effect = `${L * 2}ダメージ`; break;
+    case 'wood':    effect = `${L}ダメージ（敵が優勢なら+${L * 2}）`; break;
+    case 'earth':   effect = `${L}ダメージ（自軍が優勢なら+${L * 2}）`; break;
+    case 'thunder': effect = `${L}〜${L * 4}ダメージ`; break;
+    case 'water':   effect = `${L}ダメージ＋${L}回復`; break;
+  }
+
+  const next = ELEMENTS[el.next].name;
+  const tail = card.effect === 'debuff'
+    ? `敵の${next}成功率→${DEBUFF_RATE}%`
+    : `自軍の${next}成功率→${BUFF_RATE}%`;
+
+  return `${cardLabel(key)}〔成功${myRates[card.element]}%〕${effect} ／ ${tail}`;
+}
+
+// 手札3枚を効果つきで1枚1行ずつ
+export function formatHandDetailed(hand, lv, myRates) {
+  return hand.map((k, i) => `-# >>> **${SLOT_LABELS[i]}** ${describeCard(k, lv, myRates)}\n`).join('');
+}
+
+// レス下段のステータス欄
+// detailed=true  : 手札を効果つきで表示（人間向け。どのカードを選ぶかの判断材料）
+// detailed=false : 手札は名前だけの1行（軍BOB向け。投稿が長くなりすぎないように）
+export function buildSpellStatusLines(displayName, hand, lv, myRates, armyName, { detailed = true } = {}) {
   const lvText = ELEMENT_KEYS.map(k => `${ELEMENTS[k].name}${lv[k]}`).join(' ');
   const rateText = ELEMENT_KEYS.map(k => `${ELEMENTS[k].name}${myRates[k]}%`).join(' ');
-  let s = `-# >>> 🃏 ${displayName} の手札: ${formatHand(hand)}\n`;
+  let s = detailed
+    ? `-# >>> 🃏 ${displayName} の手札\n` + formatHandDetailed(hand, lv, myRates)
+    : `-# >>> 🃏 ${displayName} の手札: ${formatHand(hand)}\n`;
   s += `-# >>> 📈 Lv: ${lvText}　|　🎯 ${armyName}の成功率: ${rateText}\n`;
   return s;
 }
