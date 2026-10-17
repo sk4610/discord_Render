@@ -87,8 +87,9 @@ commands
 │　│                      //   showSpellHand：/action で手札とステータスを表示
 │　├ a.mjs                // /a　手札の1枚目（A）を使う
 │　├ b.mjs                // /b　手札の2枚目（B）を使う
-│　└ c.mjs                // /c　手札の3枚目（C）を使う
-│                         //   ※3ファイルとも executeSpellCard(interaction, 番号) を呼ぶだけ
+│　├ c.mjs                // /c　手札の3枚目（C）を使う
+│　│                      //   ※3ファイルとも executeSpellCard(interaction, 番号) を呼ぶだけ
+│　└ スペルカード制.txt   // ルール解説テキスト（Discord掲示用のテンプレ）
 │
 ├ shukei
 │　├ CountMode.mjs        // /count　終戦方式の切替（カウントアップ/ダウン・初期HP設定）

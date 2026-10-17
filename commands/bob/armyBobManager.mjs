@@ -18,7 +18,7 @@ import { buildCoinStatusFixed } from '../coin/coin_common.js';
 import { checkAutoStatus } from '../taisen/autostatus.mjs';
 import {
   CARDS, ELEMENTS as SPELL_ELEMENTS, SLOT_LABELS, parseLevels, parseHand, dealHand,
-  getArmyRates, performSpellTurn, applySpellResult, buildSpellStatusLines
+  getArmyRates, performSpellTurn, applySpellResult, buildSpellStatusLines, DEBUFF_RATE
 } from '../spellcard/spellcard_main.js';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
@@ -1031,7 +1031,8 @@ async function executeSenyuuBobsForArmy(army, client, channel) {
 
 // ─────────────────────────────────────────────
 // スペルカード制 BOB行動
-// ※ 発動判定（ゾロ目・00・成功率）は人間と同一。
+// ※ 発動判定（ゾロ目・10の倍数・00・成功率）は人間と同一。
+//    選んだカードはゾロ目なら「撃つカード」、10の倍数なら「鍛える属性」になる。
 //    性格タイプは「手札のどのカードを選ぶか」に反映する
 // ─────────────────────────────────────────────
 
@@ -1055,7 +1056,7 @@ function evaluateSpellCard(key, ctx) {
   // 付随効果の伸びしろ（既に100%/25%なら価値なし）
   const next = SPELL_ELEMENTS[el].next;
   const buffGain   = card.effect === 'buff'   ? Math.max(0, 100 - ctx.myRates[next]) / 100 : 0;
-  const debuffGain = card.effect === 'debuff' ? Math.max(0, ctx.enemyRates[next] - 25) / 100 : 0;
+  const debuffGain = card.effect === 'debuff' ? Math.max(0, ctx.enemyRates[next] - DEBUFF_RATE) / 100 : 0;
 
   return { key, card, el, next, rate, dmg, heal, buffGain, debuffGain };
 }

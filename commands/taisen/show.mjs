@@ -225,7 +225,7 @@ export async function execute(interaction) {
       message += `:flower_playing_cards: **両軍の属性成功率**\n`;
       message += `🟡 ${armyNames.A}: ${fmt('A')}\n`;
       message += `🟢 ${armyNames.B}: ${fmt('B')}\n`;
-      message += `-# カードは \`/a\` \`/b\` \`/c\` で使用（ゾロ目で発動・00で3枚すべて発動）\n`;
+      message += `-# カードは \`/a\` \`/b\` \`/c\` で使用（ゾロ目で発動・10の倍数でその属性Lv+1・00で3枚すべて発動）\n`;
     }
 
 
