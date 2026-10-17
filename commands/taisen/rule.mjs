@@ -23,7 +23,9 @@ export const data = new SlashCommandBuilder()
         //技能習得制
         { name: '技能習得制', value: 'skillgein' },
         // 戦友制
-        { name: '戦友制', value: 'senyuu' }
+        { name: '戦友制', value: 'senyuu' },
+        // スペルカード制
+        { name: 'スペルカード制', value: 'spellcard' }
       ));
 
 export async function execute(interaction) {
@@ -56,6 +58,8 @@ const gameState = await GameState.findByPk(1); // 保存した後にデータを
       await interaction.reply(`ルールを技能習得制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
     }else if(mode === 'senyuu'){
       await interaction.reply(`ルールを戦友制に設定しました！ 参加者は /start コマンドで軍に参加してください。`);
+    }else if(mode === 'spellcard'){
+      await interaction.reply(`ルールをスペルカード制に設定しました！ 参加者は /start コマンドで軍に参加し、/action で手札を確認してください。`);
     }
 
     } catch (error) {

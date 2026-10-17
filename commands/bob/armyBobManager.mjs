@@ -16,6 +16,10 @@ import {
 } from '../senyuu/senyuu_main.js';
 import { buildCoinStatusFixed } from '../coin/coin_common.js';
 import { checkAutoStatus } from '../taisen/autostatus.mjs';
+import {
+  CARDS, ELEMENTS as SPELL_ELEMENTS, SLOT_LABELS, parseLevels, parseHand, dealHand,
+  getArmyRates, performSpellTurn, applySpellResult, buildSpellStatusLines
+} from '../spellcard/spellcard_main.js';
 
 const BOB_EMOJI = "<:custom_emoji:1350367513271341088>";
 
@@ -110,7 +114,7 @@ export async function checkAndActBobs(client) {
     if (!rule || rule === 'none') return;
 
     // 対応ルールチェック
-    const SUPPORTED_RULES = ['ranked', 'coin', 'beast', 'passive', 'fighting', 'skillgein', 'senyuu'];
+    const SUPPORTED_RULES = ['ranked', 'coin', 'beast', 'passive', 'fighting', 'skillgein', 'senyuu', 'spellcard'];
     if (!SUPPORTED_RULES.includes(rule)) return;
 
     const now = new Date();
@@ -135,6 +139,7 @@ export async function checkAndActBobs(client) {
         case 'fighting': await executeFightingBobsForArmy(army, client, channel); break;
         case 'skillgein':await executeSkillgeinBobsForArmy(army, client, channel); break;
         case 'senyuu':   await executeSenyuuBobsForArmy(army, client, channel); break;
+        case 'spellcard':await executeSpellcardBobsForArmy(army, client, channel); break;
       }
     }
 
@@ -1020,6 +1025,152 @@ async function executeSenyuuBobsForArmy(army, client, channel) {
 
     if (!channel) continue;
     try { await channel.send(msg); } catch (err) { console.error('❌ BOB戦友投稿エラー:', err); }
+    await sleep(BOB_ACTION_DELAY_MS);
+  }
+}
+
+// ─────────────────────────────────────────────
+// スペルカード制 BOB行動
+// ※ 発動判定（ゾロ目・00・成功率）は人間と同一。
+//    性格タイプは「手札のどのカードを選ぶか」に反映する
+// ─────────────────────────────────────────────
+
+// カード1枚の評価（期待ダメージと付随効果の価値）
+function evaluateSpellCard(key, ctx) {
+  const card = CARDS[key];
+  const el = card.element;
+  const rate = ctx.myRates[el] / 100;
+  const lv = ctx.lv[el];
+
+  let dmg = 0;
+  let heal = 0;
+  switch (el) {
+    case 'fire':    dmg = lv * 2; break;
+    case 'wood':    dmg = lv + ((ctx.enemyHP - lv) > ctx.myHP ? lv * 2 : 0); break;
+    case 'earth':   dmg = lv + (ctx.myHP > (ctx.enemyHP - lv) ? lv * 2 : 0); break;
+    case 'thunder': dmg = lv * 2; break;   // 期待倍率 0.4×1 + 0.3×2 + 0.2×3 + 0.1×4 = 2.0
+    case 'water':   dmg = lv; heal = Math.min(lv, ctx.initialHP - ctx.myHP); break;
+  }
+
+  // 付随効果の伸びしろ（既に100%/25%なら価値なし）
+  const next = SPELL_ELEMENTS[el].next;
+  const buffGain   = card.effect === 'buff'   ? Math.max(0, 100 - ctx.myRates[next]) / 100 : 0;
+  const debuffGain = card.effect === 'debuff' ? Math.max(0, ctx.enemyRates[next] - 25) / 100 : 0;
+
+  return { key, card, el, next, rate, dmg, heal, buffGain, debuffGain };
+}
+
+function chooseSpellCard(typeKey, hand, ctx) {
+  const evals = hand.map((k, slot) => ({ slot, ...evaluateSpellCard(k, ctx) }));
+  const nextName = (e) => SPELL_ELEMENTS[e.next].name;
+  let score;
+  let reason;
+
+  switch (typeKey) {
+    case 'assault': // 猪突型：期待ダメージ最大のカード
+      score = e => e.rate * e.dmg;
+      reason = e => `猪突本能（期待ダメージ${(e.rate * e.dmg).toFixed(1)}）`;
+      break;
+
+    case 'guardian': // 守護型：回復と自軍の成功率アップを優先
+      score = e => e.rate * (e.heal * 3 + e.dmg * 0.5) + e.buffGain * 3;
+      reason = e => e.heal > 0 ? '守護本能（自軍を回復）'
+        : e.buffGain > 0 ? `守護本能（自軍の${nextName(e)}成功率を固める）`
+        : '守護本能（堅実に削る）';
+      break;
+
+    case 'ambush': // 奇襲型：敵の成功率を下げるカードを優先
+      score = e => e.rate * (e.debuffGain * 6 + e.dmg * 0.5);
+      reason = e => e.debuffGain > 0 ? `奇襲本能（敵の${nextName(e)}成功率を崩す）` : '奇襲本能（隙をうかがう）';
+      break;
+
+    default: { // 策士型：劣勢なら回復を重視し、成功率の書き換えも加味して総合判断
+      const losing = ctx.myHP < ctx.enemyHP;
+      score = e => e.rate * (e.dmg + e.heal * (losing ? 2 : 0.5)) + (e.buffGain + e.debuffGain) * 2;
+      reason = e => (losing && e.heal > 0) ? '戦局判断（劣勢なので回復）'
+        : (e.buffGain + e.debuffGain) > 0.5 ? `戦局判断（${nextName(e)}成功率を操作）`
+        : `戦局判断（期待ダメージ${(e.rate * e.dmg).toFixed(1)}）`;
+    }
+  }
+
+  let best = evals[0];
+  for (const e of evals) if (score(e) > score(best)) best = e;
+  return { slot: best.slot, reason: reason(best) };
+}
+
+async function executeSpellcardBobsForArmy(army, client, channel) {
+  const gameState = await GameState.findOne({ where: { id: 1 } });
+  if (!gameState || gameState.isGameOver) return;
+
+  const allInArmy = await User.findAll({ where: { army } });
+  const armyBobs = allInArmy.filter(u => u.id.startsWith(`armybob-${army}-`));
+  if (armyBobs.length === 0) return;
+
+  const enemy = army === 'A' ? 'B' : 'A';
+  const armyNames = await getArmyNames();
+  const armyName = armyNames[army];
+
+  for (const bob of armyBobs) {
+    await gameState.reload();
+    if (gameState.isGameOver) break;
+
+    const typeKey = getBobType(bob);
+    const typeInfo = BOB_TYPES[typeKey] || BOB_TYPES.tactician;
+
+    const initialHP = gameState.initialArmyHP;
+    const myHP    = initialHP - (army === 'A' ? gameState.b_team_kills : gameState.a_team_kills);
+    const enemyHP = initialHP - (army === 'A' ? gameState.a_team_kills : gameState.b_team_kills);
+
+    let hand = parseHand(bob.spell_hand);
+    if (hand.length === 0) hand = dealHand();
+    const lv = parseLevels(bob.spell_levels);
+    const myRates = getArmyRates(gameState, army);
+    const enemyRates = getArmyRates(gameState, enemy);
+
+    const { slot, reason } = chooseSpellCard(typeKey, hand, { lv, myRates, enemyRates, myHP, enemyHP, initialHP });
+
+    const randomNum = Math.floor(Math.random() * 100);
+    const randomStr = randomNum.toString().padStart(2, '0');
+
+    let msg = `-# ${BOB_EMOJI} **[軍BOB]** ${armyName} **${bob.username}**【${typeInfo.name}${typeInfo.emoji}】が ${SLOT_LABELS[slot]}:【${CARDS[hand[slot]].name}】を選択！\n`;
+    msg += `-# 　（${reason}）\n`;
+    msg += `** :scales: ｼﾞｬｯｼﾞﾅﾝﾊﾞｰ: __${randomStr}__**`;
+
+    const result = performSpellTurn({ hand, slot, randomNum, lv, myRates, enemyRates, myHP, enemyHP, initialHP });
+    msg += result.message;
+
+    // BOB更新
+    bob.spell_levels = JSON.stringify(result.lv);
+    bob.spell_hand = JSON.stringify(result.newHand);
+    bob.gekiha_counts += 1;
+    bob.total_kills += result.totalDamage;
+    await bob.save();
+
+    // 戦況・成功率を反映
+    await applySpellResult(gameState, army, result);
+    await gameState.reload();
+
+    if (result.totalDamage > 0 || result.totalHeal > 0) {
+      const aHP = gameState.initialArmyHP - gameState.b_team_kills;
+      const bHP = gameState.initialArmyHP - gameState.a_team_kills;
+      msg += `-# >>> ⚔️ 戦況: 🟡 ${armyNames.A} 兵力${aHP} | 🟢 ${armyNames.B} 兵力${bHP}\n`;
+      msg += `-# >>> 🏅 ${armyName} ${bob.username}　行動数: **${bob.gekiha_counts}回** 撃破数: **${bob.total_kills}撃破**\n`;
+
+      if (aHP <= 0 || bHP <= 0) {
+        const winnerTeam = aHP > bHP ? armyNames.A : armyNames.B;
+        const loserTeam  = aHP > bHP ? armyNames.B : armyNames.A;
+        await gameState.update({ isGameOver: true });
+        msg += `\n**📢 ${loserTeam}の兵力が0になった！**\n`;
+        msg += `# 🎖 ${winnerTeam}の勝利だ！\n`;
+        msg += `**今次大戦は終戦した！次の大戦でまた会おう！**`;
+      }
+    }
+
+    // ステータス欄（常時表示）
+    msg += buildSpellStatusLines(bob.username, result.newHand, result.lv, result.myRates, armyName);
+
+    if (!channel) continue;
+    try { await channel.send(msg); } catch (err) { console.error('❌ BOBスペルカード投稿エラー:', err); }
     await sleep(BOB_ACTION_DELAY_MS);
   }
 }

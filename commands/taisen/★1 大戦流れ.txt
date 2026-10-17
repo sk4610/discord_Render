@@ -1,5 +1,5 @@
 ================================================================
- きのたけBot フォルダ構造・処理の流れ　2026/08/08更新
+ きのたけBot フォルダ構造・処理の流れ　2026/10/17更新
 ================================================================
 
 commands
@@ -79,6 +79,17 @@ commands
 │                         //     parseComrades / applySenyuuResult など）
 │                         //   ※.jsのためコマンド自動登録の対象外
 │
+├ spellcard               ← 2026/10/17追加
+│　├ spellcard_main.js    // スペルカード制のコアロジック（.jsなのでコマンド登録対象外）
+│　│                      //   カード10種の定義・手札配布・発動判定・成功率判定
+│　│                      //   performSpellTurn / resolveCard / applySpellResult など
+│　│                      //   人間（/a /b /c）と軍BOBで共有
+│　│                      //   showSpellHand：/action で手札とステータスを表示
+│　├ a.mjs                // /a　手札の1枚目（A）を使う
+│　├ b.mjs                // /b　手札の2枚目（B）を使う
+│　└ c.mjs                // /c　手札の3枚目（C）を使う
+│                         //   ※3ファイルとも executeSpellCard(interaction, 番号) を呼ぶだけ
+│
 ├ shukei
 │　├ CountMode.mjs        // /count　終戦方式の切替（カウントアップ/ダウン・初期HP設定）
 │　└ shukeiNotice.js      // 集計通知の補助処理
@@ -107,7 +118,7 @@ commands
 │　│                      //   BOBはDiscordに存在しないIDなのでDBのusernameで表示
 │　│                      //   人間/軍BOB/個人BOBの内訳も表示する
 │　├ reset.mjs            // /reset　大戦データリセット（force_recreate:Trueで完全初期化）
-│　├ rule.mjs             // /rule　ルール設定（7種対応）
+│　├ rule.mjs             // /rule　ルール設定（8種対応）
 │　└ show.mjs             // /show　現在の戦況表示（ルール名・戦友の部隊編成も表示）
 │
 └ utils
@@ -133,6 +144,7 @@ commands
   rule_type = passive   → PassiveSkill.mjs     （パッシブスキル制）
   rule_type = skillgein → Skillgein/action.mjs （技能習得制）
   rule_type = senyuu    → senyuu/senyuu_main.js（戦友制）
+  rule_type = spellcard → 手札とステータスを表示（カードは /a /b /c で使う）
   rule_type = coin      → /coin-fire 等を案内
   rule_type = beast     → /beast を案内
   rule_type = fighting  → /punch /charge /burst を案内
@@ -152,6 +164,8 @@ commands
   ファイティング制 fight_value
   技能習得制      skill_atk / skill_magic / skill_spirit / skill_snipe / skills_data
   戦友制          comrades_data（前衛・中衛・後衛の3枠をJSONで保持）
+  スペルカード制  spell_levels（個人の火木土雷水Lv）/ spell_hand（手札3枚）
+                  ※GameState側に a_spell_rates / b_spell_rates（軍ごとの成功率）
   軍BOB共通       bob_type（性格タイプ。skills_dataとの衝突を避けるため専用カラム）
 
 【/reset の使い方】

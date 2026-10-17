@@ -3,6 +3,9 @@ import { GameState, User } from '../taisen/game.js';
 import { getArmyNames } from '../armyname/armyname.js';
 import { parseComrades, formatComradeLine } from '../senyuu/senyuu_main.js';
 import { parseSkills, formatSkillSummary } from '../Skillgein/action.mjs';
+import {
+  ELEMENTS, ELEMENT_KEYS, parseLevels, ensureHand, getArmyRates, formatHand
+} from '../spellcard/spellcard_main.js';
 
 const BOB_EMOJI = '<:custom_emoji:1350367513271341088>';
 
@@ -71,6 +74,7 @@ export async function execute(interaction) {
       fighting:  ':fire: ファイティング制',
       skillgein: ':sparkles: 技能習得制',
       senyuu:    ':handshake: 戦友制',
+      spellcard: ':flower_playing_cards: スペルカード制',
     };
     message += `-# >>> **ルール**: ${RULE_LABELS[gameState.rule_type] || '未設定'}\n`;
 
@@ -104,6 +108,13 @@ export async function execute(interaction) {
     if (gameState.rule_type === 'senyuu') {
       message += `-# >>> 🪖 **あなたの部隊**\n`;
       message += formatComradeLine(parseComrades(player.comrades_data));
+    }
+
+    if (gameState.rule_type === 'spellcard') {
+      const hand = await ensureHand(player);
+      const lv = parseLevels(player.spell_levels);
+      message += `-# >>> 🃏 手札: ${formatHand(hand)}\n`;
+      message += `-# >>> 📈 Lv: ${ELEMENT_KEYS.map(k => `${ELEMENTS[k].name}${lv[k]}`).join(' ')}\n`;
     }
     
     // === BOB情報 ===
@@ -204,6 +215,17 @@ export async function execute(interaction) {
       message += `**🟢 ${armyNames.B}**\n`;
       message += buildSkillRoster(allUsers.filter(u => u.army === 'B'));
       message += `-# 狙撃: \`/snipe target:名前\`（狙撃ポイント🎯が1以上必要）\n`;
+
+    } else if (gameState.rule_type === 'spellcard') {
+      // スペルカード制：両軍の属性成功率（どの属性のカードが通りやすいかの判断材料）
+      const fmt = (key) => {
+        const rates = getArmyRates(gameState, key);
+        return ELEMENT_KEYS.map(k => `${ELEMENTS[k].emoji}${rates[k]}%`).join(' ');
+      };
+      message += `:flower_playing_cards: **両軍の属性成功率**\n`;
+      message += `🟡 ${armyNames.A}: ${fmt('A')}\n`;
+      message += `🟢 ${armyNames.B}: ${fmt('B')}\n`;
+      message += `-# カードは \`/a\` \`/b\` \`/c\` で使用（ゾロ目で発動・00で3枚すべて発動）\n`;
     }
 
 
