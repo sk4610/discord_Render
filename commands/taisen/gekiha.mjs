@@ -4,6 +4,7 @@ import { kaikyu_main } from '../kaikyu/kaikyu_main.js';
 import { executePassive } from '../PassiveSkill/PassiveSkill.mjs';
 import { executeSkillgein } from '../Skillgein/action.mjs';
 import { executeSenyuu } from '../senyuu/senyuu_main.js';
+import { showSpellHand } from '../spellcard/spellcard_main.js';
 
 export const data = new SlashCommandBuilder()
   .setName('action')
@@ -37,6 +38,10 @@ export async function execute(interaction) {
       break;
     case 'senyuu':
       await executeSenyuu(interaction);
+      break;
+    case 'spellcard':
+      // スペルカード制はカードを /a /b /c で選ぶ。/action は手札の確認に使う
+      await showSpellHand(interaction);
       break;
     case 'coin':
       await interaction.reply('属性コイン制では `/coin-fire` などのコインコマンドを使ってください。');

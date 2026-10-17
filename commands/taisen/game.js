@@ -81,6 +81,12 @@ const User = sequelize.define('User', {
   // {"front":{"name":"疾風のゲンジ","atk":2,"skill":"連撃"},"mid":null,"rear":null}
   comrades_data: { type: DataTypes.TEXT, defaultValue: '{}' },
 
+  // スペルカード制フィールド
+  // spell_levels: {"fire":1,"wood":1,"earth":1,"thunder":1,"water":1}（初期値1）
+  // spell_hand  : ["fire","bamboo","titan"]（重複なしの3枚。A/B/Cの順）
+  spell_levels: { type: DataTypes.TEXT, defaultValue: '{}' },
+  spell_hand:   { type: DataTypes.TEXT, defaultValue: '[]' },
+
 });
 
 // ゲームの状態を格納する GamaState
@@ -180,6 +186,10 @@ const GameState = sequelize.define('GameState', {
  // 軍名設定用フィールド（追加）
   custom_army_a_name: { type: DataTypes.STRING, defaultValue: null },
   custom_army_b_name: { type: DataTypes.STRING, defaultValue: null },
+
+  // スペルカード制：軍ごとの属性成功率（初期値50%）
+  a_spell_rates: { type: DataTypes.TEXT, defaultValue: '{}' },
+  b_spell_rates: { type: DataTypes.TEXT, defaultValue: '{}' },
 
   // AUTO戦況表示用フィールド
   autostatus_enabled:    { type: DataTypes.BOOLEAN, defaultValue: false },
