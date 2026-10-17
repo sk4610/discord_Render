@@ -18,7 +18,7 @@ export const ELEMENTS = {
 export const ELEMENT_KEYS = Object.keys(ELEMENTS);
 
 // ─── カード定義（全10種） ────────────────────────────────────
-// effect: 'debuff' = 敵軍の next 属性の成功率を25%にする
+// effect: 'debuff' = 敵軍の next 属性の成功率を33%にする
 //         'buff'   = 自軍の next 属性の成功率を100%にする
 export const CARDS = {
   fire:      { name: 'ファイア',       element: 'fire',    effect: 'debuff' },
@@ -37,7 +37,11 @@ export const CARD_KEYS = Object.keys(CARDS);
 export const SLOT_LABELS = ['A', 'B', 'C'];   // /a /b /c に対応
 
 const DEFAULT_LV = 1;
-const DEFAULT_RATE = 50;
+// 成功率は 33 / 66 / 100 の三段階
+//   初期値66%、弱体カードで33%、強化カードで100%
+export const DEFAULT_RATE = 66;
+export const DEBUFF_RATE = 33;
+export const BUFF_RATE = 100;
 
 // ─── データの読み書き ────────────────────────────────────────
 function safeParse(raw, fallback) {
@@ -62,6 +66,12 @@ export function parseRates(raw) {
   const d = safeParse(raw, {});
   const out = {};
   for (const k of ELEMENT_KEYS) out[k] = Number.isInteger(d[k]) ? d[k] : DEFAULT_RATE;
+  // 移行措置：旧ルール（25/50/100）で保存された値を新ルール（33/66/100）に読み替える。
+  // 新ルールでは25と50が出ないので取り違えは起きない。大戦の途中で更新しても破綻しないため
+  for (const k of ELEMENT_KEYS) {
+    if (out[k] === 50) out[k] = DEFAULT_RATE;
+    if (out[k] === 25) out[k] = DEBUFF_RATE;
+  }
   return out;
 }
 
@@ -179,34 +189,39 @@ export function resolveCard(cardKey, state, rng = Math.random) {
     }
   }
 
-  // その後：Lv+1 と成功率の書き換え
-  state.lv[card.element] = lv + 1;
+  // その後：成功率の書き換え
+  // ※ カード使用によるLv+1は廃止（Lvは10の倍数でのみ上がる）。
+  //   当たった人だけが強くなり独走する「雪だるま」を抑えるため
   const target = ELEMENTS[el.next];
   if (card.effect === 'debuff') {
-    state.enemyRates[el.next] = 25;
-    message += `-# 　　${el.name}Lv ${lv}→**${lv + 1}**　/　敵軍の${target.name}成功率を **25%** に下げた！\n`;
+    state.enemyRates[el.next] = DEBUFF_RATE;
+    message += `-# 　　敵軍の${target.name}成功率を **${DEBUFF_RATE}%** に下げた！\n`;
   } else {
-    state.myRates[el.next] = 100;
-    message += `-# 　　${el.name}Lv ${lv}→**${lv + 1}**　/　自軍の${target.name}成功率を **100%** に上げた！\n`;
+    state.myRates[el.next] = BUFF_RATE;
+    message += `-# 　　自軍の${target.name}成功率を **${BUFF_RATE}%** に上げた！\n`;
   }
 
   return { message, damage, heal, success: true };
 }
 
 // ─── 1ターン分の処理 ─────────────────────────────────────────
-// 11〜99のゾロ目 → 選んだカードを発動
-// 00            → 手札3枚を A→B→C の順に全て発動
-// それ以外       → 何も起きない（手札もそのまま）
-// 発動したら（成功・失敗にかかわらず）新しい手札3枚を配り直す
+// 11〜99のゾロ目   → 選んだカードを発動し、手札3枚を配り直す
+// 00              → 手札3枚を A→B→C の順に全て発動し、手札3枚を配り直す
+//                   （00は10の倍数でもあるが、Lv+1は付かない）
+// 10,20,…,90      → 選んだカードの属性Lv+1（手札はそのまま）
+// それ以外         → 何も起きない（手札もそのまま）
+// 発動したら（成功率判定の成否にかかわらず）手札を配り直す
 // DBへの保存は呼び出し側が行う
 export function performSpellTurn({ hand, slot, randomNum, lv, myRates, enemyRates, myHP, enemyHP, initialHP, rng = Math.random }) {
   const state = { lv, myRates, enemyRates, myHP, enemyHP, initialHP };
   const isZorome = randomNum !== 0 && Math.floor(randomNum / 10) === randomNum % 10;
+  const isTen = randomNum !== 0 && randomNum % 10 === 0;
 
   let message = '';
   let totalDamage = 0;
   let totalHeal = 0;
   let activated = false;
+  let trained = null;   // 10の倍数で鍛えた属性
 
   const fire = (key) => {
     const r = resolveCard(key, state, rng);
@@ -223,6 +238,13 @@ export function performSpellTurn({ hand, slot, randomNum, lv, myRates, enemyRate
     activated = true;
     message += ` → ✨ **ゾロ目！ ${SLOT_LABELS[slot]}:【${CARDS[hand[slot]].name}】発動！**\n`;
     fire(hand[slot]);
+  } else if (isTen) {
+    trained = CARDS[hand[slot]].element;
+    const el = ELEMENTS[trained];
+    const before = state.lv[trained];
+    state.lv[trained] = before + 1;
+    message += ` → 📈 **10の倍数！ ${SLOT_LABELS[slot]}:【${CARDS[hand[slot]].name}】で${el.name}属性を鍛えた！**\n`;
+    message += `-# 　　${el.emoji} ${el.name}Lv ${before}→**${before + 1}**（手札はそのまま）\n`;
   } else {
     message += ` → ざんねん、カードは反応しなかった…\n`;
   }
@@ -231,7 +253,7 @@ export function performSpellTurn({ hand, slot, randomNum, lv, myRates, enemyRate
   if (activated) message += `-# 🔄 手札を配り直した\n`;
 
   return {
-    message, totalDamage, totalHeal, activated, newHand,
+    message, totalDamage, totalHeal, activated, trained, newHand,
     lv: state.lv, myRates: state.myRates, enemyRates: state.enemyRates,
   };
 }
@@ -280,7 +302,7 @@ export async function showSpellHand(interaction) {
 
   let msg = `-#  :military_helmet: ${armyNames[player.army]} ${interaction.member.displayName} の手札確認\n`;
   msg += buildSpellStatusLines(interaction.member.displayName, hand, lv, myRates, armyNames[player.army]);
-  msg += `-# 使うカードを \`/a\` \`/b\` \`/c\` で選ぼう（ゾロ目で発動、00なら3枚すべて発動）`;
+  msg += `-# カードを \`/a\` \`/b\` \`/c\` で選ぼう（ゾロ目で発動／10の倍数でその属性Lv+1／00なら3枚すべて発動）`;
   await interaction.reply(msg);
 }
 
